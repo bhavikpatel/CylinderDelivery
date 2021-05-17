@@ -20,9 +20,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.purchaseorder.purchaseOrderSorting"
+        <activity android:name=".ui.purchaseorder.EditPurchaseOrderActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.purchaseorder.purchaseOrderSorting"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Transparent"/>
+            android:theme="@style/Theme.Transparent" />
         <activity
             android:name=".ui.purchaseorder.AddPurchaseOrderActivity"
             android:screenOrientation="portrait" />

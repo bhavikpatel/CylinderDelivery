@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,10 +48,10 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
                 @Override
                 public void onClick(View v) {
                     int pos= (int) imgArrow.getTag ();
-                    /*Intent intent=new Intent(context, CylinderDetailActivity.class);
-                    intent.putExtra("editData",cylinderList.get(pos));
+                    Intent intent=new Intent(context, EditPurchaseOrderActivity.class);
+                    intent.putExtra("editData",podetailList.get(pos));
                     context.startActivity(intent);
-                    context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);*/
+                    context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
                     /*AlertDialog.Builder adb = new AlertDialog.Builder(context,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                     //adb.setView(alertDialogView);
                     adb.setTitle("You are sure won't be Delete this PO Detail!");

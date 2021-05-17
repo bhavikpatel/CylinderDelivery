@@ -114,7 +114,6 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         lvTab1=findViewById(R.id.lvTab1);
         txtLineinfoUnderline=findViewById(R.id.txtLineinfoUnderline);
 
-
         lvTab2=findViewById(R.id.lvTab2);
         txtPurchaseOrderDetail=findViewById(R.id.txtPurchaseOrderDetail);
         txtPurchasodUnderline=findViewById(R.id.txtPurchasodUnderline);
