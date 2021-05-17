@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "175649422407",
+    "project_id": "simba-22477",
+    "storage_bucket": "simba-22477.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:175649422407:android:88fcd7d89791e460cdc562",
+        "android_client_info": {
+          "package_name": "com.track.cylinderdelivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "175649422407-q7ubsv5ttbb7td50jf00bv4oi6vub55v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCr_usm-64xHfJmlp-gcTAo2njUQJY9b7Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "175649422407-q7ubsv5ttbb7td50jf00bv4oi6vub55v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

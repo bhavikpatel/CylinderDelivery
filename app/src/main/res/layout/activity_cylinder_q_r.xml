@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/barcode_scanner"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_above="@+id/buttonsLayout"
+        android:layout_alignParentTop="true">
+
+    </com.journeyapps.barcodescanner.DecoratedBarcodeView>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/buttonsLayout"
+        android:gravity="center"
+        android:layout_toLeftOf="@+id/centerHorizont">
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pause"
+            android:background="@drawable/button_background"
+            android:textColor="@color/white"
+            android:onClick="pause" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Resume"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/button_background"
+            android:textColor="@color/white"
+            android:onClick="resume" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/btnSubmit"
+            android:text="@string/submit"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/button_background"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <View
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/centerHorizont" />
+    <RelativeLayout
+        android:layout_toRightOf="@id/centerHorizont"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/buttonsLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/txtCount"
+            android:layout_height="wrap_content"
+            android:id="@+id/barcodePreview" />
+        <TextView
+            android:id="@+id/txtCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/read"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
+            android:textSize="20sp"
+            android:text="0" />
+        <ImageView
+            android:id="@+id/imgScanList"
+            android:layout_below="@+id/txtCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingRight="5dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/ic_baseline_format_list_bulleted_24"
+            android:text="1" />
+    </RelativeLayout>
+</RelativeLayout>
