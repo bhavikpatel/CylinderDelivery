@@ -153,6 +153,9 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         edtPoDate.setText(mapdata.get("strPODate"));
         PoDate=mapdata.get("poDate");
         edtPOGeneratedBy.setText(mapdata.get("poGeneratedBy"));
+        if(!edtPOGeneratedBy.getText().equals("")){
+            edtPOGeneratedBy.setEnabled(false);
+        }
         if(isNetworkConnected()){
             callGetActiveUserData();
         }else {

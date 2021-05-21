@@ -309,6 +309,13 @@ public class AddCompany extends AppCompatActivity {
         }else{
             edtEmail.setError(null);
         }
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        if (edtEmail.getText().toString().matches(emailPattern)) {
+            edtEmail.setError(null);
+        }else{
+            edtEmail.setError("valid email address.");
+            valid=false;
+        }
 
         return valid;
     }

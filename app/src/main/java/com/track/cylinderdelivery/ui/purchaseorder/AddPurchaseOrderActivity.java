@@ -146,6 +146,9 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
         edtPoNumber.setText(PONumber);
         edtPOGeneratedBy.setText(settings.getString("fullName",""));
+        if(!edtPOGeneratedBy.getText().equals("")){
+            edtPOGeneratedBy.setEnabled(false);
+        }
         if(isNetworkConnected()){
             callGetActiveUserData();
         }else {
