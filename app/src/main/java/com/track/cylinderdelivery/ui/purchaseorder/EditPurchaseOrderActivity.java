@@ -1,5 +1,6 @@
 package com.track.cylinderdelivery.ui.purchaseorder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,6 +21,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,7 +68,7 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
     private int UserId;
     String PONumber;
     private ArrayList<HashMap<String,String>> userList;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     private SharedPreferences settings;
     Calendar myCalendar;
     Button btnCancel,btnSaveAndContinue;
@@ -84,11 +86,11 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
     ArrayList<HashMap<String,String>> productList;
     NiceSpinner NSProduct;
     private String search="";
-    private int pageno=0;
+
     private int totalinpage=10;
     private String SortBy="";
     private String Sort="";
-    private int totalRecord;
+
     ArrayList<HashMap<String,String>> podetailList;
     ProductEditListAdapter productEditListAdapter;
     RecyclerView recyclerView;
@@ -97,6 +99,16 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
     EditText edtQuantity;
     private int quantity=0;
     private int productid=0;
+    Button btnLastSubmit;
+    SharedPreferences spSorting;
+    Button btnSaveAsDraft;
+
+    private ProgressBar progressBar;
+    Boolean isLoading=false;
+    Boolean isLastPage=false;
+    private int totalRecord;
+    private int pageno=0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,17 +136,22 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         txtPurchasodUnderline=findViewById(R.id.txtPurchasodUnderline);
         txtLineinfoUnderline=findViewById(R.id.txtLineinfoUnderline);
         NSProduct=findViewById(R.id.NSProduct);
-        podetailList=new ArrayList<>();
+
         recyclerView=findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         btnAdd=findViewById(R.id.btnAdd);
         edtQuantity=findViewById(R.id.edtQuantity);
+        btnLastSubmit=findViewById(R.id.btnLastSubmit);
+        spSorting=context.getSharedPreferences("POFilter",MODE_PRIVATE);
+        btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
+        progressBar=findViewById(R.id.progressBar);
 
         lvTab1.setVisibility(View.VISIBLE);
         lvTab2.setVisibility(View.GONE);
         edtPoNumber.setText(mapdata.get("poNumber"));
         edtPoDate.setText(mapdata.get("strPODate"));
+        PoDate=mapdata.get("poDate");
         edtPOGeneratedBy.setText(mapdata.get("poGeneratedBy"));
         if(isNetworkConnected()){
             callGetActiveUserData();
@@ -190,8 +207,11 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(isNetworkConnected()){
+                    SharedPreferences.Editor userFilterEditor = spSorting.edit();
+                    userFilterEditor.putBoolean("dofilter",true);
+                    userFilterEditor.commit();
                     PoNumber=edtPoNumber.getText().toString();
-                    PoDate=edtPoDate.getText().toString();
+                    //PoDate=edtPoDate.getText().toString();
                     POGeneratedBy=edtPOGeneratedBy.getText().toString();
                     if(validate()){
                         try {
@@ -224,6 +244,7 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
                     quantity=Integer.parseInt(edtQuantity.getText().toString()+"");
                     if(isNetworkConnected()){
                         try {
+                            podetailList.clear();
                             callAddEditPODetail();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -251,7 +272,132 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(v);
             }
         });
+
+        btnLastSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(podetailList.size()!=0){
+                    if(isNetworkConnected()){
+                        callSubmitPO();
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    Toast.makeText(context, "PO Detail are pending.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                Log.d("visibleItemCount==>",visibleItemCount+"");
+                Log.d("totalItemCount==>",totalItemCount+"");
+                Log.d("firstvisibleitmpos==>",firstVisibleItemPosition+"");
+                if (!isLoading && !isLastPage) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount < totalRecord) {
+                        if (isNetworkConnected()) {
+                            pageno++;
+                            Log.d("pageno==>", pageno + "");
+                            try {
+                                callAddEditPODetail();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                        }
+                        Log.d("callapi==>", "callapi");
+                    }
+                }
+            }
+        });
     }
+
+    private void callSubmitPO() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobPurchaseOrder/SubmitPO?POId="+POId+
+                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                        finish();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -353,10 +499,13 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
     private void updateLabel() {
-        //String myFormat = "MM/dd/yy"; //In which you need put here
+
         String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        edtPoDate.setText(sdf.format(myCalendar.getTime()));
+        PoDate=sdf.format(myCalendar.getTime());
+        String myFormat1 = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat sdf1 = new SimpleDateFormat(myFormat1, Locale.US);
+        edtPoDate.setText(sdf1.format(myCalendar.getTime()));
     }
     public boolean validate() {
         boolean valid = true;
@@ -551,6 +700,11 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
                     j = new JSONObject(Response);
                     totalRecord=j.getInt("totalRecord");
                     JSONArray jsonArray=j.getJSONArray("list");
+                    Boolean flgfirstload=false;
+                    if(podetailList==null){
+                        podetailList=new ArrayList<>();
+                        flgfirstload=true;
+                    }
                     for(int i=0;i<jsonArray.length();i++){
                         HashMap<String,String> map=new HashMap<>();
                         map.put("podetailid", String.valueOf(jsonArray.getJSONObject(i).getInt("poDetailId")));
@@ -560,7 +714,11 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
                         map.put("Quantity", String.valueOf(jsonArray.getJSONObject(i).getInt("quantity")));
                         podetailList.add(map);
                     }
+                    if(podetailList.size()>=totalRecord){
+                        isLastPage=true;
+                    }
                     if(productEditListAdapter==null){
+                        flgfirstload=false;
                         productEditListAdapter=new ProductEditListAdapter(podetailList,context);
                         recyclerView.setAdapter(productEditListAdapter);
                     }else {
@@ -573,7 +731,9 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //progressDialog.dismiss();
+                progressDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
+                isLoading=false;
                 String message = null;
                 if (error instanceof NetworkError) {
                     message = "Cannot connect to Internet...Please check your connection!";
@@ -697,9 +857,17 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
     }
 
     private void callAddEditPODetail() throws JSONException {
+        isLoading=true;
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
-        progressDialog.show();
+        if(podetailList==null){
+            isLoading=false;
+            isLastPage=false;
+            pageno=0;
+            progressDialog.show();
+        }else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         String url = BASE_URL+"/Api/MobPurchaseOrder/AddEditPODetail";
         final JSONObject jsonBody=new JSONObject();
         jsonBody.put("POId",POId);
@@ -707,39 +875,35 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         jsonBody.put("Quantity",quantity);
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
 
-        Log.d("jsonRequest==>",jsonBody.toString()+"");
+        Log.d("jsonRequest==>",url+jsonBody.toString()+"");
 
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         progressDialog.dismiss();
+                        progressBar.setVisibility(View.GONE);
+                        isLoading=false;
                         Log.d("response==>",response.toString()+"");
                         try{
                             JSONObject jsonObject=response;
                             if(jsonObject.getBoolean("status")){
                                 //Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
-                                int podetailid= jsonObject.getInt("data");
-                                HashMap<String,String> map=new HashMap<>();
-                                map.put("podetailid", String.valueOf(podetailid));
-                                map.put("POId", String.valueOf(POId));
-                                map.put("ProductId", String.valueOf(productid));
-                                map.put("productName",productList.get(prodpos-1).get("productName"));
-                                map.put("Quantity", String.valueOf(quantity));
-                                if(podetailList.size()!=0){
-                                    for(int i=0;i<podetailList.size();i++){
-                                        if(podetailList.get(i).get("ProductId").equals(String.valueOf(productid))){
-                                            podetailList.get(i).put("podetailid", String.valueOf(podetailid));
-                                            podetailList.get(i).put("POId", String.valueOf(POId));
-                                            podetailList.get(i).put("ProductId", String.valueOf(productid));
-                                            podetailList.get(i).put("productName",productList.get(prodpos-1).get("productName"));
-                                            podetailList.get(i).put("Quantity", String.valueOf(quantity));
-                                            break;
-                                        }else {
-                                            podetailList.add(map);
-                                        }
-                                    }
-                                }else {
+                                JSONObject dataobj=jsonObject.getJSONObject("data");
+                                 totalRecord= dataobj.getInt("totalRecord");
+                                JSONArray jsonArray=dataobj.getJSONArray("list");
+                                Boolean flgfirstload=false;
+                                if(podetailList==null){
+                                    podetailList=new ArrayList<>();
+                                    flgfirstload=true;
+                                }
+                                for(int i=0;i<jsonArray.length();i++){
+                                    HashMap<String,String> map=new HashMap<>();
+                                    map.put("podetailid", String.valueOf(jsonArray.getJSONObject(i).getInt("poDetailId")));
+                                    map.put("POId", String.valueOf(jsonArray.getJSONObject(i).getInt("poId")));
+                                    map.put("ProductId", String.valueOf(jsonArray.getJSONObject(i).getInt("productId")));
+                                    map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
+                                    map.put("Quantity", String.valueOf(jsonArray.getJSONObject(i).getInt("quantity")));
                                     podetailList.add(map);
                                 }
                                 if(productEditListAdapter==null){

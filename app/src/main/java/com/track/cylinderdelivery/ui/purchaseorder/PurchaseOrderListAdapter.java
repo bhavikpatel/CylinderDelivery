@@ -82,6 +82,8 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
                 holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_24);
         }else if(podetailList.get(position).get("status").equals("Draft")){
             holder.imgArrow.setImageResource(R.drawable.ic_baseline_edit_24);
+        }else {
+            holder.imgArrow.setVisibility(View.GONE);
         }
     }
 
