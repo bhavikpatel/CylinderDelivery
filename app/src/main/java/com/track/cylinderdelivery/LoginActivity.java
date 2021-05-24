@@ -49,6 +49,7 @@ public class LoginActivity extends BaseActivity {
     private Button btn_login;
     private EditText edt_user,edt_password;
     private SharedPreferences settings;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
    // private boolean loggedIN;
 
     @Override
@@ -149,8 +150,14 @@ public class LoginActivity extends BaseActivity {
                 return map;
             }
         };
-        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
-        requestQueue.add(jsonObjectRequest);
+/*        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        requestQueue.add(jsonObjectRequest);*/
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(jsonObjectRequest);
     }
 
 

@@ -219,12 +219,7 @@ public class AddUserActivity extends BaseActivity {
                             String Address2,String SecondaryPhone,String SecondaryEmail) {
         boolean valid = true;
 
-        if (SecondaryEmail.isEmpty()) {
-            edtSecondaryEmail.setError("Field is Required.");
-            valid = false;
-        } else {
-            edtSecondaryEmail.setError(null);
-        }
+
         if (SecondaryPhone.isEmpty()) {
             edtSecondaryMobile.setError("Field is Required.");
             valid = false;
@@ -278,6 +273,25 @@ public class AddUserActivity extends BaseActivity {
             valid=false;
         }else{
             edtEmail.setError(null);
+        }
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        if (edtEmail.getText().toString().matches(emailPattern)) {
+            edtEmail.setError(null);
+        }else{
+            edtEmail.setError("valid email address.");
+            valid=false;
+        }
+        if (SecondaryEmail.isEmpty()) {
+            edtSecondaryEmail.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtSecondaryEmail.setError(null);
+        }
+        if (edtSecondaryEmail.getText().toString().matches(emailPattern)) {
+            edtSecondaryEmail.setError(null);
+        }else{
+            edtSecondaryEmail.setError("valid email address.");
+            valid=false;
         }
         if(EmailPassword.isEmpty()){
             edtPassword.setError("Field is Required.");

@@ -243,12 +243,7 @@ public class AddCompany extends AppCompatActivity {
         } else {
             edtSecondaryMobile.setError(null);
         }
-        if (SecondaryEmail.isEmpty()) {
-            edtSecondaryEmail.setError("Field is Required.");
-            valid = false;
-        } else {
-            edtSecondaryEmail.setError(null);
-        }
+
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
             valid = false;
@@ -314,6 +309,18 @@ public class AddCompany extends AppCompatActivity {
             edtEmail.setError(null);
         }else{
             edtEmail.setError("valid email address.");
+            valid=false;
+        }
+        if (SecondaryEmail.isEmpty()) {
+            edtSecondaryEmail.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtSecondaryEmail.setError(null);
+        }
+        if (edtSecondaryEmail.getText().toString().matches(emailPattern)) {
+            edtSecondaryEmail.setError(null);
+        }else{
+            edtSecondaryEmail.setError("valid email address.");
             valid=false;
         }
 
