@@ -58,7 +58,7 @@ public class PurchaseOrderFragment extends Fragment {
     Context context;
     RecyclerView recyclerView;
     private ProgressBar progressBar;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     private SharedPreferences settings;
     private String search="";
     private int pageno=0;
@@ -357,7 +357,7 @@ public class PurchaseOrderFragment extends Fragment {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //progressDialog.dismiss();
+                    progressDialog.dismiss();
                     String message = null;
                     if (error instanceof NetworkError) {
                         message = "Cannot connect to Internet...Please check your connection!";
