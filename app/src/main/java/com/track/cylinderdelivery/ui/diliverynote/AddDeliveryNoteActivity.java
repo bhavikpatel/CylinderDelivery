@@ -45,6 +45,7 @@ import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.cylinder.AddCylinderActivity;
 import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
+import com.track.cylinderdelivery.ui.purchaseorder.ProductAddListAdapter;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -94,7 +95,11 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
     private int ClintUserId;
     private int clintuserpos=0;
     private ArrayList<HashMap<String,String>> DeliveryNotePOList;
-
+    private Button btnAdd;
+    private int ClientPenPurDetpos=0;
+    private int ProductId;
+    private int PODetailId;
+    private int Quantity=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +137,7 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         txtPurchasodUnderline=findViewById(R.id.txtPurchasodUnderline);
         NSClinetList=findViewById(R.id.NSClinetList);
         NSClientPenPurDet=findViewById(R.id.NSClientPenPurDet);
+        btnAdd=findViewById(R.id.btnAdd);
 
         lvTab1.setVisibility(View.VISIBLE);
         lvTab2.setVisibility(View.GONE);
@@ -144,6 +150,22 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(validate()){
+                    if(isNetworkConnected()){
+                        try {
+                            callAddDNCylinder();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
         btnSaveAndContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,6 +208,26 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                 hideSoftKeyboard(v);
             }
         });
+        NSClientPenPurDet.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                ClientPenPurDetpos=position;
+                if(position!=0) {
+                    ProductId = Integer.parseInt(DeliveryNotePOList.get(position - 1).get("productId"));
+                    PODetailId= Integer.parseInt(DeliveryNotePOList.get(position - 1).get("poDetailId"));
+                    Quantity= Integer.parseInt(DeliveryNotePOList.get(position - 1).get("quantity"));
+                }
+            }
+        });
+        NSClientPenPurDet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NSClientPenPurDet.setError(null);
+                hideSoftKeyboard(v);
+            }
+        });
         NSClinetList.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
@@ -205,6 +247,7 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         NSClinetList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NSClinetList.setError(null);
                 hideSoftKeyboard(v);
             }
         });
@@ -249,6 +292,107 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void callAddDNCylinder() throws JSONException {
+        //isLoading=true;
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        /*if(podetailList==null){
+            isLoading=false;
+            isLastPage=false;
+            pageno=0;*/
+            progressDialog.show();
+        /*}else {
+            progressBar.setVisibility(View.VISIBLE);
+        }*/
+        String url = BASE_URL+"/Api/MobDeliveryNote/AddEditDNDetail";
+        final JSONObject jsonBody=new JSONObject();
+        jsonBody.put("DNDetailId",JSONObject.NULL);
+        jsonBody.put("DNId",DNId);
+        jsonBody.put("CompanyId",Integer.parseInt(settings.getString("companyId","1")));
+        jsonBody.put("UserId",UserId);
+        jsonBody.put("ProductId",ProductId);
+        jsonBody.put("PODetailId",PODetailId);
+        jsonBody.put("Quantity",Quantity);
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        jsonBody.put("CylinderList",jsonArrayCylList);
+        Log.d("jsonRequest==>",jsonBody.toString()+"");
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        //progressBar.setVisibility(View.GONE);
+                       // isLoading=false;
+                        Log.d("response==>",response.toString()+"");
+                        try{
+                            JSONObject jsonObject=response;
+                            if(jsonObject.getBoolean("status")){
+                                //Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
+                                JSONObject dataobj=jsonObject.getJSONObject("data");
+                                //totalRecord= dataobj.getInt("totalRecord");
+                                JSONArray jsonArray=dataobj.getJSONArray("list");
+                                Boolean flgfirstload=false;
+/*                                if(podetailList==null){
+                                    podetailList=new ArrayList<>();
+                                    flgfirstload=true;
+                                }*/
+                                for(int i=0;i<jsonArray.length();i++){
+                                    HashMap<String,String> map=new HashMap<>();
+                                    map.put("podetailid", String.valueOf(jsonArray.getJSONObject(i).getInt("poDetailId")));
+                                    map.put("POId", String.valueOf(jsonArray.getJSONObject(i).getInt("poId")));
+                                    map.put("ProductId", String.valueOf(jsonArray.getJSONObject(i).getInt("productId")));
+                                    map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
+                                    map.put("Quantity", String.valueOf(jsonArray.getJSONObject(i).getInt("quantity")));
+                                   // podetailList.add(map);
+                                }
+/*                                if(podetailList.size()>=totalRecord){
+                                    isLastPage=true;
+                                }
+                                if(flgfirstload){
+                                    flgfirstload=false;
+                                    productAddListAdapter=new ProductAddListAdapter(podetailList,context);
+                                    recyclerView.setAdapter(productAddListAdapter);
+                                }else {
+                                    productAddListAdapter.notifyDataSetChanged();
+                                }*/
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        /*progressBar.setVisibility(View.GONE);
+                        isLoading=false;*/
+                        Log.d("response==>",error.toString()+"");
+                    }
+                }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
     }
 
     private void callGetDeliveryNotePOList() {
@@ -620,84 +764,18 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         } else {
             txtCylinderNos.setError(null);
         }
-  /*      if (wharehouspos<=0) {
-            spWarehouse.setError("Field is Required.");
+       if (clintuserpos<=0) {
+           NSClinetList.setError("Field is Required.");
             valid = false;
         } else {
-            spWarehouse.setError(null);
+           NSClinetList.setError(null);
         }
-        if (ManufacturingDate.isEmpty()) {
-            edtManufacturingDate.setError("Field is Required.");
-            valid = false;
-        } else {
-            edtManufacturingDate.setError(null);
-        }
-        if(Company.isEmpty()){
-            edtCompanyName.setError("Field is Required.");
-            valid=false;
-        }else {
-            edtCompanyName.setError(null);
-        }
-        if(Address1.isEmpty()){
-            edtAddress1.setError("Field is Required.");
-            valid=false;
-        }else {
-            edtAddress1.setError(null);
-        }
-        if(Address2.isEmpty()){
-            edtAddress2.setError("Field is Required.");
-            valid=false;
-        }else {
-            edtAddress2.setError(null);
-        }
-        if(City.isEmpty()){
-            editCity.setError("Field is Required.");
-            valid=false;
-        }else {
-            editCity.setError(null);
-        }
-        if(Country.isEmpty()){
-            edtCountry.setError("Field is Required.");
-            valid=false;
-        }else{
-            edtCountry.setError(null);
-        }
-        if(ZipCode.isEmpty()){
-            edtZipCode.setError("Field is Required.");
-            valid=false;
-        }else{
-            edtZipCode.setError(null);
-        }
-        if(ValueComanyName.isEmpty()){
-            edtValveCompanyName.setError("Field is Required.");
-            valid=false;
-        }else{
-            edtValveCompanyName.setError(null);
-        }
-        if(PurchaeDate.isEmpty()){
-            edtPurchaesDate.setError("Field is Required.");
-            valid=false;
-        }else{
-            edtPurchaesDate.setError(null);
-        }
-        if(ExpireDate.isEmpty()){
-            edtExpireDate.setError("Field is Required.");
-            valid=false;
-        }else{
-            edtExpireDate.setError(null);
-        }
-        if(PaintExpireDays.isEmpty()){
-            edtPaintExpireMonth.setError("Field is Required.");
-            valid=false;
-        }else {
-            edtExpireDate.setError(null);
-        }
-        if(TestingPeriodDays.isEmpty()){
-            edtTestingPeriodMonth.setError("Field is Required.");
-            valid=false;
-        }else {
-            edtTestingPeriodMonth.setError(null);
-        }*/
+       if(ClientPenPurDetpos<=0){
+           NSClientPenPurDet.setError("Field is Required.");
+           valid = false;
+       }else {
+           NSClientPenPurDet.setError(null);
+       }
         return valid;
     }
     private boolean isNetworkConnected() {
