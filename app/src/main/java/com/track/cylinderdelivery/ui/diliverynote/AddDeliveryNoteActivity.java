@@ -99,7 +99,8 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
     private int ClientPenPurDetpos=0;
     private int ProductId;
     private int PODetailId;
-    private int Quantity=0;
+    private int remainingQty=0;
+    private int totalRecord=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +150,20 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         }else{
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
+
+        txtClientInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lvTab1.setVisibility(View.VISIBLE);
+                lvTab2.setVisibility(View.GONE);
+                txtPurchaseOrderDetail.setTextColor(getResources().getColor(R.color.lightGrey));
+                txtClientInfo.setTextColor(getResources().getColor(R.color.green));
+                txtLineinfoUnderline.setBackgroundColor(getResources().getColor(R.color.green));
+                txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
+                //NSClinetList.setSelected(false);
+                //NSClientPenPurDet.setSelected(false);
+            }
+        });
 
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,7 +232,7 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                 if(position!=0) {
                     ProductId = Integer.parseInt(DeliveryNotePOList.get(position - 1).get("productId"));
                     PODetailId= Integer.parseInt(DeliveryNotePOList.get(position - 1).get("poDetailId"));
-                    Quantity= Integer.parseInt(DeliveryNotePOList.get(position - 1).get("quantity"));
+                    remainingQty= Integer.parseInt(DeliveryNotePOList.get(position - 1).get("remainingQty"));
                 }
             }
         });
@@ -314,11 +329,12 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         jsonBody.put("UserId",UserId);
         jsonBody.put("ProductId",ProductId);
         jsonBody.put("PODetailId",PODetailId);
-        jsonBody.put("Quantity",Quantity);
-        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("Quantity",remainingQty);
         JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
-        jsonBody.put("CylinderList",jsonArrayCylList);
+        jsonBody.put("Cylinders",jsonArrayCylList);
         Log.d("jsonRequest==>",jsonBody.toString()+"");
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -332,7 +348,7 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                             if(jsonObject.getBoolean("status")){
                                 //Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
                                 JSONObject dataobj=jsonObject.getJSONObject("data");
-                                //totalRecord= dataobj.getInt("totalRecord");
+                                totalRecord= dataobj.getInt("totalRecord");
                                 JSONArray jsonArray=dataobj.getJSONArray("list");
                                 Boolean flgfirstload=false;
 /*                                if(podetailList==null){
@@ -341,11 +357,24 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                                 }*/
                                 for(int i=0;i<jsonArray.length();i++){
                                     HashMap<String,String> map=new HashMap<>();
-                                    map.put("podetailid", String.valueOf(jsonArray.getJSONObject(i).getInt("poDetailId")));
-                                    map.put("POId", String.valueOf(jsonArray.getJSONObject(i).getInt("poId")));
-                                    map.put("ProductId", String.valueOf(jsonArray.getJSONObject(i).getInt("productId")));
+                                    map.put("dnDetailId", jsonArray.getJSONObject(i).getString("dnDetailId"));
+                                    map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
+                                    map.put("companyId", jsonArray.getJSONObject(i).getString("companyId"));
+                                    map.put("userId",jsonArray.getJSONObject(i).getString("userId"));
+                                    map.put("productId", jsonArray.getJSONObject(i).getString("productId"));
                                     map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
-                                    map.put("Quantity", String.valueOf(jsonArray.getJSONObject(i).getInt("quantity")));
+                                    map.put("poDetailId",jsonArray.getJSONObject(i).getString("poDetailId"));
+                                    map.put("quantity",jsonArray.getJSONObject(i).getString("quantity"));
+                                    map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
+                                    map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                                    map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
+                                    map.put("createdDateStr",jsonArray.getJSONObject(i).getString("createdDateStr"));
+                                    map.put("userName",jsonArray.getJSONObject(i).getString("userName"));
+                                    map.put("deliveryNoteNo",jsonArray.getJSONObject(i).getString("deliveryNoteNo"));
+                                    map.put("poNo",jsonArray.getJSONObject(i).getString("poNo"));
+                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+                                    map.put("cylinders",jsonArray.getJSONObject(i).getString("cylinders"));
+
                                    // podetailList.add(map);
                                 }
 /*                                if(podetailList.size()>=totalRecord){
