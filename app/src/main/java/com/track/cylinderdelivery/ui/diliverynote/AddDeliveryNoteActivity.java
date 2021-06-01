@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
@@ -64,7 +66,7 @@ import java.util.Map;
 
 public class AddDeliveryNoteActivity extends AppCompatActivity {
 
-    Context context;
+    AddDeliveryNoteActivity context;
     /////////////////////////////////////1 part
     EditText edtDNnumber,edtDNDate,edtDNGeneratedBy;
     Calendar myCalendar;
@@ -101,6 +103,9 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
     private int PODetailId;
     private int remainingQty=0;
     private int totalRecord=0;
+    private ArrayList<HashMap<String,String>> dNDetailList;
+    private DNDetailListAdapter dNDetailListAdapter;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +144,9 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         NSClinetList=findViewById(R.id.NSClinetList);
         NSClientPenPurDet=findViewById(R.id.NSClientPenPurDet);
         btnAdd=findViewById(R.id.btnAdd);
+        recyclerView=findViewById(R.id.recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(layoutManager);
 
         lvTab1.setVisibility(View.VISIBLE);
         lvTab2.setVisibility(View.GONE);
@@ -351,10 +359,10 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                                 totalRecord= dataobj.getInt("totalRecord");
                                 JSONArray jsonArray=dataobj.getJSONArray("list");
                                 Boolean flgfirstload=false;
-/*                                if(podetailList==null){
-                                    podetailList=new ArrayList<>();
-                                    flgfirstload=true;
-                                }*/
+                                if(dNDetailList==null){
+                                    dNDetailList=new ArrayList<>();
+                                  //  flgfirstload=true;
+                                }
                                 for(int i=0;i<jsonArray.length();i++){
                                     HashMap<String,String> map=new HashMap<>();
                                     map.put("dnDetailId", jsonArray.getJSONObject(i).getString("dnDetailId"));
@@ -375,8 +383,11 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                                     map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
                                     map.put("cylinders",jsonArray.getJSONObject(i).getString("cylinders"));
 
-                                   // podetailList.add(map);
+                                    dNDetailList.add(map);
                                 }
+                                dNDetailListAdapter=new DNDetailListAdapter(dNDetailList,context);
+                                recyclerView.setAdapter(dNDetailListAdapter);
+
 /*                                if(podetailList.size()>=totalRecord){
                                     isLastPage=true;
                                 }
