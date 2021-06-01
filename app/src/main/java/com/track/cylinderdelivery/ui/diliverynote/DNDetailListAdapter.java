@@ -53,12 +53,12 @@ public class DNDetailListAdapter extends RecyclerView.Adapter<DNDetailListAdapte
                     context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);*/
                     AlertDialog.Builder adb = new AlertDialog.Builder(context,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                     //adb.setView(alertDialogView);
-                    adb.setTitle("You are sure won't be Delete this PO Detail!");
+                    adb.setTitle("You are sure won't be Delete this DN Detail!");
                     adb.setIcon(R.drawable.ic_baseline_delete_24);
                     adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             if(isNetworkConnected()){
-                               // context.callChangeCompanyStatus(podetailList.get(pos).get("podetailid"));
+                                context.callDeleteDNDetail(DNdetailList.get(pos).get("dnDetailId"));
                             }else {
                                 Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                             }
@@ -75,8 +75,6 @@ public class DNDetailListAdapter extends RecyclerView.Adapter<DNDetailListAdapte
         }
     }
 
-
-
     @NonNull
     @Override
     public DNDetailListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -92,8 +90,9 @@ public class DNDetailListAdapter extends RecyclerView.Adapter<DNDetailListAdapte
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         holder.imgArrow.setTag(position);
-        holder.txtProductName.setText(DNdetailList.get(position).get("productName"));
-        holder.txtQuantity.setText("Quantity: "+ DNdetailList.get(position).get("Quantity"));
+        holder.txtProductName.setText(DNdetailList.get(position).get("userName"));
+        holder.txtQuantity.setText(DNdetailList.get(position).get("productName")+"/"+
+                DNdetailList.get(position).get("quantity"));
     }
 
     @Override

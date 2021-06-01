@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,11 +37,14 @@ import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.product.AddProductActivity;
 import com.track.cylinderdelivery.ui.purchaseorder.AddPurchaseOrderActivity;
+import com.track.cylinderdelivery.ui.purchaseorder.PurchaseOrderListAdapter;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +55,18 @@ public class DeliveryNoteFragment extends Fragment {
     Context context;
     private SharedPreferences settings;
     private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private String search="";
+    private int pageno=0;
+    private int totalinpage=10;
+    private String Sort="desc";
+    private int SortBy;
+    private ProgressBar progressBar;
+    private ArrayList<HashMap<String,String>> deliveryNoteList;
+    private int totalRecord;
+    private boolean isLoading=false;
+    private boolean isLastPage=false;
+    private DeliveryNoteListAdapter deliveryNoteListAdapter;
+    RecyclerView recyclerView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -59,22 +75,164 @@ public class DeliveryNoteFragment extends Fragment {
         setHasOptionsMenu(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.Delivery_Note_List
         ));
-       // final TextView textView = root.findViewById(R.id.text_home);
-       // final Button button=root.findViewById(R.id.button);
-        //Button btnAddProduct=root.findViewById(R.id.btnAddProduct);
-        RecyclerView recyclerView=root.findViewById(R.id.rv_delivery_list);
+
+        recyclerView=root.findViewById(R.id.rv_delivery_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
+        progressBar=root.findViewById(R.id.progressBar);
 
-/*        btnAddProduct.setOnClickListener(new View.OnClickListener() {
+        if(isNetworkConnected()){
+            callGetDeliveryNoteList();
+        }else {
+            Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+        }
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(getActivity(), AddProductActivity.class);
-                getActivity().startActivity(intent);
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
             }
-        });*/
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int visibleItemCount = layoutManager.getChildCount();
+                int totalItemCount = layoutManager.getItemCount();
+                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                Log.d("visibleItemCount==>",visibleItemCount+"");
+                Log.d("totalItemCount==>",totalItemCount+"");
+                Log.d("firstvisibleitmpos==>",firstVisibleItemPosition+"");
+                if (!isLoading && !isLastPage) {
+                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0
+                            && totalItemCount < totalRecord) {
+                        if (isNetworkConnected()) {
+                            pageno++;
+                            Log.d("pageno==>", pageno + "");
+                            callGetDeliveryNoteList();
+                        } else {
+                            Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                        }
+                        Log.d("callapi==>", "callapi");
+                    }
+                }
+            }
+        });
+
         return root;
+    }
+
+    private void callGetDeliveryNoteList() {
+        isLoading=true;
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        if(deliveryNoteList==null){
+            isLoading=false;
+            isLastPage=false;
+            pageno=0;
+            progressDialog.show();
+        }else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        //http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteList?search=&pageno=0&totalinpage=10&SortBy=&Sort=desc&UserId=1&CompanyId=1&UserType=Admin
+        String url = "http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteList?search="+search+
+                "&pageno="+pageno+"&totalinpage="+totalinpage+
+                "&SortBy="+SortBy+"&Sort="+Sort+
+                "&UserId="+Integer.parseInt(settings.getString("userId","1"))+
+                "&CompanyId="+Integer.parseInt(settings.getString("companyId","1"))+
+                "&UserType="+settings.getString("userType","1");
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
+                isLoading=false;
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    totalRecord=j.getInt("totalRecord");
+                    JSONArray jsonArray=j.getJSONArray("list");
+                    Boolean flgfirstload=false;
+                    if(deliveryNoteList==null){
+                        deliveryNoteList=new ArrayList<>();
+                        flgfirstload=true;
+                    }
+
+                    for(int i=0;i<jsonArray.length();i++){
+                        HashMap<String,String> map=new HashMap<>();
+                        map.put("dnId",jsonArray.getJSONObject(i).getInt("dnId")+"");
+                        map.put("dnNumber",jsonArray.getJSONObject(i).getString("dnNumber")+"");
+                        map.put("userId",jsonArray.getJSONObject(i).getString("userId")+"");
+                        map.put("status",jsonArray.getJSONObject(i).getString("status")+"");
+                        map.put("dnDate",jsonArray.getJSONObject(i).getString("dnDate")+"");
+                        map.put("dnGeneratedBy",jsonArray.getJSONObject(i).getString("dnGeneratedBy")+"");
+                        map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy")+"");
+                        map.put("strDNDate",jsonArray.getJSONObject(i).getString("strDNDate")+"");
+                        map.put("username",jsonArray.getJSONObject(i).getString("username")+"");
+                        map.put("quantity",jsonArray.getJSONObject(i).getString("quantity")+"");
+                        map.put("dndm",jsonArray.getJSONObject(i).getString("dndm")+"");
+                        map.put("dnrcm",jsonArray.getJSONObject(i).getString("dnrcm"));
+                        map.put("toCompanyId",jsonArray.getJSONObject(i).getString("toCompanyId"));
+                        deliveryNoteList.add(map);
+                    }
+
+                    if(deliveryNoteList.size()>=totalRecord){
+                        isLastPage=true;
+                    }
+                    if(flgfirstload){
+                        flgfirstload=false;
+                        deliveryNoteListAdapter=new DeliveryNoteListAdapter(deliveryNoteList,getActivity());
+                        recyclerView.setAdapter(deliveryNoteListAdapter);
+                    }else {
+                        deliveryNoteListAdapter.notifyDataSetChanged();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
+                isLoading=false;
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 
     @Override
