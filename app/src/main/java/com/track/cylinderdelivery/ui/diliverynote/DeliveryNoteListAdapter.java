@@ -47,10 +47,10 @@ public class DeliveryNoteListAdapter extends RecyclerView.Adapter<DeliveryNoteLi
                 public void onClick(View v) {
                     int pos= (int) imgArrow.getTag ();
                     if(podetailList.get(pos).get("status").equals("Draft")){
-                        /*Intent intent=new Intent(context, EditPurchaseOrderActivity.class);
+                        Intent intent=new Intent(context, EditDeliveryNoteActivity.class);
                         intent.putExtra("editData",podetailList.get(pos));
                         context.startActivity(intent);
-                        context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);*/
+                        context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
                     }
                 }
             });

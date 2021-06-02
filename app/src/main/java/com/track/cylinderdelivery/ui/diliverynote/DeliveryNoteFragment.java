@@ -73,6 +73,7 @@ public class DeliveryNoteFragment extends Fragment {
     RecyclerView recyclerView;
     SearchView svSearch;
     LinearLayout lvSortingParent;
+    SharedPreferences spSorting;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -89,6 +90,8 @@ public class DeliveryNoteFragment extends Fragment {
         progressBar=root.findViewById(R.id.progressBar);
         svSearch=root.findViewById(R.id.svSearch);
         lvSortingParent=root.findViewById(R.id.lvSortingParent);
+        spSorting=context.getSharedPreferences("DNFilter",MODE_PRIVATE);
+
 
         if(isNetworkConnected()){
             callGetDeliveryNoteList();
@@ -99,8 +102,8 @@ public class DeliveryNoteFragment extends Fragment {
         lvSortingParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent intent=new Intent(context, purchaseOrderSorting.class);
-                startActivity(intent);*/
+                Intent intent=new Intent(context, DeliveryNoteSortingActivity.class);
+                startActivity(intent);
             }
         });
         svSearch.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -173,6 +176,28 @@ public class DeliveryNoteFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(spSorting.getBoolean("dofilter",false)){
+            SharedPreferences.Editor userFilterEditor = spSorting.edit();
+            userFilterEditor.putBoolean("dofilter",false);
+            userFilterEditor.commit();
+            SortBy=spSorting.getInt("index1",1);
+            if(spSorting.getString("text2","Decinding").equals("Decinding")){
+                Sort="desc";
+            }else{
+                Sort="asc";
+            }
+            if(isNetworkConnected()){
+                deliveryNoteList=null;
+                callGetDeliveryNoteList();
+            }else {
+                Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private void callGetDeliveryNoteList() {
         isLoading=true;
         Log.d("Api Calling==>","Api Calling");
@@ -186,6 +211,8 @@ public class DeliveryNoteFragment extends Fragment {
             progressBar.setVisibility(View.VISIBLE);
         }
         //http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteList?search=&pageno=0&totalinpage=10&SortBy=&Sort=desc&UserId=1&CompanyId=1&UserType=Admin
+//        /Api/MobDeliveryNote/GetDeliveryNoteList?search=&pageno=0&totalinpage=10&SortBy=&Sort=desc&UserId=1&CompanyId=1&UserType=Admin
+
         String url = "http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteList?search="+search+
                 "&pageno="+pageno+"&totalinpage="+totalinpage+
                 "&SortBy="+SortBy+"&Sort="+Sort+
