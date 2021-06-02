@@ -109,6 +109,7 @@ public class PurchaseOrderFragment extends Fragment {
                     search="";
                     purchaseOrderList=null;
                     callGetPurchaseOrderList();
+                    svUser.clearFocus();
                 }else {
                     Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                 }
@@ -122,6 +123,7 @@ public class PurchaseOrderFragment extends Fragment {
                     search=query;
                     purchaseOrderList=null;
                     callGetPurchaseOrderList();
+                    svUser.clearFocus();
                 }else {
                     Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                 }

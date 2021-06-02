@@ -12,8 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,6 +41,7 @@ import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.product.AddProductActivity;
 import com.track.cylinderdelivery.ui.purchaseorder.AddPurchaseOrderActivity;
 import com.track.cylinderdelivery.ui.purchaseorder.PurchaseOrderListAdapter;
+import com.track.cylinderdelivery.ui.purchaseorder.purchaseOrderSorting;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.json.JSONArray;
@@ -67,6 +71,8 @@ public class DeliveryNoteFragment extends Fragment {
     private boolean isLastPage=false;
     private DeliveryNoteListAdapter deliveryNoteListAdapter;
     RecyclerView recyclerView;
+    SearchView svSearch;
+    LinearLayout lvSortingParent;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -81,6 +87,8 @@ public class DeliveryNoteFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         progressBar=root.findViewById(R.id.progressBar);
+        svSearch=root.findViewById(R.id.svSearch);
+        lvSortingParent=root.findViewById(R.id.lvSortingParent);
 
         if(isNetworkConnected()){
             callGetDeliveryNoteList();
@@ -88,6 +96,49 @@ public class DeliveryNoteFragment extends Fragment {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+        lvSortingParent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*Intent intent=new Intent(context, purchaseOrderSorting.class);
+                startActivity(intent);*/
+            }
+        });
+        svSearch.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                if(isNetworkConnected()){
+                    search="";
+                    deliveryNoteList=null;
+                    callGetDeliveryNoteList();
+                    hideSoftKeyboard(svSearch);
+                    svSearch.clearFocus();
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
+        });
+        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(isNetworkConnected()){
+                    search=query;
+                    deliveryNoteList=null;
+                    callGetDeliveryNoteList();
+                    hideSoftKeyboard(svSearch);
+                    svSearch.clearFocus();
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                search=newText;
+                return true;
+            }
+        });
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -152,14 +203,14 @@ public class DeliveryNoteFragment extends Fragment {
                 Log.d("resonse ==>",Response+"");
                 JSONObject j;
                 try {
-                    j = new JSONObject(Response);
-                    totalRecord=j.getInt("totalRecord");
-                    JSONArray jsonArray=j.getJSONArray("list");
                     Boolean flgfirstload=false;
                     if(deliveryNoteList==null){
                         deliveryNoteList=new ArrayList<>();
                         flgfirstload=true;
                     }
+                    j = new JSONObject(Response);
+                    totalRecord=j.getInt("totalRecord");
+                    JSONArray jsonArray=j.getJSONArray("list");
 
                     for(int i=0;i<jsonArray.length();i++){
                         HashMap<String,String> map=new HashMap<>();
@@ -191,6 +242,8 @@ public class DeliveryNoteFragment extends Fragment {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    deliveryNoteListAdapter=new DeliveryNoteListAdapter(deliveryNoteList,getActivity());
+                    recyclerView.setAdapter(deliveryNoteListAdapter);
                 }
             }
         }, new Response.ErrorListener() {
@@ -327,5 +380,10 @@ public class DeliveryNoteFragment extends Fragment {
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+
+    public void hideSoftKeyboard(View view){
+        InputMethodManager imm =(InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
