@@ -208,6 +208,6 @@
     <string name="delivery_note_no">Delivery Note No:</string>
     <string name="from_warehouse">From Warehouse:</string>
     <string name="cylinder_list1">Cylinder List:</string>
-    <string name="cylinder_product_name_quantity">(Cylinder/Product Name/Quantity)</string>
+    <string name="cylinder_product_name_quantity">(Product Name/Cylinder/Quantity)</string>
     <string name="ready_for_delivery">Ready for Delivery</string>
 </resources>

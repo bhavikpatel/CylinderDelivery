@@ -69,6 +69,8 @@ public class DNCylinderActivity extends AppCompatActivity {
     NiceSpinner NSwarehouse;
     private int warehousepos=0;
     private int warehouseId;
+    private ArrayList<Object> pendingcyliList;
+    NiceSpinner NSPendingcyl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,7 @@ public class DNCylinderActivity extends AppCompatActivity {
         edtDNnumber=findViewById(R.id.edtDNnumber);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         NSwarehouse=findViewById(R.id.NSClinetList);
+        NSPendingcyl=findViewById(R.id.NSClientPenPurDet);
 
         DNNumber= mapdata.get("dnNumber");
         edtDNnumber.setText(DNNumber);
@@ -173,10 +176,89 @@ public class DNCylinderActivity extends AppCompatActivity {
                             whereHouseList.add(map);
                         }
                         NSwarehouse.attachDataSource(imtes);
-
+                        callGetDeliveryNotePendingCylinder();
                     }else {
 
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
+    private void callGetDeliveryNotePendingCylinder() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNotePendingCylinder?search=&pageno=0&totalinpage="+Integer.MAX_VALUE+
+                "&SortBy=&Sort=desc&DNid="+Integer.parseInt(mapdata.get("dnId"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                        JSONArray jsonArray=j.getJSONArray("list");
+                        pendingcyliList = new ArrayList<>();
+                        List<String> imtes=new ArrayList<>();
+                        imtes.add("Select");
+                        for(int i=0;i<jsonArray.length();i++) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("productName", jsonArray.getJSONObject(i).getString("productName")+"");
+                            map.put("quantity", jsonArray.getJSONObject(i).getString("quantity") + "");
+                            map.put("remainingQuantity", jsonArray.getJSONObject(i).getString("remainingQuantity") + "");
+                            map.put("productID", jsonArray.getJSONObject(i).getString("productID") + "");
+                            map.put("cylinderList", jsonArray.getJSONObject(i).getString("cylinderList") + "");
+                            map.put("dndid", jsonArray.getJSONObject(i).getString("dndid") + "");
+
+                            imtes.add(jsonArray.getJSONObject(i).getString("productName")+"/"+
+                                    jsonArray.getJSONObject(i).getString("cylinderList") + "/"+
+                                    jsonArray.getJSONObject(i).getString("quantity") );
+                            pendingcyliList.add(map);
+                        }
+                    NSPendingcyl.attachDataSource(imtes);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
