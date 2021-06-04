@@ -54,7 +54,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class CylinderWarehouseMappingFragment extends Fragment {
 
     private Context context;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     private String search="";
     private int pageno=0;
     private int totalinpage=10;

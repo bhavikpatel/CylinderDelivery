@@ -986,5 +986,4 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
-
 }
