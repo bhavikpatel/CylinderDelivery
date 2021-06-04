@@ -51,6 +51,11 @@ public class DeliveryNoteListAdapter extends RecyclerView.Adapter<DeliveryNoteLi
                         intent.putExtra("editData",podetailList.get(pos));
                         context.startActivity(intent);
                         context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
+                    }else if(podetailList.get(pos).get("status").equals("Pending")){
+                        Intent intent=new Intent(context, DNCylinderActivity.class);
+                        intent.putExtra("editData",podetailList.get(pos));
+                        context.startActivity(intent);
+                        context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
                     }
                 }
             });
@@ -77,7 +82,7 @@ public class DeliveryNoteListAdapter extends RecyclerView.Adapter<DeliveryNoteLi
         holder.txtPonumber.setText(podetailList.get(position).get("dnNumber"));
         holder.txtUserName.setText(podetailList.get(position).get("username"));
         if(podetailList.get(position).get("status").equals("Pending")){
-                holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_24);
+                holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_actions_24);
         }else if(podetailList.get(position).get("status").equals("Draft")){
             holder.imgArrow.setImageResource(R.drawable.ic_baseline_edit_24);
         }else {

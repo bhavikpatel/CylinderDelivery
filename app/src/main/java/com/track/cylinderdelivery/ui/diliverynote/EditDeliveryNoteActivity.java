@@ -95,7 +95,7 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     TextView txtCylinderNos;
     ArrayList<String> qrcodeList;
-    private Button btnAdd;
+    private Button btnAdd,btnLastSubmit,btnSaveAsDraft;
     private int totalRecord=0;
     private ArrayList<HashMap<String,String>> dNDetailList;
     private int DNId=0;
@@ -137,6 +137,8 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
         recyclerView=findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
+        btnLastSubmit=findViewById(R.id.btnLastSubmit);
+        btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
 
         lvTab1.setVisibility(View.VISIBLE);
         lvTab2.setVisibility(View.GONE);
@@ -169,12 +171,46 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
         Log.d("DNDate==>",DNDate+"");
         UserId=Integer.parseInt(mapdata.get("userId"));
 
+        txtClientInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lvTab1.setVisibility(View.VISIBLE);
+                lvTab2.setVisibility(View.GONE);
+                txtPurchaseOrderDetail.setTextColor(getResources().getColor(R.color.lightGrey));
+                txtClientInfo.setTextColor(getResources().getColor(R.color.green));
+                txtLineinfoUnderline.setBackgroundColor(getResources().getColor(R.color.green));
+                txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
+                //NSClinetList.setSelected(false);
+                //NSClientPenPurDet.setSelected(false);
+            }
+        });
+        btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        btnLastSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(dNDetailList.size()!=0){
+                    if(isNetworkConnected()){
+                        callSubmitDN();
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    Toast.makeText(context, "DN Detail are pending.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(validate()){
                     if(isNetworkConnected()){
                         try {
+                            dNDetailList=null;
                             callAddDNCylinder();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -249,6 +285,7 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
                     SharedPreferences.Editor userFilterEditor = spSorting.edit();
                     userFilterEditor.putBoolean("dofilter",true);
                     userFilterEditor.commit();
+                    dNDetailList=null;
                     DNNumber=edtDNnumber.getText().toString();
                     DNGeneratedBy=edtDNGeneratedBy.getText().toString();
                     try {
@@ -285,6 +322,73 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void callSubmitDN() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobDeliveryNote/SubmitDN?DNId="+DNId+
+                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                        finish();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -345,10 +449,12 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
                 try {
                     j = new JSONObject(Response);
                     if(j.getBoolean("status")){
-                        for(int i=0;i<dNDetailList.size();i++){
-                            if(dNDetailList.get(i).get("dnDetailId").equals(dndetailid)){
-                                dNDetailList.remove(i);
-                                break;
+                        if(dNDetailList!=null){
+                            for(int i=0;i<dNDetailList.size();i++){
+                                if(dNDetailList.get(i).get("dnDetailId").equals(dndetailid)){
+                                    dNDetailList.remove(i);
+                                    break;
+                                }
                             }
                         }
                         dNDetailListAdapter.notifyDataSetChanged();
@@ -466,19 +572,9 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
 
                                     dNDetailList.add(map);
                                 }
-                                dNDetailListAdapter=new EditDNDetailListAdapter(dNDetailList,context);
-                                recyclerView.setAdapter(dNDetailListAdapter);
+                                    dNDetailListAdapter=new EditDNDetailListAdapter(dNDetailList,context);
+                                    recyclerView.setAdapter(dNDetailListAdapter);
 
-/*                                if(podetailList.size()>=totalRecord){
-                                    isLastPage=true;
-                                }
-                                if(flgfirstload){
-                                    flgfirstload=false;
-                                    productAddListAdapter=new ProductAddListAdapter(podetailList,context);
-                                    recyclerView.setAdapter(productAddListAdapter);
-                                }else {
-                                    productAddListAdapter.notifyDataSetChanged();
-                                }*/
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
@@ -710,7 +806,9 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
                 try {
                     j = new JSONObject(Response);
                     if(j.getBoolean("status")){
-                        PendingPOUserList=new ArrayList<>();
+                        if(PendingPOUserList==null){
+                            PendingPOUserList=new ArrayList<>();
+                        }
                         JSONArray datalist=j.getJSONArray("data");
                         List<String> imtes=new ArrayList<>();
                         imtes.add("Select");
@@ -723,7 +821,7 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
                             PendingPOUserList.add(map);
                         }
                         NSClinetList.attachDataSource(imtes);
-
+                        callGetDeliveryNoteDetail();
                     }else{
                         Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
                     }
@@ -770,6 +868,102 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
+
+    private void callGetDeliveryNoteDetail() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteDetail?search=&pageno=0&totalinpage="+Integer.MAX_VALUE+
+                "&SortBy=&Sort=desc&DNid="+Integer.parseInt(mapdata.get("dnId"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject jsonObject;
+                try {
+                            jsonObject = new JSONObject(Response);
+                            totalRecord= jsonObject.getInt("totalRecord");
+                            JSONArray jsonArray=jsonObject.getJSONArray("list");
+                            Boolean flgfirstload=false;
+                            if(dNDetailList==null){
+                                dNDetailList=new ArrayList<>();
+                                //  flgfirstload=true;
+                            }
+                            for(int i=0;i<jsonArray.length();i++){
+                                HashMap<String,String> map=new HashMap<>();
+                                map.put("dnDetailId", jsonArray.getJSONObject(i).getString("dnDetailId"));
+                                map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
+                                map.put("companyId", jsonArray.getJSONObject(i).getString("companyId"));
+                                map.put("userId",jsonArray.getJSONObject(i).getString("userId"));
+                                map.put("productId", jsonArray.getJSONObject(i).getString("productId"));
+                                map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
+                                map.put("poDetailId",jsonArray.getJSONObject(i).getString("poDetailId"));
+                                map.put("quantity",jsonArray.getJSONObject(i).getString("quantity"));
+                                map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
+                                map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                                map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
+                                map.put("createdDateStr",jsonArray.getJSONObject(i).getString("createdDateStr"));
+                                map.put("userName",jsonArray.getJSONObject(i).getString("userName"));
+                                map.put("deliveryNoteNo",jsonArray.getJSONObject(i).getString("deliveryNoteNo"));
+                                map.put("poNo",jsonArray.getJSONObject(i).getString("poNo"));
+                                map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+                                map.put("cylinders",jsonArray.getJSONObject(i).getString("cylinders"));
+
+                                dNDetailList.add(map);
+                            }
+                            if(dNDetailListAdapter==null){
+                                dNDetailListAdapter=new EditDNDetailListAdapter(dNDetailList,context);
+                                recyclerView.setAdapter(dNDetailListAdapter);
+                            }else {
+                                dNDetailListAdapter.notifyDataSetChanged();
+                            }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     public void hideSoftKeyboard(View view){
         InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);

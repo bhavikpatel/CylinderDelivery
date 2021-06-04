@@ -20,8 +20,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.diliverynote.EditDeliveryNoteActivity"
-            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.diliverynote.DNCylinderActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".ui.diliverynote.EditDeliveryNoteActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.diliverynote.DeliveryNoteSortingActivity"
             android:screenOrientation="portrait"
