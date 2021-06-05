@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Context;
@@ -35,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
@@ -69,8 +72,15 @@ public class DNCylinderActivity extends AppCompatActivity {
     NiceSpinner NSwarehouse;
     private int warehousepos=0;
     private int warehouseId;
-    private ArrayList<Object> pendingcyliList;
+    private ArrayList<HashMap<String,String>> pendingcyliList;
     NiceSpinner NSPendingcyl;
+    Button btnAdd;
+    private int pendingcylpos=0;
+    private int productID;
+    private static final String BASE_URL = "http://test.hdvivah.in";
+    private ArrayList<HashMap<String,String>> AddEditDNList;
+    private DNCylinderDetailListAdapter dNCylinderDetailListAdapter;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +103,10 @@ public class DNCylinderActivity extends AppCompatActivity {
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         NSwarehouse=findViewById(R.id.NSClinetList);
         NSPendingcyl=findViewById(R.id.NSClientPenPurDet);
+        btnAdd=findViewById(R.id.btnAdd);
+        recyclerView=findViewById(R.id.recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(layoutManager);
 
         DNNumber= mapdata.get("dnNumber");
         edtDNnumber.setText(DNNumber);
@@ -101,6 +115,46 @@ public class DNCylinderActivity extends AppCompatActivity {
         }else {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkConnected()){
+                    try {
+                        if(validate()) {
+                            callAddDNCylinder();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        NSPendingcyl.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                pendingcylpos=position;
+                if(position!=0) {
+                    productID = Integer.parseInt(pendingcyliList.get(position - 1).get("productID"));
+                    /*if(isNetworkConnected()){
+                        // callGetDeliveryNotePOList();
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }*/
+                }
+            }
+        });
+        NSPendingcyl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NSPendingcyl.setError(null);
+                hideSoftKeyboard(v);
+            }
+        });
 
         NSwarehouse.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
@@ -110,11 +164,11 @@ public class DNCylinderActivity extends AppCompatActivity {
                 warehousepos=position;
                 if(position!=0) {
                     warehouseId = Integer.parseInt(whereHouseList.get(position - 1).get("warehouseId"));
-                    if(isNetworkConnected()){
+                   /* if(isNetworkConnected()){
                        // callGetDeliveryNotePOList();
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                    }
+                    }*/
                 }
             }
         });
@@ -147,6 +201,165 @@ public class DNCylinderActivity extends AppCompatActivity {
         });
     }
 
+    private void callAddDNCylinder() throws JSONException {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = BASE_URL+"/Api/MobDeliveryNote/AddDNCylinder";
+        final JSONObject jsonBody=new JSONObject();
+        jsonBody.put("DNId",Integer.parseInt(mapdata.get("dnId")));
+        jsonBody.put("WarehouseId",warehouseId);
+        jsonBody.put("ProductId",productID);
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        jsonBody.put("CylinderList",jsonArrayCylList);
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+
+        Log.d("jsonRequest==>",jsonBody.toString()+"");
+
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        Log.d("response==>",response.toString()+"");
+                        try{
+                            JSONObject jsonObject=response;
+                            if(jsonObject.getBoolean("status")){
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
+                                JSONObject data=jsonObject.getJSONObject("data");
+                                JSONArray jsonArray=data.getJSONArray("list");
+                                AddEditDNList=new ArrayList<>();
+                                for(int i=0;i<jsonArray.length();i++){
+                                    HashMap<String,String> map=new HashMap<>();
+                                    map.put("dnCylinderId", jsonArray.getJSONObject(i).getString("dnCylinderId"));
+                                    map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
+                                    map.put("dnNo", jsonArray.getJSONObject(i).getString("dnNo"));
+                                    map.put("cylinderProductMappingId",jsonArray.getJSONObject(i).getString("cylinderProductMappingId"));
+                                    map.put("warehouseId", jsonArray.getJSONObject(i).getString("warehouseId"));
+                                    map.put("cylinderID",jsonArray.getJSONObject(i).getString("cylinderID"));
+                                    map.put("productID",jsonArray.getJSONObject(i).getString("productID"));
+                                    map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
+                                    map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                                    map.put("strCreatedDate",jsonArray.getJSONObject(i).getString("strCreatedDate"));
+                                    map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
+                                    map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
+                                    map.put("warehouseName",jsonArray.getJSONObject(i).getString("warehouseName"));
+                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+
+                                    AddEditDNList.add(map);
+                                }
+                                dNCylinderDetailListAdapter=new DNCylinderDetailListAdapter(AddEditDNList,context);
+                                recyclerView.setAdapter(dNCylinderDetailListAdapter);
+                            }else {
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Log.d("response==>",error.toString()+"");
+                    }
+                }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
+    }
+    void callGetDeliveryNoteCylinder(){
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = BASE_URL+"/Api/MobDeliveryNote/GetDeliveryNoteCylinder?search=&pageno=0&totalinpage="+
+                Integer.MAX_VALUE+"&SortBy=&Sort=desc&DNid="+Integer.parseInt(mapdata.get("dnId"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                progressDialog.dismiss();
+                Log.d("response==>",response.toString()+"");
+                try{
+                    JSONObject jsonObject=new JSONObject(response);
+                        JSONArray jsonArray=jsonObject.getJSONArray("list");
+                        AddEditDNList=new ArrayList<>();
+                        for(int i=0;i<jsonArray.length();i++){
+                            HashMap<String,String> map=new HashMap<>();
+                            map.put("dnCylinderId", jsonArray.getJSONObject(i).getString("dnCylinderId"));
+                            map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
+                            map.put("dnNo", jsonArray.getJSONObject(i).getString("dnNo"));
+                            map.put("cylinderProductMappingId",jsonArray.getJSONObject(i).getString("cylinderProductMappingId"));
+                            map.put("warehouseId", jsonArray.getJSONObject(i).getString("warehouseId"));
+                            map.put("cylinderID",jsonArray.getJSONObject(i).getString("cylinderID"));
+                            map.put("productID",jsonArray.getJSONObject(i).getString("productID"));
+                            map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
+                            map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                            map.put("strCreatedDate",jsonArray.getJSONObject(i).getString("strCreatedDate"));
+                            map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
+                            map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
+                            map.put("warehouseName",jsonArray.getJSONObject(i).getString("warehouseName"));
+                            map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+
+                            AddEditDNList.add(map);
+                        }
+                        dNCylinderDetailListAdapter=new DNCylinderDetailListAdapter(AddEditDNList,context);
+                        recyclerView.setAdapter(dNCylinderDetailListAdapter);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
     private void callGetWarehouseList() {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
@@ -259,6 +472,7 @@ public class DNCylinderActivity extends AppCompatActivity {
                             pendingcyliList.add(map);
                         }
                     NSPendingcyl.attachDataSource(imtes);
+                    callGetDeliveryNoteCylinder();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -360,5 +574,97 @@ public class DNCylinderActivity extends AppCompatActivity {
         Intent intent=new Intent(context, CylinderQRActivity.class);
         intent.putExtra("scanlist",qrcodeList);
         startActivityForResult(intent,201);
+    }
+    public boolean validate() {
+        boolean valid = true;
+        if (qrcodeList.size()==0) {
+            txtCylinderNos.setError("Field is Required.");
+            valid = false;
+        } else {
+            txtCylinderNos.setError(null);
+        }
+        if (warehousepos<=0) {
+            NSwarehouse.setError("Field is Required.");
+            valid = false;
+        } else {
+            NSwarehouse.setError(null);
+        }
+        if(pendingcylpos<=0){
+            NSPendingcyl.setError("Field is Required.");
+            valid = false;
+        }else {
+            NSPendingcyl.setError(null);
+        }
+        return valid;
+    }
+
+    public void callDeleteDNCylinder(String dnDetailId) {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = BASE_URL+"/Api/MobDeliveryNote/DeleteDNCylinder?DNCylinderId="+dnDetailId;
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        for(int i=0;i<AddEditDNList.size();i++){
+                            if(AddEditDNList.get(i).get("dnCylinderId").equals(dnDetailId)){
+                                AddEditDNList.remove(i);
+                                break;
+                            }
+                        }
+                        dNCylinderDetailListAdapter.notifyDataSetChanged();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 }
