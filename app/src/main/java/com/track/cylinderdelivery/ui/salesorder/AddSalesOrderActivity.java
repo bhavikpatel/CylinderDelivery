@@ -1,14 +1,16 @@
-package com.track.cylinderdelivery.ui.purchaseorder;
+package com.track.cylinderdelivery.ui.salesorder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.DatePickerDialog;
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -18,10 +20,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
+import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
+import com.track.cylinderdelivery.ui.diliverynote.DNDetailListAdapter;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -51,169 +54,131 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class AddPurchaseOrderActivity extends AppCompatActivity {
+public class AddSalesOrderActivity extends AppCompatActivity {
 
-    AddPurchaseOrderActivity context;
+    AddSalesOrderActivity context;
+    private String SNNumber;
+    EditText edtSoNumber,edtSoDate,edtSOGeneratedBy;
     private static final String BASE_URL = "http://test.hdvivah.in";
     private static final int MY_SOCKET_TIMEOUT_MS = 10000;
-    TextView txtClientInfo;
     private SharedPreferences settings;
-    String PONumber;
-    EditText edtPoNumber,edtPoDate,edtPOGeneratedBy;
-    Calendar myCalendar;
-    NiceSpinner NSUserName;
-    private int userpos=0;
+    NiceSpinner NSDeloryNote,NSClient;
+    private ArrayList<HashMap<String,String>> deliveryList;
+    private int delnotepos=0;
+    private String dnNumber;
+    private String dnId;
+    private ArrayList<HashMap<String,String>> customerList;
     Button btnCancel,btnSaveAndContinue;
-    private String PoNumber;
-    private String PoDate;
-    private ArrayList<HashMap<String,String>> userList;
-    private int UserId;
-    private String POGeneratedBy;
+    SharedPreferences spSorting;
+    private String soDate;
+    private int clientpos=0;
+    private String clintvalue;
+    private String clinttext;
+    private String WarehouseId=null;
     LinearLayout lvTab1;
-    TextView txtLineinfoUnderline;
-
     RelativeLayout lvTab2;
     TextView txtPurchaseOrderDetail;
     TextView txtPurchasodUnderline;
-    private int prodpos=0;
-    EditText edtQuantity;
-    Button btnAdd;
-    private int quantity=0;
-    NiceSpinner NSProduct;
-    ArrayList<HashMap<String,String>> productList;
-    private int productid=0;
-    private int POId;
-    ArrayList<HashMap<String,String>> podetailList;
-    RecyclerView recyclerView;
-    ProductAddListAdapter productAddListAdapter;
-    Button btnLastSubmit;
-    SharedPreferences spSorting;
-    Button btnSaveAsDraft;
-
-    private ProgressBar progressBar;
-    Boolean isLoading=false;
-    Boolean isLastPage=false;
-    private int totalRecord;
-    private int pageno=0;
+    TextView txtClientInfo;
+    TextView txtLineinfoUnderline;
+    private int SOId;
+    NiceSpinner NSPendingSales;
+    private ArrayList<HashMap<String,String>> pendingsalesList;
+    ImageView btnScanCylinders;
+    public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
+    private ArrayList<String> qrcodeList;
+    TextView txtCylinderNos;
+    private Button btnAdd;
+    private int pendingsalespos=0;
+    private String dnDetailId;
+    private String productId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_purchase_order);
+        setContentView(R.layout.activity_add_sales_order);
+        SNNumber= getIntent().getStringExtra("SNNumber");
         context=this;
-        PONumber= getIntent().getStringExtra("PONumber");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final Drawable upArrow =  ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
         upArrow.setColorFilter(ContextCompat.getColor(context, R.color.black), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        getSupportActionBar().setTitle("Add Purchase Order");
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Purchase Order</font>"));
+        getSupportActionBar().setTitle("Add Sales Order");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Sales Order</font>"));
+        edtSoNumber=findViewById(R.id.edtSoNumber);
+        edtSoDate=findViewById(R.id.edtSoDate);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
-        txtClientInfo=findViewById(R.id.txtClientInfo);
-        edtPoNumber=findViewById(R.id.edtPoNumber);
-        edtPoDate=findViewById(R.id.edtPoDate);
-        spSorting=context.getSharedPreferences("POFilter",MODE_PRIVATE);
-        NSUserName=findViewById(R.id.NSUserName);
-        edtPOGeneratedBy=findViewById(R.id.edtPOGeneratedBy);
+        NSDeloryNote=findViewById(R.id.NSUserName);
+        NSClient=findViewById(R.id.NSClient);
+        edtSOGeneratedBy=findViewById(R.id.edtPOGeneratedBy);
         btnCancel=findViewById(R.id.btnCancel);
         btnSaveAndContinue=findViewById(R.id.btnSaveAndContinue);
+        spSorting=context.getSharedPreferences("SOFilter",MODE_PRIVATE);
         lvTab1=findViewById(R.id.lvTab1);
-        txtLineinfoUnderline=findViewById(R.id.txtLineinfoUnderline);
-        progressBar=findViewById(R.id.progressBar);
-
         lvTab2=findViewById(R.id.lvTab2);
         txtPurchaseOrderDetail=findViewById(R.id.txtPurchaseOrderDetail);
         txtPurchasodUnderline=findViewById(R.id.txtPurchasodUnderline);
-        edtQuantity=findViewById(R.id.edtQuantity);
-        btnAdd=findViewById(R.id.btnAdd);
-        NSProduct=findViewById(R.id.NSProduct);
-
-        btnLastSubmit=findViewById(R.id.btnLastSubmit);
-        btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
-
-        recyclerView=findViewById(R.id.recyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(layoutManager);
-
+        txtClientInfo=findViewById(R.id.txtClientInfo);
+        txtLineinfoUnderline=findViewById(R.id.txtLineinfoUnderline);
+        NSPendingSales=findViewById(R.id.NSPendingSales);
         lvTab1.setVisibility(View.VISIBLE);
         lvTab2.setVisibility(View.GONE);
         txtLineinfoUnderline.setBackgroundColor(getResources().getColor(R.color.green));
         txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
-        edtPoNumber.setText(PONumber);
-        edtPOGeneratedBy.setText(settings.getString("fullName",""));
-        if(!edtPOGeneratedBy.getText().equals("")){
-            edtPOGeneratedBy.setEnabled(false);
-        }
-        if(isNetworkConnected()){
-            callGetActiveUserData();
+        btnScanCylinders=findViewById(R.id.btnScanCylinders);
+        txtCylinderNos=findViewById(R.id.txtCylinderNos);
+        qrcodeList=new ArrayList<String>();
+        btnAdd=findViewById(R.id.btnAdd);
+
+        Date c = Calendar.getInstance().getTime();
+        Log.d("soDate==>",c+"");
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String formattedDate = df.format(c);
+        edtSoDate.setText(formattedDate);
+        SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        soDate=df1.format(c);
+        edtSoNumber.setText(SNNumber);
+        edtSOGeneratedBy.setText(settings.getString("fullName",""));
+        if(isNetworkConnected()) {
+            callGetReadyforDeliveryDeliveryList();
         }else {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
-        myCalendar = Calendar.getInstance();
 
-        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                // TODO Auto-generated method stub
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel();
-            }
-        };
-        edtPoDate.setOnClickListener(new View.OnClickListener() {
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(context, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-        NSUserName.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
-            @Override
-            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                Log.d("checkedId==>",position+"");
-                hideSoftKeyboard(view);
-                userpos=position;
-                if(position!=0) {
-                    UserId = Integer.parseInt(userList.get(position - 1).get("userId"));
+                if(validate()){
+                    if(isNetworkConnected()){
+                        try {
+                            callAddSOCylinder();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
-        NSUserName.setOnClickListener(new View.OnClickListener() {
+        btnScanCylinders.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideSoftKeyboard(v);
-            }
-        });
-        NSProduct.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
-            @Override
-            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
-                Log.d("checkedId==>",position+"");
-                hideSoftKeyboard(view);
-                prodpos=position;
-                if(position!=0) {
-                    productid = Integer.parseInt(productList.get(position - 1).get("productId"));
+                if (ContextCompat.checkSelfPermission(context,
+                        Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(AddSalesOrderActivity.this,
+                            new String[]{Manifest.permission.CAMERA},
+                            MY_PERMISSIONS_REQUEST_CAMERA);
+                }else {
+                    openQrScan();
                 }
-            }
-        });
-        NSProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftKeyboard(v);
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
             }
         });
         txtClientInfo.setOnClickListener(new View.OnClickListener() {
@@ -232,14 +197,11 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isNetworkConnected()){
                     SharedPreferences.Editor userFilterEditor = spSorting.edit();
-                    userFilterEditor.putBoolean("dofilter",true);
+                    userFilterEditor.putBoolean("sofilter",true);
                     userFilterEditor.commit();
-                    PoNumber=edtPoNumber.getText().toString();
-                    //PoDate=edtPoDate.getText().toString();
-                    POGeneratedBy=edtPOGeneratedBy.getText().toString();
-                    if(validate()){
+                    if(validate1()){
                         try {
-                            callAddEditPO();
+                            callAddEditSO();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -249,199 +211,161 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                 }
             }
         });
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftKeyboard(v);
-                if(validate1()){
-                    quantity=Integer.parseInt(edtQuantity.getText().toString()+"");
-                    if(isNetworkConnected()){
-                        try {
-                            callAddEditPODetail();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }else {
-                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });
-        btnLastSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(podetailList.size()!=0){
-                    if(isNetworkConnected()){
-                        callSubmitPO();
-                    }else {
-                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                    }
-                }else {
-                    Toast.makeText(context, "PO Detail are pending.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        NSPendingSales.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                NSPendingSales.setError(null);
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                pendingsalespos=position;
+                if(position!=0) {
+                    dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
+                    productId=pendingsalesList.get(position-1).get("productId");
+                }else {
 
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                Log.d("visibleItemCount==>",visibleItemCount+"");
-                Log.d("totalItemCount==>",totalItemCount+"");
-                Log.d("firstvisibleitmpos==>",firstVisibleItemPosition+"");
-                if (!isLoading && !isLastPage) {
-                    if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                            && firstVisibleItemPosition >= 0
-                            && totalItemCount < totalRecord) {
-                        if (isNetworkConnected()) {
-                            pageno++;
-                            Log.d("pageno==>", pageno + "");
-                            try {
-                                callAddEditPODetail();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                        }
-                        Log.d("callapi==>", "callapi");
-                    }
                 }
+            }
+        });
+        NSPendingSales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
+
+        NSClient.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                NSClient.setError(null);
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                clientpos=position;
+                if(position!=0) {
+                    clintvalue=customerList.get(position-1).get("value");
+                    clinttext=customerList.get(position-1).get("text");
+                }else {
+                    clintvalue="";
+                    clinttext="";
+                }
+            }
+        });
+        NSClient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
+
+;        NSDeloryNote.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                NSDeloryNote.setError(null);
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                delnotepos=position;
+                if(position!=0) {
+                    dnNumber=deliveryList.get(position-1).get("dnNumber");
+                    dnId=deliveryList.get(position-1).get("dnId");
+                    if(isNetworkConnected()){
+                        if(dnId!=null){
+                            callgetDeliveryNoteCustomerList(dnId);
+                        }
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    List<String> imtes=new ArrayList<>();
+                    imtes.add("Select");
+                    NSClient.attachDataSource(imtes);
+                    NSClient.setSelectedIndex(0);
+                }
+            }
+        });
+        NSDeloryNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
             }
         });
     }
 
-    private void callSubmitPO() {
+    private void callAddSOCylinder() throws JSONException {
+        //isLoading=true;
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
-        progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobPurchaseOrder/SubmitPO?POId="+POId+
-                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
-        Log.d("request==>",url);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,
-                url,new Response.Listener<String>() {
-            @Override
-            public void onResponse(String Response) {
-                progressDialog.dismiss();
-                Log.d("resonse ==>",Response+"");
-                JSONObject j;
-                try {
-                    j = new JSONObject(Response);
-                    if(j.getBoolean("status")){
-                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
-                        finish();
-                    }else {
-                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //progressDialog.dismiss();
-                String message = null;
-                if (error instanceof NetworkError) {
-                    message = "Cannot connect to Internet...Please check your connection!";
-                } else if (error instanceof ServerError) {
-                    message = "The server could not be found. Please try again after some time!!";
-                } else if (error instanceof AuthFailureError) {
-                    message = "Cannot connect to Internet...Please check your connection!";
-                } else if (error instanceof ParseError) {
-                    message = "Parsing error! Please try again after some time!!";
-                } else if (error instanceof TimeoutError) {
-                    message = "Connection TimeOut! Please check your internet connection.";
-                }
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.d("error==>",message+"");
-            }
-        }){
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap map=new HashMap();
-                map.put("content-type","application/json");
-                return map;
-            }
-        };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        RequestQueue queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
-    }
-
-    private void callAddEditPODetail() throws JSONException {
-        isLoading=true;
-        Log.d("Api Calling==>","Api Calling");
-        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
-        if(podetailList==null){
+        /*if(podetailList==null){
             isLoading=false;
             isLastPage=false;
-            pageno=0;
-            progressDialog.show();
-        }else {
+            pageno=0;*/
+        progressDialog.show();
+        /*}else {
             progressBar.setVisibility(View.VISIBLE);
-        }
-        String url = BASE_URL+"/Api/MobPurchaseOrder/AddEditPODetail";
+        }*/
+        String url = BASE_URL+"/Api/MobSalesOrder/AddSOCylinder";
         final JSONObject jsonBody=new JSONObject();
-        jsonBody.put("POId",POId);
-        jsonBody.put("ProductId",productid);
-        jsonBody.put("Quantity",quantity);
-        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
-
+        jsonBody.put("SOId",SOId);
+        jsonBody.put("ProductId",Integer.parseInt(productId));
+        jsonBody.put("DNDetailId",Integer.parseInt(dnDetailId));
+        jsonBody.put("DNid",Integer.parseInt(dnId));
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        jsonBody.put("CylinderList",jsonArrayCylList);
         Log.d("jsonRequest==>",jsonBody.toString()+"");
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
 
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         progressDialog.dismiss();
-                        progressBar.setVisibility(View.GONE);
-                        isLoading=false;
+                        //progressBar.setVisibility(View.GONE);
+                        // isLoading=false;
                         Log.d("response==>",response.toString()+"");
                         try{
                             JSONObject jsonObject=response;
                             if(jsonObject.getBoolean("status")){
                                 //Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
-                                JSONObject dataobj=jsonObject.getJSONObject("data");
+                                /*JSONObject dataobj=jsonObject.getJSONObject("data");
                                 totalRecord= dataobj.getInt("totalRecord");
                                 JSONArray jsonArray=dataobj.getJSONArray("list");
                                 Boolean flgfirstload=false;
-                                if(podetailList==null){
-                                    podetailList=new ArrayList<>();
-                                    flgfirstload=true;
+                                if(dNDetailList==null){
+                                    dNDetailList=new ArrayList<>();
+                                    //  flgfirstload=true;
                                 }
                                 for(int i=0;i<jsonArray.length();i++){
                                     HashMap<String,String> map=new HashMap<>();
-                                    map.put("podetailid", String.valueOf(jsonArray.getJSONObject(i).getInt("poDetailId")));
-                                    map.put("POId", String.valueOf(jsonArray.getJSONObject(i).getInt("poId")));
-                                    map.put("ProductId", String.valueOf(jsonArray.getJSONObject(i).getInt("productId")));
+                                    map.put("dnDetailId", jsonArray.getJSONObject(i).getString("dnDetailId"));
+                                    map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
+                                    map.put("companyId", jsonArray.getJSONObject(i).getString("companyId"));
+                                    map.put("userId",jsonArray.getJSONObject(i).getString("userId"));
+                                    map.put("productId", jsonArray.getJSONObject(i).getString("productId"));
                                     map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
-                                    map.put("Quantity", String.valueOf(jsonArray.getJSONObject(i).getInt("quantity")));
-                                    podetailList.add(map);
+                                    map.put("poDetailId",jsonArray.getJSONObject(i).getString("poDetailId"));
+                                    map.put("quantity",jsonArray.getJSONObject(i).getString("quantity"));
+                                    map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
+                                    map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                                    map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
+                                    map.put("createdDateStr",jsonArray.getJSONObject(i).getString("createdDateStr"));
+                                    map.put("userName",jsonArray.getJSONObject(i).getString("userName"));
+                                    map.put("deliveryNoteNo",jsonArray.getJSONObject(i).getString("deliveryNoteNo"));
+                                    map.put("poNo",jsonArray.getJSONObject(i).getString("poNo"));
+                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+                                    map.put("cylinders",jsonArray.getJSONObject(i).getString("cylinders"));
+
+                                    dNDetailList.add(map);
                                 }
-                                if(podetailList.size()>=totalRecord){
+                                dNDetailListAdapter=new DNDetailListAdapter(dNDetailList,context);
+                                recyclerView.setAdapter(dNDetailListAdapter);*/
+
+/*                                if(podetailList.size()>=totalRecord){
                                     isLastPage=true;
                                 }
                                 if(flgfirstload){
@@ -450,7 +374,8 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                                     recyclerView.setAdapter(productAddListAdapter);
                                 }else {
                                     productAddListAdapter.notifyDataSetChanged();
-                                }
+                                }*/
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }
@@ -463,8 +388,8 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
-                        progressBar.setVisibility(View.GONE);
-                        isLoading=false;
+                        /*progressBar.setVisibility(View.GONE);
+                        isLoading=false;*/
                         Log.d("response==>",error.toString()+"");
                     }
                 }){
@@ -487,17 +412,85 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void callAddEditPO() throws JSONException {
+    private boolean validate1() {
+        boolean valid = true;
+        if (qrcodeList.size()==0) {
+            txtCylinderNos.setError("Field is Required.");
+            valid = false;
+        } else {
+            txtCylinderNos.setError(null);
+        }
+        if (pendingsalespos<=0) {
+            NSPendingSales.setError("Field is Required.");
+            valid = false;
+        } else {
+            NSPendingSales.setError(null);
+        }
+        return valid;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==201){
+            try {
+                qrcodeList = (ArrayList<String>) data.getSerializableExtra("scanlist");
+                txtCylinderNos.setText(qrcodeList.toString()+"");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                Log.i("Camera", "G : " + grantResults[0]);
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted,
+                    openQrScan();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    if (ActivityCompat.shouldShowRequestPermissionRationale
+                            (this, Manifest.permission.CAMERA)) {
+                        //showAlert();
+                    } else {
+
+                    }
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+    private void openQrScan() {
+        txtCylinderNos.setError(null);
+        Intent intent=new Intent(context, CylinderQRActivity.class);
+        intent.putExtra("scanlist",qrcodeList);
+        startActivityForResult(intent,201);
+    }
+    private void callAddEditSO() throws JSONException {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = BASE_URL+"/Api/MobPurchaseOrder/AddEditPO";
+        String url = BASE_URL+"/Api/MobSalesOrder/AddEditSO";
         final JSONObject jsonBody=new JSONObject();
-        jsonBody.put("POId",JSONObject.NULL);
-        jsonBody.put("POGeneratedBy",POGeneratedBy);
-        jsonBody.put("PODate",PoDate);
-        jsonBody.put("UserId",UserId);
-        jsonBody.put("PONumber",PONumber+"");
+        jsonBody.put("SOId",JSONObject.NULL);
+        jsonBody.put("DNId",Integer.parseInt(dnId));
+        jsonBody.put("SONumber",SNNumber);
+        jsonBody.put("UserId",Integer.parseInt(clintvalue));
+        jsonBody.put("SODate",soDate+"");
+        jsonBody.put("SOGeneratedBy",edtSOGeneratedBy.getText().toString()+"");
+        jsonBody.put("WarehouseId",WarehouseId);
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
@@ -512,7 +505,7 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                             JSONObject jsonObject=response;
                             if(jsonObject.getBoolean("status")){
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
-                                POId=jsonObject.getInt("data");
+                                SOId=jsonObject.getInt("data");
                                 lvTab1.setVisibility(View.GONE);
                                 lvTab2.setVisibility(View.VISIBLE);
                                 txtPurchaseOrderDetail.setTextColor(getResources().getColor(R.color.green));
@@ -520,7 +513,7 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                                 txtLineinfoUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                                 txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.green));
                                 if(isNetworkConnected()){
-                                    callGetProductList();
+                                   callGetSalesOrderDetail();
                                 }else {
                                     Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                                 }
@@ -554,11 +547,12 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    private void callGetProductList() {
+    private void callGetSalesOrderDetail() {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/api/MobProduct/GetProductList";
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/GetSalesOrderDetail?search=&pageno=0&totalinpage="+Integer.MAX_VALUE+
+                "&SortBy=&Sort=desc&SOId="+SOId+"&DNId="+Integer.parseInt(dnId)+"&UserId="+Integer.parseInt(clintvalue);
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
@@ -568,23 +562,40 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                 Log.d("resonse ==>",Response+"");
                 JSONObject j;
                 try {
-                    j = new JSONObject(Response);
-                    if(j.getBoolean("status")){
-                        JSONArray jsonArray=j.getJSONArray("data");
-                        productList=new ArrayList<>();
+                        j = new JSONObject(Response);
+                        pendingsalesList=new ArrayList<>();
+                        JSONArray datalist=j.getJSONArray("list");
                         List<String> imtes=new ArrayList<>();
                         imtes.add("Select");
-                        for(int i=0;i<jsonArray.length();i++){
+                        for(int i=0;i<datalist.length();i++){
                             HashMap<String,String> map=new HashMap<>();
-                            map.put("productId",jsonArray.getJSONObject(i).getString("productId"));
-                            map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
-                            imtes.add(jsonArray.getJSONObject(i).getString("productName"));
-                            productList.add(map);
+                            JSONObject dataobj=datalist.getJSONObject(i);
+                            map.put("dnDetailId",dataobj.getInt("dnDetailId")+"");
+                            map.put("dnId",dataobj.getString("dnId"));
+                            map.put("companyId",dataobj.getString("companyId"));
+                            map.put("userId",dataobj.getString("userId"));
+                            map.put("productId",dataobj.getString("productId"));
+                            map.put("productName",dataobj.getString("productName"));
+                            map.put("poDetailId",dataobj.getString("poDetailId"));
+                            map.put("quantity",dataobj.getString("quantity"));
+                            map.put("createdBy",dataobj.getString("createdBy"));
+                            map.put("createdDate",dataobj.getString("createdDate"));
+                            map.put("createdByName",dataobj.getString("createdByName"));
+                            map.put("createdDateStr",dataobj.getString("createdDateStr"));
+                            map.put("userName",dataobj.getString("userName"));
+                            map.put("deliveryNoteNo",dataobj.getString("deliveryNoteNo"));
+                            map.put("poNo",dataobj.getString("poNo"));
+                            map.put("cylinderList",dataobj.getString("cylinderList"));
+                            map.put("cylinders",dataobj.getString("cylinders"));
+
+                            imtes.add(dataobj.getString("productName") +
+                                    "/"+dataobj.getString("quantity")+
+                                    "/"+dataobj.getString("userName")+
+                                    "/"+dataobj.getString("cylinderList"));
+                            pendingsalesList.add(map);
                         }
-                        NSProduct.attachDataSource(imtes);
-                    }else {
-                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
-                    }
+                        NSPendingSales.attachDataSource(imtes);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -592,7 +603,7 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //progressDialog.dismiss();
+                progressDialog.dismiss();
                 String message = null;
                 if (error instanceof NetworkError) {
                     message = "Cannot connect to Internet...Please check your connection!";
@@ -631,57 +642,43 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
 
     public boolean validate() {
         boolean valid = true;
-
-        if (PoNumber.isEmpty()) {
-            edtPoNumber.setError("Field is Required.");
+        if (SNNumber.isEmpty()) {
+            edtSoNumber.setError("Field is Required.");
             valid = false;
         } else {
-            edtPoNumber.setError(null);
+            edtSoNumber.setError(null);
         }
-        if(PoDate.isEmpty()){
-            edtPoDate.setError("Field is Required.");
+        if(soDate.isEmpty()){
+            edtSoDate.setError("Field is Required.");
             valid=false;
         }else {
-            edtPoDate.setError(null);
+            edtSoDate.setError(null);
         }
-        if(userpos<=0){
-            NSUserName.setError("Field is Required.");
+        if(delnotepos<=0){
+            NSDeloryNote.setError("Field is Required.");
             valid=false;
         }else {
-            NSUserName.setError(null);
+            NSDeloryNote.setError(null);
         }
-        if(POGeneratedBy.isEmpty()){
-            edtPOGeneratedBy.setError("Field is Required.");
+        if(clientpos<=0){
+            NSClient.setError("Field is Required.");
             valid=false;
         }else {
-            edtPOGeneratedBy.setError(null);
+            NSClient.setError(null);
+        }
+        if(edtSOGeneratedBy.getText().toString()==null){
+            edtSOGeneratedBy.setError("Field is Required.");
+            valid=false;
+        }else {
+            edtSOGeneratedBy.setError(null);
         }
         return valid;
     }
-
-    public boolean validate1() {
-        boolean valid = true;
-        if(prodpos<=0){
-            NSProduct.setError("Field is Required.");
-            valid=false;
-        }else {
-            NSProduct.setError(null);
-        }
-        if(edtQuantity.getText().toString().isEmpty()){
-            edtQuantity.setError("Field is Required.");
-            valid=false;
-        }else {
-            edtQuantity.setError(null);
-        }
-        return valid;
-    }
-    private void callGetActiveUserData() {
+    private void callgetDeliveryNoteCustomerList(String dnId) {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobUser/GetActiveUserData?CompanyId="+Integer.parseInt(settings.getString("companyId","1"))+
-                "&UserType="+settings.getString("userType","1")+
-                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+Integer.parseInt(dnId);
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
@@ -693,19 +690,19 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                 try {
                     j = new JSONObject(Response);
                     if(j.getBoolean("status")){
-                        userList=new ArrayList<>();
-                       JSONArray datalist=j.getJSONArray("data");
+                        customerList=new ArrayList<>();
+                        JSONArray datalist=j.getJSONArray("data");
                         List<String> imtes=new ArrayList<>();
                         imtes.add("Select");
-                       for(int i=0;i<datalist.length();i++){
-                           HashMap<String,String> map=new HashMap<>();
-                           JSONObject dataobj=datalist.getJSONObject(i);
-                           map.put("userId",dataobj.getInt("userId")+"");
-                           map.put("fullName",dataobj.getString("fullName"));
-                           imtes.add(dataobj.getString("fullName") + "");
-                           userList.add(map);
-                       }
-                        NSUserName.attachDataSource(imtes);
+                        for(int i=0;i<datalist.length();i++){
+                            HashMap<String,String> map=new HashMap<>();
+                            JSONObject dataobj=datalist.getJSONObject(i);
+                            map.put("value",dataobj.getInt("value")+"");
+                            map.put("text",dataobj.getString("text"));
+                            imtes.add(dataobj.getString("text") + "");
+                            customerList.add(map);
+                        }
+                        NSClient.attachDataSource(imtes);
                     }else {
                         Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
                     }
@@ -752,19 +749,83 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
+
+    private void callGetReadyforDeliveryDeliveryList() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/GetReadyforDeliveryDeliveryList?CompanyId="+Integer.parseInt(settings.getString("companyId","1"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        deliveryList=new ArrayList<>();
+                        JSONArray datalist=j.getJSONArray("data");
+                        List<String> imtes=new ArrayList<>();
+                        imtes.add("Select");
+                        for(int i=0;i<datalist.length();i++){
+                            HashMap<String,String> map=new HashMap<>();
+                            JSONObject dataobj=datalist.getJSONObject(i);
+                            map.put("dnId",dataobj.getInt("dnId")+"");
+                            map.put("dnNumber",dataobj.getString("dnNumber"));
+                            imtes.add(dataobj.getString("dnNumber") + "");
+                            deliveryList.add(map);
+                        }
+                        NSDeloryNote.attachDataSource(imtes);
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
-    private void updateLabel() {
-        String myFormat = "yyyy-MM-dd"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        PoDate=sdf.format(myCalendar.getTime());
-        String myFormat1 = "dd/MM/yyyy"; //In which you need put here
-        SimpleDateFormat sdf1 = new SimpleDateFormat(myFormat1, Locale.US);
-        edtPoDate.setText(sdf1.format(myCalendar.getTime()));
-    }
+
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
@@ -772,74 +833,5 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
     public void hideSoftKeyboard(View view){
         InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-    public void callChangeCompanyStatus(String podetailid) {
-        Log.d("Api Calling==>","Api Calling");
-        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
-        progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobPurchaseOrder/DeletePODetail?PODetailId="+Integer.parseInt(podetailid);
-        Log.d("request==>",url);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET,
-                url,new Response.Listener<String>() {
-            @Override
-            public void onResponse(String Response) {
-                progressDialog.dismiss();
-                Log.d("resonse ==>",Response+"");
-                JSONObject j;
-                try {
-                    j = new JSONObject(Response);
-                    if(j.getBoolean("status")){
-                        for(int i=0;i<podetailList.size();i++){
-                            if(podetailList.get(i).get("podetailid").equals(podetailid)){
-                                podetailList.remove(i);
-                                break;
-                            }
-                        }
-                        productAddListAdapter.notifyDataSetChanged();
-                    }else {
-                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //progressDialog.dismiss();
-                String message = null;
-                if (error instanceof NetworkError) {
-                    message = "Cannot connect to Internet...Please check your connection!";
-                } else if (error instanceof ServerError) {
-                    message = "The server could not be found. Please try again after some time!!";
-                } else if (error instanceof AuthFailureError) {
-                    message = "Cannot connect to Internet...Please check your connection!";
-                } else if (error instanceof ParseError) {
-                    message = "Parsing error! Please try again after some time!!";
-                } else if (error instanceof TimeoutError) {
-                    message = "Connection TimeOut! Please check your internet connection.";
-                }
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                Log.d("error==>",message+"");
-            }
-        }){
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap map=new HashMap();
-                map.put("content-type","application/json");
-                return map;
-            }
-        };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        RequestQueue queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
     }
 }

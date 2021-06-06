@@ -20,9 +20,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.diliverynote.DNCylinderActivity"
+        <activity android:name=".ui.salesorder.AddSalesOrderActivity"
             android:screenOrientation="portrait"
-            />
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity
+            android:name=".ui.diliverynote.DNCylinderActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.diliverynote.EditDeliveryNoteActivity"
             android:screenOrientation="portrait" />

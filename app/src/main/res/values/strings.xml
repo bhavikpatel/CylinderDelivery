@@ -173,6 +173,7 @@
     <string name="cylinder_warehouse_mapping">Cylinder Warehouse Mapping</string>
     <string name="permission">Permission</string>
     <string name="delivery_note">Delivery Note</string>
+    <string name="delivery_note_">Delivery Note:</string>
     <string name="sales_order">Sales Order</string>
     <string name="return_order">Return Order</string>
     <string name="action_addCylinderProductMapping">Add Cylinder Product Mapping</string>
@@ -210,4 +211,11 @@
     <string name="cylinder_list1">Cylinder List:</string>
     <string name="cylinder_product_name_quantity">(Product Name/Cylinder/Quantity)</string>
     <string name="ready_for_delivery">Ready for Delivery</string>
+    <string name="action_addSalseOrde">Sales Order</string>
+    <string name="_1_sales_information">1. Sales Information</string>
+    <string name="_2_sales_order_details">2. Sales Order Details</string>
+    <string name="so_number">SO Number:</string>
+    <string name="so_date">SO Date:</string>
+    <string name="client">Client:</string>
+    <string name="client_pending_sales_details">Client Pending Sales Details:</string>
 </resources>
