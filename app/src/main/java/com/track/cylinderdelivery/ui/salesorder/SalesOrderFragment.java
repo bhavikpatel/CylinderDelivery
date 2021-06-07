@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,8 @@ public class SalesOrderFragment extends Fragment {
     private SharedPreferences settings;
     private int totalRecord;
     private SalesOrderListAdapter salesOrderListAdapter;
+    SharedPreferences spSorting;
+    SearchView svUser;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -79,6 +82,8 @@ public class SalesOrderFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         progressBar=root.findViewById(R.id.progressBar);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
+        spSorting=context.getSharedPreferences("SOFilter",MODE_PRIVATE);
+        svUser=root.findViewById(R.id.svUser);
 
         if(isNetworkConnected()){
             callGetSalesOrderList();
@@ -86,6 +91,40 @@ public class SalesOrderFragment extends Fragment {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+        svUser.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                if(isNetworkConnected()){
+                    search="";
+                    salesOrderList=null;
+                    callGetSalesOrderList();
+                    svUser.clearFocus();
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
+        });
+        svUser.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(isNetworkConnected()){
+                    search=query;
+                    salesOrderList=null;
+                    callGetSalesOrderList();
+                    svUser.clearFocus();
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                search=newText;
+                return true;
+            }
+        });
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -119,6 +158,29 @@ public class SalesOrderFragment extends Fragment {
         });
         return root;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(spSorting.getBoolean("sofilter",false)){
+            SharedPreferences.Editor userFilterEditor = spSorting.edit();
+            userFilterEditor.putBoolean("sofilter",false);
+            userFilterEditor.commit();
+            SortBy=spSorting.getInt("index1",1);
+            if(spSorting.getString("text2","Decinding").equals("Decinding")){
+                Sort="desc";
+            }else{
+                Sort="asc";
+            }
+            if(isNetworkConnected()){
+                salesOrderList=null;
+                callGetSalesOrderList();
+            }else {
+                Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.salesorder_menu, menu);

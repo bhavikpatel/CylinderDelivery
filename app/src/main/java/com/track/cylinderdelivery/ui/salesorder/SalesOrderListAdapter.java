@@ -47,7 +47,7 @@ public class SalesOrderListAdapter extends RecyclerView.Adapter<SalesOrderListAd
                 public void onClick(View v) {
                     int pos= (int) imgArrow.getTag ();
                     if(podetailList.get(pos).get("status").equals("Draft")){
-                        /*Intent intent=new Intent(context, EditPurchaseOrderActivity.class);
+                        /*Intent intent=new Intent(context, EditSalesOrderActivity.class);
                         intent.putExtra("editData",podetailList.get(pos));
                         context.startActivity(intent);
                         context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);*/
