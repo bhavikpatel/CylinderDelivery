@@ -806,7 +806,7 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //progressDialog.dismiss();
+                progressDialog.dismiss();
                 String message = null;
                 if (error instanceof NetworkError) {
                     message = "Cannot connect to Internet...Please check your connection!";

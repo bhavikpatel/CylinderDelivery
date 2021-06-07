@@ -201,6 +201,7 @@
             android:textSize="20sp"
             app:popupTextAlignment="start"
             app:textTint="@color/black" />
+
         <ImageView
             android:id="@+id/btnScanCylinders"
             android:layout_width="wrap_content"

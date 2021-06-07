@@ -5,6 +5,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Context;
@@ -94,10 +96,15 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     private ArrayList<String> qrcodeList;
     TextView txtCylinderNos;
-    private Button btnAdd;
+    private Button btnAdd,btnLastSubmit;
     private int pendingsalespos=0;
     private String dnDetailId;
     private String productId;
+    private int totalRecord;
+    private ArrayList<HashMap<String,String>> sODetailList;
+    private SODetailListAdapter sODetailListAdapter;
+    RecyclerView recyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +142,10 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         txtCylinderNos=findViewById(R.id.txtCylinderNos);
         qrcodeList=new ArrayList<String>();
         btnAdd=findViewById(R.id.btnAdd);
+        recyclerView=findViewById(R.id.recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(layoutManager);
+        btnLastSubmit=findViewById(R.id.btnLastSubmit);
 
         Date c = Calendar.getInstance().getTime();
         Log.d("soDate==>",c+"");
@@ -151,10 +162,20 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+        btnLastSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkConnected()){
+                    callSubmitSO();
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validate()){
+                if(validate1()){
                     if(isNetworkConnected()){
                         try {
                             callAddSOCylinder();
@@ -199,7 +220,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                     SharedPreferences.Editor userFilterEditor = spSorting.edit();
                     userFilterEditor.putBoolean("sofilter",true);
                     userFilterEditor.commit();
-                    if(validate1()){
+                    if(validate()){
                         try {
                             callAddEditSO();
                         } catch (JSONException e) {
@@ -297,6 +318,72 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         });
     }
 
+    private void callSubmitSO() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/SubmitSO?SOId="+SOId+
+                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                        finish();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     private void callAddSOCylinder() throws JSONException {
         //isLoading=true;
         Log.d("Api Calling==>","Api Calling");
@@ -332,38 +419,33 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                             JSONObject jsonObject=response;
                             if(jsonObject.getBoolean("status")){
                                 //Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
-                                /*JSONObject dataobj=jsonObject.getJSONObject("data");
+                                JSONObject dataobj=jsonObject.getJSONObject("data");
                                 totalRecord= dataobj.getInt("totalRecord");
                                 JSONArray jsonArray=dataobj.getJSONArray("list");
                                 Boolean flgfirstload=false;
-                                if(dNDetailList==null){
-                                    dNDetailList=new ArrayList<>();
+                                if(sODetailList==null){
+                                    sODetailList=new ArrayList<>();
                                     //  flgfirstload=true;
                                 }
                                 for(int i=0;i<jsonArray.length();i++){
                                     HashMap<String,String> map=new HashMap<>();
-                                    map.put("dnDetailId", jsonArray.getJSONObject(i).getString("dnDetailId"));
-                                    map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
-                                    map.put("companyId", jsonArray.getJSONObject(i).getString("companyId"));
-                                    map.put("userId",jsonArray.getJSONObject(i).getString("userId"));
+                                    map.put("soDetailId", jsonArray.getJSONObject(i).getString("soDetailId"));
+                                    map.put("soId", jsonArray.getJSONObject(i).getString("soId"));
                                     map.put("productId", jsonArray.getJSONObject(i).getString("productId"));
                                     map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
-                                    map.put("poDetailId",jsonArray.getJSONObject(i).getString("poDetailId"));
-                                    map.put("quantity",jsonArray.getJSONObject(i).getString("quantity"));
+                                    map.put("cylinderProductMappingId", jsonArray.getJSONObject(i).getString("cylinderProductMappingId"));
+                                    map.put("dnDetailId",jsonArray.getJSONObject(i).getString("dnDetailId"));
+                                    map.put("cylinderID",jsonArray.getJSONObject(i).getString("cylinderID"));
+                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
                                     map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
                                     map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                                    map.put("dNid",jsonArray.getJSONObject(i).getString("dNid"));
                                     map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
                                     map.put("createdDateStr",jsonArray.getJSONObject(i).getString("createdDateStr"));
-                                    map.put("userName",jsonArray.getJSONObject(i).getString("userName"));
-                                    map.put("deliveryNoteNo",jsonArray.getJSONObject(i).getString("deliveryNoteNo"));
-                                    map.put("poNo",jsonArray.getJSONObject(i).getString("poNo"));
-                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
-                                    map.put("cylinders",jsonArray.getJSONObject(i).getString("cylinders"));
-
-                                    dNDetailList.add(map);
+                                    sODetailList.add(map);
                                 }
-                                dNDetailListAdapter=new DNDetailListAdapter(dNDetailList,context);
-                                recyclerView.setAdapter(dNDetailListAdapter);*/
+                                sODetailListAdapter=new SODetailListAdapter(sODetailList,context);
+                                recyclerView.setAdapter(sODetailListAdapter);
 
 /*                                if(podetailList.size()>=totalRecord){
                                     isLastPage=true;
@@ -375,6 +457,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                                 }else {
                                     productAddListAdapter.notifyDataSetChanged();
                                 }*/
+
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
@@ -833,5 +916,75 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     public void hideSoftKeyboard(View view){
         InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void callChangeCompanyStatus(String soDetailId) {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/DeleteSODetail?SODetailId="+Integer.parseInt(soDetailId);
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        for(int i=0;i<sODetailList.size();i++){
+                            if(sODetailList.get(i).get("soDetailId").equals(soDetailId)){
+                                sODetailList.remove(i);
+                                break;
+                            }
+                        }
+                        sODetailListAdapter.notifyDataSetChanged();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 }
