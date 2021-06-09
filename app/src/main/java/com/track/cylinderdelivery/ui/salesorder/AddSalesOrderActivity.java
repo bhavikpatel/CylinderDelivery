@@ -272,6 +272,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                 if(position!=0) {
                     clintvalue=customerList.get(position-1).get("value");
                     clinttext=customerList.get(position-1).get("text");
+
                 }else {
                     clintvalue="";
                     clinttext="";

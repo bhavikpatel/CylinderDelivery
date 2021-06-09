@@ -132,14 +132,31 @@
             android:textSize="20sp"
             app:popupTextAlignment="start"
             app:textTint="@color/black" />
+        <TextView
+            android:id="@+id/txtUserName11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/warehouse1"
+            android:textSize="@dimen/lblForm" />
+
+        <org.angmarch.views.NiceSpinner
+            android:id="@+id/NSWarehouse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/veryLightGray"
+            android:textSize="20sp"
+            app:popupTextAlignment="start"
+            app:textTint="@color/black" />
 
         <TextView
             android:id="@+id/txtPOGeneratedBy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/POGeneratedBy"
+            android:text="@string/SOGeneratedBy"
             android:textSize="@dimen/lblForm" />
+
 
         <EditText
             android:id="@+id/edtPOGeneratedBy"
