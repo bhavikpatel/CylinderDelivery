@@ -21,6 +21,7 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -33,6 +34,7 @@ import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.BaseActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
+import org.angmarch.views.NiceSpinner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,12 +45,16 @@ import java.util.Map;
 
 public class AddUserActivity extends BaseActivity {
 
-    AppCompatSpinner spinner_name;
+
     Context context;
     EditText edtName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode;
     EditText edtMobile,edtSecondaryMobile,edtEmail,edtPassword,edtSecondaryEmail;
     Button btnSubmit,btnCancel;
     private SharedPreferences spUserFilter;
+    NiceSpinner NSUserType;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private EditText edtHoldingCapacity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +69,7 @@ public class AddUserActivity extends BaseActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add User </font>"));
         //RefreshUserList=true;
 
-        spinner_name=(AppCompatSpinner)findViewById(R.id.spinner_name);
+
         edtName=(EditText)findViewById(R.id.edtName);
         edtAddress1=(EditText)findViewById(R.id.edtAddress1);
         edtAddress2=(EditText)findViewById(R.id.edtAddress2);
@@ -77,14 +83,8 @@ public class AddUserActivity extends BaseActivity {
         edtSecondaryEmail=(EditText)findViewById(R.id.edtSecondaryEmail);
         btnSubmit=(Button)findViewById(R.id.btnSubmit);
         btnCancel=(Button)findViewById(R.id.btnCancel);
-
-        ArrayList list = new ArrayList<String>();
-        list.add("Select");
-        list.add("01");
-        list.add("02");
-        ArrayAdapter<String> adp = new ArrayAdapter<String>
-                (this, android.R.layout.simple_spinner_item, list);
-        spinner_name.setAdapter(adp);
+        NSUserType=findViewById(R.id.NSUserType);
+        edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +105,9 @@ public class AddUserActivity extends BaseActivity {
                 int CreatedBy=1;
                 int ModifiedBy=1;
                 int HoldingCapacity=10;
+                if(edtHoldingCapacity.getText().toString().trim().length()!=0){
+                    HoldingCapacity=Integer.parseInt(edtHoldingCapacity.getText().toString());
+                }
 
                 if(validate(FullName,Address1,City,County,ZipCode,Phone,Email,EmailPassword,
                         Address2,SecondaryPhone,SecondaryEmail)){
@@ -116,7 +119,6 @@ public class AddUserActivity extends BaseActivity {
                         }else {
                             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                         }
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -142,8 +144,9 @@ public class AddUserActivity extends BaseActivity {
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(AddUserActivity.this, R.drawable.loader);
         progressDialog.show();
         String url = BASE_URL+"MobUser/AddEdit";
+        Log.d("requestUrl==>",url);
         final JSONObject jsonBody=new JSONObject();
-        jsonBody.put("UserId",null);
+        jsonBody.put("UserId",JSONObject.NULL);
         jsonBody.put("FullName",FullName+"");
         jsonBody.put("CompanyId",CompanyId);
         jsonBody.put("Address1",Address1+"");
@@ -163,7 +166,7 @@ public class AddUserActivity extends BaseActivity {
         jsonBody.put("ModifiedBy",ModifiedBy);
 
         final String v = jsonBody.toString();
-
+        Log.d("request==>",v);
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -204,8 +207,12 @@ public class AddUserActivity extends BaseActivity {
                 return map;
             }
         };
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        requestQueue.add(jsonObjectRequest);
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(jsonObjectRequest);
     }
 
     @Override
@@ -219,13 +226,13 @@ public class AddUserActivity extends BaseActivity {
                             String Address2,String SecondaryPhone,String SecondaryEmail) {
         boolean valid = true;
 
-
+/*
         if (SecondaryPhone.isEmpty()) {
             edtSecondaryMobile.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryMobile.setError(null);
-        }
+        }*/
         if (Address2.isEmpty()) {
             edtAddress2.setError("Field is Required.");
             valid = false;
@@ -281,7 +288,7 @@ public class AddUserActivity extends BaseActivity {
             edtEmail.setError("valid email address.");
             valid=false;
         }
-        if (SecondaryEmail.isEmpty()) {
+/*        if (SecondaryEmail.isEmpty()) {
             edtSecondaryEmail.setError("Field is Required.");
             valid = false;
         } else {
@@ -292,7 +299,7 @@ public class AddUserActivity extends BaseActivity {
         }else{
             edtSecondaryEmail.setError("valid email address.");
             valid=false;
-        }
+        }*/
         if(EmailPassword.isEmpty()){
             edtPassword.setError("Field is Required.");
             valid=false;

@@ -55,7 +55,7 @@ public class EditCompany extends AppCompatActivity {
     EditText edtTexNumber,edtEmail,edtSecondaryEmail,edtMobile,edtSecondaryMobile;
     NiceSpinner spCompanyType;
     private SharedPreferences settings,CompanyUpdate;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     ArrayList<HashMap<String,String>> companyTypeList;
     private int companytypepos=0;
 

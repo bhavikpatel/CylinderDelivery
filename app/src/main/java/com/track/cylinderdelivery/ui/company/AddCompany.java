@@ -63,7 +63,7 @@ public class AddCompany extends AppCompatActivity {
     private EditText edtSecondaryMobile,edtEmailPassword;
     private SharedPreferences settings;
     private SharedPreferences CompanyUpdate;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     ArrayList<HashMap<String,String>> companyTypeList;
     NiceSpinner spCompanyType;
     int companytypepos=-1;

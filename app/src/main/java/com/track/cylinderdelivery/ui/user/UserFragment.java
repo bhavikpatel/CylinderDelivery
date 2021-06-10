@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -151,6 +152,8 @@ public class UserFragment extends Fragment {
                         search="";
                         dataList=null;
                         callUserListApi();
+                        hideSoftKeyboard(svUser);
+                        svUser.clearFocus();
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                     }
@@ -168,6 +171,8 @@ public class UserFragment extends Fragment {
                         search=query;
                         dataList=null;
                         callUserListApi();
+                        hideSoftKeyboard(svUser);
+                        svUser.clearFocus();
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                     }
@@ -353,10 +358,11 @@ public class UserFragment extends Fragment {
                             if(userTypeListApifirsttime){
                                 userTypeListApi();
                             }
-
+                            hideSoftKeyboard(recyclerView);
                         }else {
                             userListAdapter.notifyDataSetChanged();
                         }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -575,5 +581,9 @@ public class UserFragment extends Fragment {
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+    public void hideSoftKeyboard(View view){
+        InputMethodManager imm =(InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

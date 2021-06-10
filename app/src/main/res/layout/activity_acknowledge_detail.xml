@@ -314,13 +314,13 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/btnAction"
-                    android:src="@drawable/ic_baseline_edit_24"
+                    android:src="@drawable/ic_baseline_mode_edit_24"
                     android:layout_width="50dp"
                     android:layout_height="50dp"/>
                 <ImageView
                     android:id="@+id/btnAckno"
                     android:layout_marginLeft="50dp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:src="@drawable/ic_baseline_doorbell_24"
                     android:layout_width="50dp"
                     android:layout_height="50dp"/>

@@ -39,23 +39,25 @@
         android:text="" />
 
         <TextView
-        android:id="@+id/txtType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:visibility="gone"
-        android:textSize="@dimen/lblForm"
-        android:text="@string/type" />
-
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/spinner_name"
+            android:id="@+id/txtType"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:autofillHints="Select"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/type"
+            android:textColor="@color/black"
+            android:textSize="@dimen/lblForm"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <org.angmarch.views.NiceSpinner
+            android:id="@+id/NSUserType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/veryLightGray"
+            android:textSize="20sp"
             android:visibility="gone"
-            android:background="@color/white" />
+            app:popupTextAlignment="start"
+            app:textTint="@color/black" />
     <TextView
         android:id="@+id/txtAddress1"
         android:layout_width="match_parent"
@@ -172,14 +174,30 @@
         android:textColor="@color/black"
         android:textStyle="bold"
         android:textSize="@dimen/lblForm"
-        android:text="@string/secondary_mobile" />
+        android:text="@string/secondary_mobile_" />
         <EditText
             android:id="@+id/edtSecondaryMobile"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:paddingRight="@dimen/EditTextPadding"
             android:paddingLeft="@dimen/EditTextPadding"
-
+            android:inputType="number"
+            android:text="" />
+        <TextView
+            android:id="@+id/txtSecondaryMobile1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/per_month_requirement" />
+        <EditText
+            android:id="@+id/edtHoldingCapacity"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingRight="@dimen/EditTextPadding"
+            android:paddingLeft="@dimen/EditTextPadding"
             android:inputType="number"
             android:text="" />
         <TextView
@@ -226,7 +244,7 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/lblForm"
-            android:text="@string/secondary_email" />
+            android:text="@string/secondary_email_" />
         <EditText
             android:id="@+id/edtSecondaryEmail"
             android:layout_width="match_parent"

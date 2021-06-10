@@ -38,9 +38,11 @@ public class EditUserActivity extends BaseActivity {
     Context context;
     EditText edtName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode;
     EditText edtMobile,edtSecondaryMobile,edtEmail,edtPassword,edtSecondaryEmail;
+    EditText edtHoldingCapacity;
     Button btnSubmit,btnCancel;
     HashMap<String, String> mapdata;
     private SharedPreferences spUserFilter;
+    int holdingCapacity=10;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +72,7 @@ public class EditUserActivity extends BaseActivity {
         edtSecondaryEmail= findViewById(R.id.edtSecondaryEmail);
         btnSubmit= findViewById(R.id.btnSubmit);
         btnCancel= findViewById(R.id.btnCancel);
+        edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
 
         edtName.setText(mapdata.get("fullName"));
         edtAddress1.setText(mapdata.get("address1"));
@@ -82,6 +85,7 @@ public class EditUserActivity extends BaseActivity {
         edtEmail.setText(mapdata.get("email"));
         edtSecondaryEmail.setText(mapdata.get("secondaryEmail"));
         edtPassword.setText(mapdata.get("emailPassword"));
+        edtHoldingCapacity.setText(mapdata.get("holdingCapacity"));
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,7 +98,10 @@ public class EditUserActivity extends BaseActivity {
                         edtSecondaryEmail.getText().toString().trim())){
                     try {
                         if(isNetworkConnected()){
-                            callEditUserApi();
+                            if(edtHoldingCapacity.getText().toString().trim().length()!=0){
+                                holdingCapacity=Integer.parseInt(edtHoldingCapacity.getText().toString());
+                                callEditUserApi();
+                            }
                         }else {
                             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                         }
@@ -130,7 +137,7 @@ public class EditUserActivity extends BaseActivity {
         jsonBody.put("ZipCode",edtZipCode.getText().toString().trim()+"");
         jsonBody.put("Phone",edtMobile.getText().toString().trim()+"");
         jsonBody.put("SecondaryPhone",edtSecondaryMobile.getText().toString().trim()+"");
-        jsonBody.put("HoldingCapacity",Integer.parseInt(mapdata.get("holdingCapacity")));
+        jsonBody.put("HoldingCapacity",holdingCapacity);
         jsonBody.put("Email",edtEmail.getText().toString().trim()+"");
         jsonBody.put("SecondaryEmail",edtSecondaryEmail.getText().toString().trim()+"");
         jsonBody.put("EmailPassword",edtPassword.getText().toString().trim()+"");
@@ -195,18 +202,18 @@ public class EditUserActivity extends BaseActivity {
                             String address2,String SecondaryMobile,String SecondaryEmail) {
         boolean valid = true;
 
-        if (SecondaryEmail.isEmpty()) {
+/*        if (SecondaryEmail.isEmpty()) {
             edtSecondaryEmail.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryEmail.setError(null);
-        }
-        if (SecondaryMobile.isEmpty()) {
+        }*/
+/*        if (SecondaryMobile.isEmpty()) {
             edtSecondaryMobile.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryMobile.setError(null);
-        }
+        }*/
         if (address2.isEmpty()) {
             edtAddress2.setError("Field is Required.");
             valid = false;
