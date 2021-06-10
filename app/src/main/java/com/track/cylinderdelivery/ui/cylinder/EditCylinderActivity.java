@@ -60,7 +60,7 @@ public class EditCylinderActivity extends AppCompatActivity {
     ArrayList<HashMap<String,String>> wharehouselist;
     private SharedPreferences settings;
     private int CompanyId;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     EditText edtManufacturingDate,edtCompanyName,edtAddress1,edtAddress2,editCity,edtCountry;
     EditText edtZipCode,edtValveCompanyName,edtPurchaesDate,edtExpireDate,edtPaintExpireMonth,edtTestingPeriodMonth;
     Calendar myCalendar;
@@ -422,36 +422,36 @@ public class EditCylinderActivity extends AppCompatActivity {
         }else {
             edtCompanyName.setError(null);
         }
-        if(Address1.isEmpty()){
+/*        if(Address1.isEmpty()){
             edtAddress1.setError("Field is Required.");
             valid=false;
         }else {
             edtAddress1.setError(null);
-        }
-        if(Address2.isEmpty()){
+        }*/
+/*        if(Address2.isEmpty()){
             edtAddress2.setError("Field is Required.");
             valid=false;
         }else {
             edtAddress2.setError(null);
-        }
-        if(City.isEmpty()){
+        }*/
+/*        if(City.isEmpty()){
             editCity.setError("Field is Required.");
             valid=false;
         }else {
             editCity.setError(null);
-        }
-        if(Country.isEmpty()){
+        }*/
+/*        if(Country.isEmpty()){
             edtCountry.setError("Field is Required.");
             valid=false;
         }else{
             edtCountry.setError(null);
-        }
-        if(ZipCode.isEmpty()){
+        }*/
+/*        if(ZipCode.isEmpty()){
             edtZipCode.setError("Field is Required.");
             valid=false;
         }else{
             edtZipCode.setError(null);
-        }
+        }*/
         if(ValueComanyName.isEmpty()){
             edtValveCompanyName.setError("Field is Required.");
             valid=false;

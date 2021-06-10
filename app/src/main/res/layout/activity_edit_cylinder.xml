@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/address1" />
+            android:text="@string/address11" />
         <EditText
             android:id="@+id/edtAddress1"
             android:layout_width="match_parent"
@@ -105,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/address2" />
+            android:text="@string/address2_" />
         <EditText
             android:id="@+id/edtAddress2"
             android:layout_width="match_parent"
@@ -119,7 +119,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/city" />
+            android:text="@string/city1" />
         <EditText
             android:id="@+id/editCity"
             android:layout_width="match_parent"
@@ -133,7 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/country" />
+            android:text="@string/country1" />
         <EditText
             android:id="@+id/edtCountry"
             android:layout_width="match_parent"
@@ -147,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/zipcode" />
+            android:text="@string/zipcode1" />
         <EditText
             android:id="@+id/edtZipCode"
             android:layout_width="match_parent"

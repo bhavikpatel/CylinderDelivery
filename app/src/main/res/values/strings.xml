@@ -66,6 +66,7 @@
     <string name="country">Country*</string>
     <string name="country1">Country</string>
     <string name="zipcode">ZipCode*</string>
+    <string name="zipcode1">ZipCode</string>
     <string name="pin_number">Tax Number*</string>
     <string name="pin_number1">Tax Number</string>
     <string name="email">Email*</string>
@@ -164,6 +165,7 @@
     <string name="userRemark">User Remark</string>
     <string name="add_qr_code">Add QR Code Manually</string>
     <string name="Warehouse">Warehouse</string>
+    <string name="Warehouse_">Warehouse*</string>
     <string name="manufacturing_company">Manufacturing Company</string>
     <string name="warehouse_list">Warehouse List</string>
     <string name="action_addWarehouse">Add Warehouse</string>

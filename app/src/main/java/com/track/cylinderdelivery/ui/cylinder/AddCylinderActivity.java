@@ -421,36 +421,36 @@ public class AddCylinderActivity extends AppCompatActivity {
         }else {
             edtCompanyName.setError(null);
         }
-        if(Address1.isEmpty()){
+        /*if(Address1.isEmpty()){
             edtAddress1.setError("Field is Required.");
             valid=false;
         }else {
             edtAddress1.setError(null);
-        }
-        if(Address2.isEmpty()){
+        }*/
+/*        if(Address2.isEmpty()){
             edtAddress2.setError("Field is Required.");
             valid=false;
         }else {
             edtAddress2.setError(null);
-        }
-        if(City.isEmpty()){
+        }*/
+ /*       if(City.isEmpty()){
             editCity.setError("Field is Required.");
             valid=false;
         }else {
             editCity.setError(null);
-        }
-          if(Country.isEmpty()){
+        }*/
+/*          if(Country.isEmpty()){
             edtCountry.setError("Field is Required.");
             valid=false;
         }else{
             edtCountry.setError(null);
-        }
-        if(ZipCode.isEmpty()){
+        }*/
+/*        if(ZipCode.isEmpty()){
             edtZipCode.setError("Field is Required.");
             valid=false;
         }else{
             edtZipCode.setError(null);
-        }
+        }*/
           if(ValueComanyName.isEmpty()){
              edtValveCompanyName.setError("Field is Required.");
             valid=false;

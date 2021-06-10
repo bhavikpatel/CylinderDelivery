@@ -64,7 +64,7 @@ public class CylinderFragment extends Fragment {
     private RecyclerView recyclerView;
     private SearchView searchViewCylinder;
     private SharedPreferences settings;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     private int CompanyId;
     ArrayList<HashMap<String,String>> cylinderList;
     CylinderListAdapter cylinderListAdapter;
@@ -72,7 +72,7 @@ public class CylinderFragment extends Fragment {
     String search="";
     int pageno=0;
     int totalinpage=10;
-    int SortBy=0;
+    String SortBy="";
     String Sort="desc";
     SharedPreferences spSorting;
     private String CyldType;
@@ -196,7 +196,7 @@ public class CylinderFragment extends Fragment {
             }else if(spSorting.getBoolean("dofilter",false)){
                 //CompanyId= Integer.parseInt(settings.getString("companyId","1"));
                 CyldType = spSorting.getString("text","");
-                SortBy=spSorting.getInt("index1",1);
+                SortBy=spSorting.getString("text1","");
                 if(spSorting.getString("text2","Decinding").equals("Decinding")){
                     Sort="desc";
                 }else{

@@ -71,12 +71,27 @@ public class CylinderListAdapter extends RecyclerView.Adapter<CylinderListAdapte
         holder.imgArrow.setTag(position);
         holder.txtCylinderNo.setText(cylinderList.get(position).get("cylinderNo"));
        // holder.txtValManuf.setText(cylinderList.get(position).get("companyName"));
-        holder.txtValManuf.setText(cylinderList.get(position).get("companyName")+
-                ","+cylinderList.get(position).get("address1")+
-                ","+cylinderList.get(position).get("address2")+
-                ","+cylinderList.get(position).get("city")+
-                ","+cylinderList.get(position).get("county")+
-                ","+cylinderList.get(position).get("zipCode"));
+        String address="";
+        if(cylinderList.get(position).get("companyName").length()!=0 && !cylinderList.get(position).get("companyName").equals("null")){
+            address+=cylinderList.get(position).get("companyName");
+        }
+        if(cylinderList.get(position).get("address1").length()!=0 && !cylinderList.get(position).get("address1").equals("null")){
+            address+=","+cylinderList.get(position).get("address1");
+        }
+        if(cylinderList.get(position).get("address2").length()!=0 && !cylinderList.get(position).get("address2").equals("null")){
+            address+=","+cylinderList.get(position).get("address2");
+        }
+        if(cylinderList.get(position).get("city").length()!=0 && !cylinderList.get(position).get("city").equals("null")){
+            address+=","+cylinderList.get(position).get("city");
+        }
+        if(cylinderList.get(position).get("county").length()!=0 && !cylinderList.get(position).get("county").equals("null")){
+            address+=","+cylinderList.get(position).get("county");
+        }
+        if(cylinderList.get(position).get("zipCode").length()!=0 && !cylinderList.get(position).get("zipCode").equals("null")){
+            address+="-"+cylinderList.get(position).get("zipCode");
+        }
+
+        holder.txtValManuf.setText(address);
     }
 
     @Override
