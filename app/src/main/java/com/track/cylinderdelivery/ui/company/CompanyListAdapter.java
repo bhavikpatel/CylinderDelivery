@@ -36,12 +36,15 @@ public class CompanyListAdapter extends RecyclerView.Adapter<CompanyListAdapter.
         TextView txtName;
         TextView txtAddress;
         ImageView imgArrow;
+        TextView txtAdminName,txtStatus;
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
             txtName = (TextView) view.findViewById(R.id.txtName);
             txtAddress=(TextView)view.findViewById(R.id.txtAddress);
             imgArrow=(ImageView)view.findViewById(R.id.imgArrow);
+            txtAdminName=(TextView)view.findViewById(R.id.txtAdminName);
+            txtStatus=view.findViewById(R.id.txtStatus);
             imgArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -73,6 +76,8 @@ public class CompanyListAdapter extends RecyclerView.Adapter<CompanyListAdapter.
        // holder.getTextView().setText(localDataSet[position]);
         holder.imgArrow.setTag(position);
         holder.txtName.setText(companyList.get(position).get("companyName"));
+        holder.txtAdminName.setText("Admin Name: "+companyList.get(position).get("adminName"));
+        holder.txtStatus.setText(companyList.get(position).get("status"));
         holder.txtAddress.setText(companyList.get(position).get("address1")+
                 ","+companyList.get(position).get("address2")+
                 ","+companyList.get(position).get("city")+

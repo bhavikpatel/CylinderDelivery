@@ -97,7 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textSize="@dimen/lblForm"
-        android:text="@string/address2" />
+        android:text="@string/address2_" />
     <EditText
         android:id="@+id/edtAddress2"
         android:layout_width="match_parent"
@@ -179,7 +179,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textSize="@dimen/lblForm"
-        android:text="@string/secondary_email" />
+        android:text="@string/secondary_email_" />
     <EditText
         android:id="@+id/edtSecondaryEmail"
         android:layout_width="match_parent"
@@ -207,7 +207,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textSize="@dimen/lblForm"
-        android:text="@string/secondary_mobile" />
+        android:text="@string/secondary_mobile_" />
         <EditText
             android:id="@+id/edtSecondaryMobile"
             android:layout_width="match_parent"

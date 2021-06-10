@@ -70,41 +70,24 @@ public class FilterUserListActivity extends AppCompatActivity {
         userDataSet = new LinkedList<>();
 
         for(int i=0;i<companyList.size();i++){
-            //RadioButton radioButton=new RadioButton(context);
-            //radioButton.setId(1+i);
-            //RadioGroup.LayoutParams rprms = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
-            //radioButton.setText(companyList.get(i).get("text"));
             companyDataSet.add(companyList.get(i).get("text"));
-            //radioButton.setTextColor(getResources().getColor(R.color.black));
-            //radioButton.setTextSize(getResources().getDimension(R.dimen.radiolbl));
-            //radioButton.setButtonTintList(getRadioButtonColors());
-            //companyRadioGroup.addView(radioButton,i,rprms);
             if(companyList.get(i).get("text").trim().equals(spCompanyFilter.getString("text","").trim())){
-            //    radioButton.setChecked(true);
                 indexCompanySelected=i;
             }
         }
-       // companyDataSet.add("data");
         spinnerCompany.attachDataSource(companyDataSet);
         spinnerCompany.setSelectedIndex(indexCompanySelected);
+        CompanyPosition=indexCompanySelected;
 
         for(int i=0;i<userTypeList.size();i++){
-            //RadioButton radioButton=new RadioButton(context);
-            //radioButton.setId(1+i);
-            //RadioGroup.LayoutParams rprms = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
-            //radioButton.setText(userTypeList.get(i).get("text"));
             userDataSet.add(userTypeList.get(i).get("text"));
-            //radioButton.setTextColor(getResources().getColor(R.color.black));
-            //radioButton.setTextSize(getResources().getDimension(R.dimen.radiolbl));
-            //radioButton.setButtonTintList(getRadioButtonColors());
-            //userRadioGroup.addView(radioButton,i,rprms);
             if(userTypeList.get(i).get("text").toString().trim().equals(spUserFilter.getString("text","").trim())){
-              //  radioButton.setChecked(true);
                 indexUserSelected=i;
             }
         }
         spinnerUser.attachDataSource(userDataSet);
         spinnerUser.setSelectedIndex(indexUserSelected);
+        userPosition=indexUserSelected;
 
         spinnerCompany.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
@@ -137,6 +120,7 @@ public class FilterUserListActivity extends AppCompatActivity {
                 companyFilterEditor.putBoolean("dofilter",true);
                 companyFilterEditor.putInt("index",CompanyPosition);
                 companyFilterEditor.putString("text",companyList.get(CompanyPosition).get("text"));
+                companyFilterEditor.putInt("companyId", Integer.parseInt(companyList.get(CompanyPosition).get("value")));
                 companyFilterEditor.commit();
 
                 finish();
@@ -161,16 +145,4 @@ public class FilterUserListActivity extends AppCompatActivity {
             }
         });
     }
-/*    private ColorStateList getRadioButtonColors() {
-        return new ColorStateList (
-                new int[][] {
-                        new int[] {android.R.attr.state_checked}, // checked
-                        new int[] {android.R.attr.state_enabled} // unchecked
-                },
-                new int[] {
-                        Color.GREEN, // checked
-                        Color.BLUE   // unchecked
-                }
-        );
-    }*/
 }

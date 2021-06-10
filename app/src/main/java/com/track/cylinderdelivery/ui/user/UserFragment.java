@@ -76,7 +76,7 @@ public class UserFragment extends Fragment {
     private ArrayList<HashMap<String, String>> companyList;
     private SharedPreferences spUserFilter;
     private SharedPreferences spCompanyFilter;
-    private int SortBy=1;
+    private String SortBy="";
     private String Sort="desc";
     ArrayList<HashMap<String,String>> dataList;
 
@@ -85,6 +85,7 @@ public class UserFragment extends Fragment {
     Boolean isLastPage=false;
     int totalRecord;
     private UserListAdapter userListAdapter;
+    boolean userTypeListApifirsttime=true;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -235,10 +236,10 @@ public class UserFragment extends Fragment {
             companyFilterEditor.putBoolean("dofilter",false);
             companyFilterEditor.commit();
 
-            CompanyId= Integer.parseInt(settings.getString("companyId","1"));
+            CompanyId= spCompanyFilter.getInt("companyId",1);
             UserType = spUserFilter.getString("text","");
 
-            SortBy=spUserFilter.getInt("index1",1);
+            SortBy=spUserFilter.getString("text1","");
             if(spUserFilter.getString("text2","Decinding").equals("Decinding")){
                 Sort="desc";
             }else{
@@ -288,7 +289,8 @@ public class UserFragment extends Fragment {
         }else {
             progressBar.setVisibility(View.VISIBLE);
         }
-       String url = "http://test.hdvivah.in/Api/MobUser/UserList?search="+search+"&pageno="+pageno+"&totalinpage="+totalinpage+"&CompanyId="+CompanyId+"&UserType="+UserType+"&SortBy="+SortBy+"&Sort="+Sort;
+       String url = "http://test.hdvivah.in/Api/MobUser/UserList?search="+search+"&pageno="+pageno+
+               "&totalinpage="+totalinpage+"&CompanyId="+CompanyId+"&UserType="+UserType+"&SortBy="+SortBy+"&Sort="+Sort;
 
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
@@ -348,7 +350,10 @@ public class UserFragment extends Fragment {
                             userListAdapter=new UserListAdapter(dataList,getActivity());
                             recyclerView.setAdapter(userListAdapter);
                             userListAdapter.notifyDataSetChanged();
-                            userTypeListApi();
+                            if(userTypeListApifirsttime){
+                                userTypeListApi();
+                            }
+
                         }else {
                             userListAdapter.notifyDataSetChanged();
                         }
@@ -376,7 +381,9 @@ public class UserFragment extends Fragment {
                 }
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                 Log.d("error==>",message+"");
-                userTypeListApi();
+                if(userTypeListApifirsttime){
+                    userTypeListApi();
+                }
             }
         }){
             @Override
@@ -403,7 +410,7 @@ public class UserFragment extends Fragment {
         Log.d("Api Calling==>","Api Calling");
         //final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         //progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobUser/ActiveCompanyList?CompayId="+CompanyId;
+        String url = "http://test.hdvivah.in/Api/MobUser/ActiveCompanyList?CompayId="+Integer.parseInt(settings.getString("companyId","1"));;
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
@@ -437,6 +444,7 @@ public class UserFragment extends Fragment {
                             break;
                         }
                     }
+                    userTypeListApifirsttime=false;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

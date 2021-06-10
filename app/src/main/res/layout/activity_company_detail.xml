@@ -37,6 +37,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
             </RelativeLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -251,7 +254,7 @@
                         android:layout_height="50dp"/>
                     <ImageView
                         android:id="@+id/btnEdit"
-                        android:src="@drawable/ic_baseline_edit_24"
+                        android:src="@drawable/ic_baseline_mode_edit_24"
                         android:layout_marginLeft="50dp"
                         android:layout_width="50dp"
                         android:layout_height="50dp"/>
@@ -263,6 +266,7 @@
                         android:layout_height="50dp"/>
                 </LinearLayout>
             </LinearLayout>
+            </ScrollView>
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

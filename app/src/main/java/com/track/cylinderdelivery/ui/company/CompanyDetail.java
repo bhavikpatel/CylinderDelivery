@@ -52,7 +52,7 @@ public class CompanyDetail extends AppCompatActivity {
     ImageView btnActive;
     String CompanyStatus;
     String alretString;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     private SharedPreferences settings,CompanyUpdate;
     private String Status;
 

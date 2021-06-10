@@ -57,7 +57,7 @@ public class EditCompany extends AppCompatActivity {
     private SharedPreferences settings,CompanyUpdate;
     private static final int MY_SOCKET_TIMEOUT_MS = 5000;
     ArrayList<HashMap<String,String>> companyTypeList;
-    private int companytypepos=-1;
+    private int companytypepos=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -260,18 +260,18 @@ public class EditCompany extends AppCompatActivity {
         } else {
             edtAddress2.setError(null);
         }
-        if (secondaryPhone.isEmpty()) {
+/*        if (secondaryPhone.isEmpty()) {
             edtSecondaryMobile.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryMobile.setError(null);
-        }
-        if (secondaryEmail.isEmpty()) {
+        }*/
+/*        if (secondaryEmail.isEmpty()) {
             edtSecondaryEmail.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryEmail.setError(null);
-        }
+        }*/
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
             valid = false;
@@ -362,11 +362,15 @@ public class EditCompany extends AppCompatActivity {
                             map.put("disabled",jsonArray.getJSONObject(i).getBoolean("disabled")+"");
                             map.put("group",jsonArray.getJSONObject(i).getString("group")+"");
                             map.put("selected",jsonArray.getJSONObject(i).getBoolean("selected")+"");
+                            if(mapdata.get("companyType").equals(jsonArray.getJSONObject(i).getString("text"))){
+                                companytypepos=i+1;
+                            }
 
                             imtes.add(jsonArray.getJSONObject(i).getString("value") + "");
                             companyTypeList.add(map);
                         }
                         spCompanyType.attachDataSource(imtes);
+                        spCompanyType.setSelectedIndex(companytypepos);
                     }else {
 
                     }

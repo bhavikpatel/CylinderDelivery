@@ -320,7 +320,7 @@
                 <ImageView
                     android:id="@+id/btnAckno"
                     android:layout_marginLeft="50dp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:src="@drawable/ic_baseline_doorbell_24"
                     android:layout_width="50dp"
                     android:layout_height="50dp"/>

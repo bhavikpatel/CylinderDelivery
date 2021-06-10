@@ -63,7 +63,7 @@ public class CompanyFragment extends Fragment {
     SearchView svUser;
     SharedPreferences CompanyUpdate,spCompanyFilter;
     LinearLayout lvSortingParent;
-    private int SortBy=1;
+    private String SortBy="";
     private String Sort="desc";
     ArrayList<HashMap<String,String>> dataList;
     int totalRecord;
@@ -187,7 +187,7 @@ public class CompanyFragment extends Fragment {
             companyFilterEditor.putBoolean("dofilter",false);
             companyFilterEditor.commit();
 
-            SortBy=spCompanyFilter.getInt("index1",1);
+            SortBy=spCompanyFilter.getString("text1","");
             if(spCompanyFilter.getString("text2","Decinding").equals("Decinding")){
                 Sort="desc";
             }else{

@@ -21,12 +21,35 @@
             android:text="Simba Gas Ltd"
             android:textColor="@color/black"
             android:textSize="@dimen/name_in_list" />
+        <RelativeLayout
+            android:id="@+id/lvstatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/imgArrow"
+            android:layout_below="@+id/txtName">
 
+            <TextView
+                android:id="@+id/txtAdminName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Admin Name"
+                android:textSize="@dimen/address_in_list" />
+
+            <TextView
+                android:id="@+id/txtStatus"
+                android:text="Active"
+                android:layout_alignParentRight="true"
+                android:textSize="@dimen/address_in_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txtName"
-
+            android:layout_below="@+id/lvstatus"
             android:layout_toLeftOf="@+id/imgArrow"
             android:gravity="center_vertical"
             android:orientation="horizontal">

@@ -122,10 +122,7 @@ public class AddCompany extends AppCompatActivity {
                         edtZipCode.getText().toString().trim(),
                         edtTexNumber.getText().toString().trim(),
                         edtMobile.getText().toString().trim(),
-                        edtEmail.getText().toString().trim(),
-                        edtSecondaryEmail.getText().toString().trim(),
-                        edtSecondaryMobile.getText().toString().trim(),
-                        edtAddress2.getText().toString().trim())){
+                        edtEmail.getText().toString().trim())){
                     try {
                         if(isNetworkConnected()){
                             callEditCompanyApi();
@@ -162,7 +159,7 @@ public class AddCompany extends AppCompatActivity {
         String url = BASE_URL+"/api/MobCompany/AddEdit";
         final JSONObject jsonBody=new JSONObject();
         SharedPreferences setting= getSharedPreferences("setting",MODE_PRIVATE);
-        jsonBody.put("CompanyId",null);
+        jsonBody.put("CompanyId",JSONObject.NULL);
         jsonBody.put("CompanyName",edtName.getText().toString().trim()+"");
         jsonBody.put("AdminName",edtPersonName.getText().toString().trim()+"");
         jsonBody.put("Address1",edtAddress1.getText().toString().trim()+"");
@@ -174,7 +171,7 @@ public class AddCompany extends AppCompatActivity {
         jsonBody.put("SecondaryPhone",edtSecondaryMobile.getText().toString().trim()+"");
         jsonBody.put("Email",edtEmail.getText().toString().trim()+"");
         jsonBody.put("SecondaryEmail",edtSecondaryEmail.getText().toString().trim()+"");
-        jsonBody.put("EmailPassword","");
+        jsonBody.put("EmailPassword",JSONObject.NULL);
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
         jsonBody.put("ModifiedBy",Integer.parseInt(settings.getString("userId","1")));
         jsonBody.put("CompanyType",companyTypeList.get(companytypepos-1).get("value")+"");
@@ -227,22 +224,21 @@ public class AddCompany extends AppCompatActivity {
     }
 
     public boolean validate(String fullName,String CopmanyName,String Address1,String City,String County,
-                            String ZipCode,String TaxNumber, String Phone, String Email,
-                            String SecondaryEmail,String SecondaryPhome,String Address2) {
+                            String ZipCode,String TaxNumber, String Phone, String Email) {
         boolean valid = true;
 
-        if (Address2.isEmpty()) {
+/*        if (Address2.isEmpty()) {
             edtAddress2.setError("Field is Required.");
             valid = false;
         } else {
             edtAddress2.setError(null);
-        }
-        if (SecondaryPhome.isEmpty()) {
+        }*/
+/*        if (SecondaryPhome.isEmpty()) {
             edtSecondaryMobile.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryMobile.setError(null);
-        }
+        }*/
 
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
@@ -311,18 +307,18 @@ public class AddCompany extends AppCompatActivity {
             edtEmail.setError("valid email address.");
             valid=false;
         }
-        if (SecondaryEmail.isEmpty()) {
+/*        if (SecondaryEmail.isEmpty()) {
             edtSecondaryEmail.setError("Field is Required.");
             valid = false;
         } else {
             edtSecondaryEmail.setError(null);
-        }
-        if (edtSecondaryEmail.getText().toString().matches(emailPattern)) {
+        }*/
+/*        if (edtSecondaryEmail.getText().toString().matches(emailPattern)) {
             edtSecondaryEmail.setError(null);
         }else{
             edtSecondaryEmail.setError("valid email address.");
             valid=false;
-        }
+        }*/
 
         return valid;
     }

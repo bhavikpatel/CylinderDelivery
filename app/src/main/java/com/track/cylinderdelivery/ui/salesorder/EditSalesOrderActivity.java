@@ -46,7 +46,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
 
     private HashMap<String, String> mapdata;
     EditSalesOrderActivity context;
-    EditText edtSoNumber,edtSoDate;
+    EditText edtSoNumber,edtSoDate,edtSoGenerateby;
     NiceSpinner NsDeliveyNote,NSClient;
     private SharedPreferences settings;
     private ArrayList<HashMap<String,String>> deliveryList;
@@ -83,6 +83,8 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         NsDeliveyNote=findViewById(R.id.NSUserName);
         NSClient=findViewById(R.id.NSClient);
         NSWarehouse=findViewById(R.id.NSWarehouse);
+        edtSoGenerateby=findViewById(R.id.edtPOGeneratedBy);
+        edtSoGenerateby.setText(mapdata.get("soGeneratedBy"));
 
         if(isNetworkConnected()) {
             callGetReadyforDeliveryDeliveryList();

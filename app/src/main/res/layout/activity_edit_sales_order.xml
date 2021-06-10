@@ -10,7 +10,7 @@
     <LinearLayout
         android:id="@+id/lvHading"
         android:weightSum="2"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="3dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -36,7 +36,7 @@
         android:id="@+id/lv_underline"
         android:weightSum="2"
         android:layout_below="@+id/lvHading"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
@@ -86,7 +86,7 @@
             android:id="@+id/txtPODate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/so_date"
             android:textSize="@dimen/lblForm" />
 
@@ -103,7 +103,7 @@
             android:id="@+id/txtUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/delivery_note_"
             android:textSize="@dimen/lblForm" />
 
@@ -120,7 +120,7 @@
             android:id="@+id/txtUserName1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/client"
             android:textSize="@dimen/lblForm" />
 
@@ -136,7 +136,7 @@
             android:id="@+id/txtUserName11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/warehouse1"
             android:textSize="@dimen/lblForm" />
 
@@ -153,7 +153,7 @@
             android:id="@+id/txtPOGeneratedBy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:text="@string/SOGeneratedBy"
             android:textSize="@dimen/lblForm" />
 
