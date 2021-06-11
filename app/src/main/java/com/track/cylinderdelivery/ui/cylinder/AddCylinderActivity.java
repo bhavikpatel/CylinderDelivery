@@ -73,18 +73,20 @@ public class AddCylinderActivity extends AppCompatActivity {
     EditText edtValveCompanyName,edtPurchaesDate,edtExpireDate,edtPaintExpireMonth,edtTestingPeriodMonth;
     Calendar myCalendar;
     String Company,Address1;
-    String ManufacturingDate;
+    String ManufacturingDate="";
     private String City,Country;
     private String ZipCode;
     private String ValueComanyName;
-    private String PurchaeDate;
-    private String ExpireDate;
+    private String PurchaeDate="";
+    private String ExpireDate="";
     private String PaintExpireDays;
     private String TestingPeriodDays;
     ArrayList<HashMap<String,String>> wharehouselist;
     private String Address2;
     private SharedPreferences settings;
     private SharedPreferences CompanyUpdate;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +213,7 @@ public class AddCylinderActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ManufacturingDate=edtManufacturingDate.getText().toString();
+                //ManufacturingDate=edtManufacturingDate.getText().toString();
                 Company=edtCompanyName.getText().toString();
                 Address1=edtAddress1.getText().toString();
                 Address2=edtAddress2.getText().toString();
@@ -219,8 +221,8 @@ public class AddCylinderActivity extends AppCompatActivity {
                 Country=edtCountry.getText().toString();
                 ZipCode=edtZipCode.getText().toString();
                 ValueComanyName=edtValveCompanyName.getText().toString();
-                PurchaeDate=edtPurchaesDate.getText().toString();
-                ExpireDate=edtExpireDate.getText().toString();
+                //PurchaeDate=edtPurchaesDate.getText().toString();
+                //ExpireDate=edtExpireDate.getText().toString();
                 PaintExpireDays=edtPaintExpireMonth.getText().toString();
                 TestingPeriodDays=edtTestingPeriodMonth.getText().toString();
 
@@ -319,30 +321,48 @@ public class AddCylinderActivity extends AppCompatActivity {
                 return map;
             }
         };
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        requestQueue.add(jsonObjectRequest);
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(jsonObjectRequest);
     }
-
 
     private void updateLabelExpireDate() {
         //String myFormat = "MM/dd/yy"; //In which you need put here
         String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        edtExpireDate.setText(sdf.format(myCalendar.getTime()));
+       // edtExpireDate.setText(sdf.format(myCalendar.getTime()));
+        ExpireDate=sdf.format(myCalendar.getTime());
+
+        String dmyFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat dsdf = new SimpleDateFormat(dmyFormat, Locale.US);
+        edtExpireDate.setText(dsdf.format(myCalendar.getTime()));
     }
 
     private void updateLabelPurchaesDate() {
         //String myFormat = "MM/dd/yy"; //In which you need put here
         String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        edtPurchaesDate.setText(sdf.format(myCalendar.getTime()));
+        //edtPurchaesDate.setText(sdf.format(myCalendar.getTime()));
+        PurchaeDate=sdf.format(myCalendar.getTime());
+
+        String dmyFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat dsdf = new SimpleDateFormat(dmyFormat, Locale.US);
+        edtPurchaesDate.setText(dsdf.format(myCalendar.getTime()));
     }
 
     private void updateLabel() {
         //String myFormat = "MM/dd/yy"; //In which you need put here
         String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        edtManufacturingDate.setText(sdf.format(myCalendar.getTime()));
+        //edtManufacturingDate.setText(sdf.format(myCalendar.getTime()));
+        ManufacturingDate=sdf.format(myCalendar.getTime());
+
+        String dispFormat="dd/MM/yyyy";
+        SimpleDateFormat dipsdf = new SimpleDateFormat(dispFormat, Locale.US);
+        edtManufacturingDate.setText(dipsdf.format(myCalendar.getTime()));
     }
     private void openQrScan() {
         txtCylinderNos.setError(null);
