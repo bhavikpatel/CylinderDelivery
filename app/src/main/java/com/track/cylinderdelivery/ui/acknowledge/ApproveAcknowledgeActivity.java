@@ -73,6 +73,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
     private SharedPreferences settings;
     RelativeLayout rvParent;
     private SharedPreferences shpreRefresh;
+    private int AcknowledgeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,11 +133,13 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
 
         callGetUserDetail(Integer.parseInt(mapdata.get("userId")));
 
+
         btnAckno.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(validate(edtHoldingCapacity.getText().toString(),edtDate.getText().toString(),edtRemark.getText().toString())){
                     int UserId= Integer.parseInt(mapdata.get("userId"));
+                    AcknowledgeId=Integer.parseInt(mapdata.get("acknowledgeId"));
                     int HoldingCapacity=Integer.parseInt(edtHoldingCapacity.getText().toString()+"");
                     String AcknowledgeDate=edtDate.getText().toString();
                     String Status=spinarStatus.getSelectedItem().toString();
@@ -201,6 +204,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         jsonBody.put("AchnowledgeRemark",achnowledgeRemark);
         jsonBody.put("CreatedBy",createdBy);
         jsonBody.put("AcknowledgeBy",acknowledgeBy);
+        jsonBody.put("AcknowledgeId",AcknowledgeId);
         final String v = jsonBody.toString();
         Log.d("parambers==>",v);
 

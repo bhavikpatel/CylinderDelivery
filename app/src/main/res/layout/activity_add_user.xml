@@ -84,15 +84,14 @@
         android:textColor="@color/black"
         android:textStyle="bold"
         android:textSize="@dimen/lblForm"
-        android:text="@string/address2" />
+        android:text="@string/address2_" />
     <EditText
         android:id="@+id/edtAddress2"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:paddingRight="@dimen/EditTextPadding"
         android:paddingLeft="@dimen/EditTextPadding"
-
-        android:inputType="textPersonName"
+        android:inputType="text"
         android:text="" />
     <TextView
         android:id="@+id/txtCity"

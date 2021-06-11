@@ -257,6 +257,7 @@ public class AddPurchaseOrderActivity extends AppCompatActivity {
                     quantity=Integer.parseInt(edtQuantity.getText().toString()+"");
                     if(isNetworkConnected()){
                         try {
+                            podetailList=null;
                             callAddEditPODetail();
                         } catch (JSONException e) {
                             e.printStackTrace();

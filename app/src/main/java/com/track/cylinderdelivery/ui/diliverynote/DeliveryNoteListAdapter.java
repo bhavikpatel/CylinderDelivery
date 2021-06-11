@@ -36,12 +36,14 @@ public class DeliveryNoteListAdapter extends RecyclerView.Adapter<DeliveryNoteLi
         TextView txtPonumber;
         TextView txtUserName;
         ImageView imgArrow;
+        TextView txtStatus;
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
             txtPonumber = (TextView) view.findViewById(R.id.txtPonumber);
             txtUserName=(TextView)view.findViewById(R.id.txtUserName);
             imgArrow=(ImageView)view.findViewById(R.id.imgArrow);
+            txtStatus=(TextView)view.findViewById(R.id.txtStatus);
             imgArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -81,13 +83,20 @@ public class DeliveryNoteListAdapter extends RecyclerView.Adapter<DeliveryNoteLi
         holder.imgArrow.setTag(position);
         holder.txtPonumber.setText(podetailList.get(position).get("dnNumber"));
         holder.txtUserName.setText(podetailList.get(position).get("username"));
+        holder.txtStatus.setText(podetailList.get(position).get("status"));
         if(podetailList.get(position).get("status").equals("Pending")){
-                holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_actions_24);
+            holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_actions_24);
+            holder.imgArrow.setVisibility(View.VISIBLE);
+            holder.txtStatus.setVisibility(View.VISIBLE);
         }else if(podetailList.get(position).get("status").equals("Draft")){
             holder.imgArrow.setImageResource(R.drawable.ic_baseline_edit_24);
+            holder.imgArrow.setVisibility(View.VISIBLE);
+            holder.txtStatus.setVisibility(View.VISIBLE);
         }else {
             holder.imgArrow.setVisibility(View.GONE);
+            holder.txtStatus.setVisibility(View.GONE);
         }
+
     }
 
     @Override

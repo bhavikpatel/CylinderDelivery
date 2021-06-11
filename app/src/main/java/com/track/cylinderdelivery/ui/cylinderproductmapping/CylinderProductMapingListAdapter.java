@@ -1,4 +1,4 @@
-package com.track.cylinderdelivery.ui.salesorder;
+package com.track.cylinderdelivery.ui.cylinderproductmapping;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,16 +14,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.track.cylinderdelivery.R;
-import com.track.cylinderdelivery.ui.purchaseorder.EditPurchaseOrderActivity;
+import com.track.cylinderdelivery.ui.diliverynote.DNCylinderActivity;
+import com.track.cylinderdelivery.ui.diliverynote.EditDeliveryNoteActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SalesOrderListAdapter extends RecyclerView.Adapter<SalesOrderListAdapter.ViewHolder>{
+public class CylinderProductMapingListAdapter extends RecyclerView.Adapter<CylinderProductMapingListAdapter.ViewHolder>{
 
     ArrayList<HashMap<String, String>> podetailList;
     Activity context;
-    public SalesOrderListAdapter(ArrayList<HashMap<String, String>> dataList, Activity activity) {
+    public CylinderProductMapingListAdapter(ArrayList<HashMap<String, String>> dataList, Activity activity) {
         podetailList=dataList;
         context=activity;
     }
@@ -43,27 +44,30 @@ public class SalesOrderListAdapter extends RecyclerView.Adapter<SalesOrderListAd
             txtPonumber = (TextView) view.findViewById(R.id.txtPonumber);
             txtUserName=(TextView)view.findViewById(R.id.txtUserName);
             imgArrow=(ImageView)view.findViewById(R.id.imgArrow);
-            txtStatus=view.findViewById(R.id.txtStatus);
+            txtStatus=(TextView)view.findViewById(R.id.txtStatus);
             imgArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int pos= (int) imgArrow.getTag ();
+/*                    int pos= (int) imgArrow.getTag ();
                     if(podetailList.get(pos).get("status").equals("Draft")){
-                        Intent intent=new Intent(context, EditSalesOrderActivity.class);
+                        Intent intent=new Intent(context, EditDeliveryNoteActivity.class);
                         intent.putExtra("editData",podetailList.get(pos));
                         context.startActivity(intent);
                         context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
-                    }
+                    }else if(podetailList.get(pos).get("status").equals("Pending")){
+                        Intent intent=new Intent(context, DNCylinderActivity.class);
+                        intent.putExtra("editData",podetailList.get(pos));
+                        context.startActivity(intent);
+                        context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
+                    }*/
                 }
             });
         }
     }
 
-
-
     @NonNull
     @Override
-    public SalesOrderListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CylinderProductMapingListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_purchase_order_list, parent, false);
@@ -71,27 +75,25 @@ public class SalesOrderListAdapter extends RecyclerView.Adapter<SalesOrderListAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SalesOrderListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CylinderProductMapingListAdapter.ViewHolder holder, int position) {
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         holder.imgArrow.setTag(position);
-        holder.txtPonumber.setText(podetailList.get(position).get("soNumber"));
-        holder.txtUserName.setText(podetailList.get(position).get("username")+"/"+
-                podetailList.get(position).get("quantity"));
-        holder.txtStatus.setText(podetailList.get(position).get("status"));
-        if(podetailList.get(position).get("status").equals("Pending")){
-            holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_24);
-            holder.imgArrow.setVisibility(View.INVISIBLE);
-            holder.txtStatus.setVisibility(View.VISIBLE);
+        holder.txtPonumber.setText(podetailList.get(position).get("cylinderNo")+"/"+
+                podetailList.get(position).get("productName")+"/"+podetailList.get(position).get("productName"));
+        holder.txtUserName.setText(podetailList.get(position).get("unit")+"/"+podetailList.get(position).get("quantity"));
+
+/*        if(podetailList.get(position).get("status").equals("Pending")){
+                holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_actions_24);
+                 holder.txtStatus.setText(podetailList.get(position).get("status"));
         }else if(podetailList.get(position).get("status").equals("Draft")){
             holder.imgArrow.setImageResource(R.drawable.ic_baseline_edit_24);
-            holder.imgArrow.setVisibility(View.VISIBLE);
-            holder.txtStatus.setVisibility(View.VISIBLE);
+            holder.txtStatus.setText(podetailList.get(position).get("status"));
         }else {
-            holder.imgArrow.setVisibility(View.GONE);
-            holder.txtStatus.setVisibility(View.GONE);
-        }
+            //holder.imgArrow.setVisibility(View.GONE);
+           // holder.txtStatus.setVisibility(View.GONE);
+        }*/
     }
 
     @Override

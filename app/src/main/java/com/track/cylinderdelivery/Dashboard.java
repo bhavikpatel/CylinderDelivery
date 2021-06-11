@@ -109,6 +109,14 @@ public class Dashboard extends BaseActivity {
                  R.id.nav_permssion,R.id.nav_delivery_note,R.id.nav_sales_order,R.id.nav_return_order)
                 .setDrawerLayout(drawer)
                 .build();
+/*        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_dashboard, R.id.nav_company, R.id.nav_user,R.id.nav_acknowledge,
+                R.id.nav_cylinderproductmapping,R.id.nav_cylinderWarehouseMapping,
+                R.id.nav_purchaseorder,R.id.nav_delivery_note,R.id.nav_sales_order,
+                R.id.nav_return_order,R.id.nav_cylinder,
+                R.id.nav_product,R.id.nav_warehouse,R.id.nav_report,R.id.nav_permssion)
+                .setDrawerLayout(drawer)
+                .build();*/
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
@@ -140,7 +148,11 @@ public class Dashboard extends BaseActivity {
     }
 
     private void addMenuDynamic(Menu menu, JSONObject menuJsonobj) {
-        //menu.findItem(R.id.nav_cylinder).setVisible(false);
+        menu.findItem(R.id.nav_product).setVisible(false);
+        menu.findItem(R.id.nav_warehouse).setVisible(false);
+        menu.findItem(R.id.nav_permssion).setVisible(false);
+        menu.findItem(R.id.nav_report).setVisible(false);
+        menu.findItem(R.id.nav_return_order).setVisible(false);
     }
 
     @Override

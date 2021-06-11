@@ -90,10 +90,9 @@ public class DNCylinderDetailListAdapter extends RecyclerView.Adapter<DNCylinder
         // contents of the view with that element
         holder.imgArrow.setTag(position);
         holder.txtProductName.setText(DNdetailList.get(position).get("productName")+"/"+
-                DNdetailList.get(position).get("quantity"));
-        holder.txtQuantity.setText(DNdetailList.get(position).get("warehouseName")+"/"+
-                DNdetailList.get(position).get("dnNo")+"/"+
                 DNdetailList.get(position).get("cylinderID"));
+        holder.txtQuantity.setText(DNdetailList.get(position).get("warehouseName")+"/"+
+                DNdetailList.get(position).get("dnNo"));
     }
 
     @Override

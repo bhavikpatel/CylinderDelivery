@@ -38,12 +38,15 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
         TextView txtPonumber;
         TextView txtUserName;
         ImageView imgArrow;
+        TextView txtStatus;
+
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
             txtPonumber = (TextView) view.findViewById(R.id.txtPonumber);
             txtUserName=(TextView)view.findViewById(R.id.txtUserName);
             imgArrow=(ImageView)view.findViewById(R.id.imgArrow);
+            txtStatus=view.findViewById(R.id.txtStatus);
             imgArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -78,12 +81,18 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
         holder.imgArrow.setTag(position);
         holder.txtPonumber.setText(podetailList.get(position).get("poNumber"));
         holder.txtUserName.setText(podetailList.get(position).get("username"));
+        holder.txtStatus.setText(podetailList.get(position).get("status"));
+        holder.imgArrow.setImageResource(R.drawable.ic_baseline_edit_24);
         if(podetailList.get(position).get("status").equals("Pending")){
-                holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_24);
+                //holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_24);
+            holder.imgArrow.setVisibility(View.INVISIBLE);
+            holder.txtStatus.setVisibility(View.VISIBLE);
         }else if(podetailList.get(position).get("status").equals("Draft")){
-            holder.imgArrow.setImageResource(R.drawable.ic_baseline_edit_24);
+            holder.imgArrow.setVisibility(View.VISIBLE);
+            holder.txtStatus.setVisibility(View.VISIBLE);
         }else {
             holder.imgArrow.setVisibility(View.GONE);
+            holder.txtStatus.setVisibility(View.GONE);
         }
     }
 

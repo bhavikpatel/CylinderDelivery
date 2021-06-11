@@ -17,41 +17,21 @@
             android:icon="@drawable/ic_people_24px"
             android:title="@string/user" />
         <item
-            android:id="@+id/nav_cylinder"
-            android:icon="@drawable/ic_fire_extinguisher_24px"
-            android:title="@string/cylinder" />
-        <item
-            android:id="@+id/nav_product"
-            android:icon="@drawable/ic_inventory_2_24px"
-            android:title="@string/product" />
-        <item
-            android:id="@+id/nav_warehouse"
-            android:icon="@drawable/ic_storage_24px"
-            android:title="@string/warehouse" />
-        <item
             android:id="@+id/nav_acknowledge"
             android:icon="@drawable/ic_rate_review_24px"
             android:title="@string/acknowledge" />
-        <item
-            android:id="@+id/nav_purchaseorder"
-            android:icon="@drawable/ic_baseline_edit_calendar_24"
-            android:title="@string/purchaseorder" />
         <item
             android:id="@+id/nav_cylinderproductmapping"
             android:icon="@drawable/ic_baseline_attach_file_24"
             android:title="@string/cylinderproductmapping" />
         <item
-            android:id="@+id/nav_report"
-            android:icon="@drawable/ic_baseline_addchart_24"
-            android:title="@string/repot" />
-        <item
             android:id="@+id/nav_cylinderWarehouseMapping"
             android:icon="@drawable/ic_baseline_swap_horizontal_circle_24"
             android:title="@string/cylinder_warehouse_mapping" />
         <item
-            android:id="@+id/nav_permssion"
-            android:icon="@drawable/ic_baseline_person_pin_24"
-            android:title="@string/permission" />
+            android:id="@+id/nav_purchaseorder"
+            android:icon="@drawable/ic_baseline_edit_calendar_24"
+            android:title="@string/purchaseorder" />
         <item
             android:id="@+id/nav_delivery_note"
             android:icon="@drawable/ic_baseline_assignment_24"
@@ -64,6 +44,28 @@
             android:id="@+id/nav_return_order"
             android:icon="@drawable/ic_baseline_reply_24"
             android:title="@string/return_order" />
+        <item
+            android:id="@+id/nav_cylinder"
+            android:icon="@drawable/ic_fire_extinguisher_24px"
+            android:title="@string/cylinder" />
+        <item
+            android:id="@+id/nav_product"
+            android:icon="@drawable/ic_inventory_2_24px"
+            android:title="@string/product" />
+        <item
+            android:id="@+id/nav_warehouse"
+            android:icon="@drawable/ic_storage_24px"
+            android:title="@string/warehouse" />
+        <item
+            android:id="@+id/nav_report"
+            android:icon="@drawable/ic_baseline_addchart_24"
+            android:title="@string/repot" />
+
+        <item
+            android:id="@+id/nav_permssion"
+            android:icon="@drawable/ic_baseline_person_pin_24"
+            android:title="@string/permission" />
+
     </group>
         <!--<item android:title="Communicate">
             <menu>

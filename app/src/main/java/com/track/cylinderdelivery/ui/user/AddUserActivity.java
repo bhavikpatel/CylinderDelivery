@@ -233,12 +233,12 @@ public class AddUserActivity extends BaseActivity {
         } else {
             edtSecondaryMobile.setError(null);
         }*/
-        if (Address2.isEmpty()) {
+/*        if (Address2.isEmpty()) {
             edtAddress2.setError("Field is Required.");
             valid = false;
         } else {
             edtAddress2.setError(null);
-        }
+        }*/
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
             valid = false;

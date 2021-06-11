@@ -72,7 +72,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
     int productpos=-1;
     private int CompanyId;
     private SharedPreferences settings;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     EditText edtFillingDate;
     Calendar myCalendar;
     Button btnCancel,btnSubmit;
@@ -84,6 +84,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
     private String GaugePressure;
     private String Impurities;
     private static final String BASE_URL = "http://test.hdvivah.in";
+    SharedPreferences cylindeMappingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
         edtPurity=findViewById(R.id.edtPurity);
         edtGaugePressure=findViewById(R.id.edtGaugePressure);
         edtImpurities=findViewById(R.id.edtImpurities);
+        cylindeMappingActivity=context.getSharedPreferences("CPMSoring",MODE_PRIVATE);
 
         qrcodeList=new ArrayList<String>();
         List<String> imtes=new ArrayList<>();
@@ -141,7 +143,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CylinderNos=txtCylinderNos.getText().toString();
-                FillingDate=edtFillingDate.getText().toString();
+                //FillingDate=edtFillingDate.getText().toString();
                 Quantity=edtQuantity.getText().toString();
                 Purity=edtPurity.getText().toString();
                 GaugePressure=edtGaugePressure.getText().toString();
@@ -220,6 +222,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
+        //http://test.hdvivah.in/Api/MobCylinderProductMapping/AddCylinderProductMapping
         String url = BASE_URL+"/Api/MobCylinderProductMapping/AddCylinderProductMapping";
         final JSONObject jsonBody=new JSONObject();
         SharedPreferences setting= getSharedPreferences("setting",MODE_PRIVATE);
@@ -248,9 +251,9 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
                             JSONObject jsonObject=response;
                             if(jsonObject.getBoolean("status")){
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
-                                /*SharedPreferences.Editor editor = CompanyUpdate.edit();
+                                SharedPreferences.Editor editor = cylindeMappingActivity.edit();
                                 editor.putBoolean("refresh",true);
-                                editor.commit();*/
+                                editor.commit();
                                 finish();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
@@ -339,7 +342,12 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
         //String myFormat = "MM/dd/yy"; //In which you need put here
         String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        edtFillingDate.setText(sdf.format(myCalendar.getTime()));
+        FillingDate=sdf.format(myCalendar.getTime());
+        //edtFillingDate.setText(sdf.format(myCalendar.getTime()));
+
+        String dmyFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat dsdf = new SimpleDateFormat(dmyFormat, Locale.US);
+        edtFillingDate.setText(dsdf.format(myCalendar.getTime()));
     }
     private void GetProductionWarehouseList() {
         Log.d("Api Calling==>","Api Calling");

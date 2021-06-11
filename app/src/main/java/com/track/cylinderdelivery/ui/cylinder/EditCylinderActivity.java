@@ -373,13 +373,17 @@ public class EditCylinderActivity extends AppCompatActivity {
                             HashMap<String, String> map = new HashMap<>();
                             map.put("warehouseId", jsonArray.getJSONObject(i).getInt("warehouseId")+"");
                             map.put("name", jsonArray.getJSONObject(i).getString("name") + "");
+                            if(mapdata.get("warehousename").equals(jsonArray.getJSONObject(i).getString("name"))){
+                                wharehouspos=i+1;
+                            }
                             imtes.add(jsonArray.getJSONObject(i).getString("name") + "");
                             wharehouselist.add(map);
                         }
-                    }else {
-
                     }
                     spWarehouse.attachDataSource(imtes);
+                    if(wharehouspos!=0){
+                        spWarehouse.setSelectedIndex(wharehouspos);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

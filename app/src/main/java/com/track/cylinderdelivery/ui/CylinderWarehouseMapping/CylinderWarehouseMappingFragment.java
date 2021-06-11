@@ -62,7 +62,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
     private String Sort="desc";
     private int WarehouseId;
     SharedPreferences setting;
-    int totalRecord;
+    int totalRecord=0;
     ArrayList<HashMap<String,String>> FillCylinderWarehouseMappingList;
     ArrayList<HashMap<String,String>> EmptyCylinderWarehouseMappingList;
     FilledCylinderListAdapter filledCylinderListAdapter;
@@ -185,7 +185,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
                             pageno++;
                             Log.d("pageno==>", pageno + "");
                             if(flgAck==1){
-                               callGetFillCylinderWarehouseMappingData();
+                                callGetFillCylinderWarehouseMappingData();
                             }else if(flgAck==2){
                                 callGetEmptyCylinderWarehouseMappingData();
                             }
@@ -457,6 +457,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
                     try {
                         j = new JSONObject(Response);
                         totalRecord1=j.getInt("totalRecord");
+                        totalRecord=totalRecord1;
                         JSONArray jsonArray=j.getJSONArray("list");
                         Boolean flgfirstload=false;
                         if(EmptyCylinderWarehouseMappingList==null){

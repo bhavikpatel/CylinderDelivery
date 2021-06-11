@@ -267,7 +267,7 @@ public class CylinderFragment extends Fragment {
                             map.put("expireDateStr", jsonArray.getJSONObject(i).getString("expireDateStr") + "");
                             map.put("paintExpireDays", jsonArray.getJSONObject(i).getInt("paintExpireDays") + "");
                             map.put("testingPeriodDays", jsonArray.getJSONObject(i).getInt("testingPeriodDays") + "");
-                            //map.put("warehouseId", jsonArray.getJSONObject(i).getInt("warehouseId") + "");
+                            map.put("warehouseId", jsonArray.getJSONObject(i).getInt("warehouseId") + "");
                            // map.put("createdBy", jsonArray.getJSONObject(i).getInt("createdBy") + "");
                            // map.put("modifiedBy", jsonArray.getJSONObject(i).getInt("modifiedBy") + "");
                             map.put("createdByName", jsonArray.getJSONObject(i).getString("createdByName") + "");
@@ -277,7 +277,7 @@ public class CylinderFragment extends Fragment {
                            // map.put("days", jsonArray.getJSONObject(i).getString("days") + "");
                            // map.put("paintExpireDate", jsonArray.getJSONObject(i).getString("paintExpireDate") + "");
                            // map.put("dt", jsonArray.getJSONObject(i).getString("dt") + "");
-                           // map.put("warehousename", jsonArray.getJSONObject(i).getString("warehousename") + "");
+                            map.put("warehousename", jsonArray.getJSONObject(i).getString("warehousename") + "");
                             cylinderList.add(map);
                         }
                         if(cylinderList.size()>=totalRecord){

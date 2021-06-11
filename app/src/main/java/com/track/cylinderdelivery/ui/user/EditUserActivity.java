@@ -214,12 +214,12 @@ public class EditUserActivity extends BaseActivity {
         } else {
             edtSecondaryMobile.setError(null);
         }*/
-        if (address2.isEmpty()) {
+/*        if (address2.isEmpty()) {
             edtAddress2.setError("Field is Required.");
             valid = false;
         } else {
             edtAddress2.setError(null);
-        }
+        }*/
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
             valid = false;

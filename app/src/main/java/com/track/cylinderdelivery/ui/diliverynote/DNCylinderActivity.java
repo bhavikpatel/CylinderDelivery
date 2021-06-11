@@ -286,6 +286,7 @@ public class DNCylinderActivity extends AppCompatActivity {
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
         String url = BASE_URL+"/Api/MobDeliveryNote/AddDNCylinder";
+        Log.d("url==>",url);
         final JSONObject jsonBody=new JSONObject();
         jsonBody.put("DNId",Integer.parseInt(mapdata.get("dnId")));
         jsonBody.put("WarehouseId",warehouseId);
