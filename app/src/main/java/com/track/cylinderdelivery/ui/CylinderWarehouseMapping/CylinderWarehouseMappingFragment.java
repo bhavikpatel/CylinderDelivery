@@ -58,7 +58,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
     private String search="";
     private int pageno=0;
     private int totalinpage=10;
-    private int SortBy;
+    private String SortBy="";
     private String Sort="desc";
     private int WarehouseId;
     SharedPreferences setting;
@@ -72,7 +72,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
     private String search1="";
     private int pageno1=0;
     private int totalinpage1=10;
-    private int SortBy1;
+    private String SortBy1="";
     private String Sort1="desc";
     private int WarehouseId1;
     private int totalRecord1;
@@ -208,7 +208,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
                 SharedPreferences.Editor userFilterEditor = spFilledFilter.edit();
                 userFilterEditor.putBoolean("dofilter",false);
                 userFilterEditor.commit();
-                SortBy=spFilledFilter.getInt("index1",1);
+                SortBy=spFilledFilter.getString("text1","");
                 if(spFilledFilter.getString("text2","Decinding").equals("Decinding")){
                     Sort="desc";
                 }else{
@@ -227,7 +227,7 @@ public class CylinderWarehouseMappingFragment extends Fragment {
                 SharedPreferences.Editor userFilterEditor = spEmptyFiter.edit();
                 userFilterEditor.putBoolean("dofilter", false);
                 userFilterEditor.commit();
-                SortBy1 = spEmptyFiter.getInt("index1", 1);
+                SortBy1 = spEmptyFiter.getString("text1", "");
                 if (spEmptyFiter.getString("text2", "Decinding").equals("Decinding")) {
                     Sort1 = "desc";
                 } else {

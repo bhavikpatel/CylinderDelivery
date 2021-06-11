@@ -63,7 +63,7 @@ public class DeliveryNoteFragment extends Fragment {
     private int pageno=0;
     private int totalinpage=10;
     private String Sort="desc";
-    private int SortBy;
+    private String SortBy;
     private ProgressBar progressBar;
     private ArrayList<HashMap<String,String>> deliveryNoteList;
     private int totalRecord;
@@ -183,7 +183,7 @@ public class DeliveryNoteFragment extends Fragment {
             SharedPreferences.Editor userFilterEditor = spSorting.edit();
             userFilterEditor.putBoolean("dofilter",false);
             userFilterEditor.commit();
-            SortBy=spSorting.getInt("index1",1);
+            SortBy=spSorting.getString("text1","1");
             if(spSorting.getString("text2","Decinding").equals("Decinding")){
                 Sort="desc";
             }else{

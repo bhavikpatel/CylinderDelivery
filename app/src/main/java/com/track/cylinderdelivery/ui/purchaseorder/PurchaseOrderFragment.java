@@ -63,7 +63,7 @@ public class PurchaseOrderFragment extends Fragment {
     private String search="";
     private int pageno=0;
     private int totalinpage=10;
-    private int SortBy;
+    private String SortBy;
     private String Sort="desc";
     private int totalRecord;
     private PurchaseOrderListAdapter purchaseOrderListAdapter;
@@ -177,7 +177,7 @@ public class PurchaseOrderFragment extends Fragment {
             SharedPreferences.Editor userFilterEditor = spSorting.edit();
             userFilterEditor.putBoolean("dofilter",false);
             userFilterEditor.commit();
-            SortBy=spSorting.getInt("index1",1);
+            SortBy=spSorting.getString("text1","");
             if(spSorting.getString("text2","Decinding").equals("Decinding")){
                 Sort="desc";
             }else{
