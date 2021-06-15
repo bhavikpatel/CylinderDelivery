@@ -152,7 +152,7 @@ public class Dashboard extends BaseActivity {
         menu.findItem(R.id.nav_warehouse).setVisible(false);
         menu.findItem(R.id.nav_permssion).setVisible(false);
         menu.findItem(R.id.nav_report).setVisible(false);
-        menu.findItem(R.id.nav_return_order).setVisible(false);
+       // menu.findItem(R.id.nav_return_order).setVisible(false);
     }
 
     @Override

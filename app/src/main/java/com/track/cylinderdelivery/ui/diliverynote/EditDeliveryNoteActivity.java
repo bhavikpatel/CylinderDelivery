@@ -574,7 +574,8 @@ public class EditDeliveryNoteActivity extends AppCompatActivity {
                                 }
                                     dNDetailListAdapter=new EditDNDetailListAdapter(dNDetailList,context);
                                     recyclerView.setAdapter(dNDetailListAdapter);
-
+                                qrcodeList.clear();
+                                txtCylinderNos.setText("");
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();

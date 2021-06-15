@@ -68,14 +68,14 @@ public class FilledCylinderListAdapter extends RecyclerView.Adapter<FilledCylind
        // holder.getTextView().setText(localDataSet[position]);
         holder.imgArrow.setTag(position);
         holder.txtCylinderNo.setText(cylinderList.get(position).get("cylinderNo"));
-        holder.txtValManuf.setText(cylinderList.get(position).get("warehouseName")+
-                ", "+cylinderList.get(position).get("productName"));
-       /* holder.txtValManuf.setText(cylinderList.get(position).get("companyName")+
-                ","+cylinderList.get(position).get("address1")+
-                ","+cylinderList.get(position).get("address2")+
-                ","+cylinderList.get(position).get("city")+
-                ","+cylinderList.get(position).get("county")+
-                ","+cylinderList.get(position).get("zipCode"));*/
+        String value="";
+        if(cylinderList.get(position).get("productName").length()!=0 && !cylinderList.get(position).get("productName").equals("null")){
+            value+=cylinderList.get(position).get("productName");
+        }
+        if(cylinderList.get(position).get("warehouseName").length()!=0 && !cylinderList.get(position).get("warehouseName").equals("null")){
+            value+=", "+cylinderList.get(position).get("warehouseName");
+        }
+        holder.txtValManuf.setText(value);
     }
 
     @Override

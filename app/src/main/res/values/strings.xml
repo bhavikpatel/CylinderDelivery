@@ -215,6 +215,7 @@
     <string name="cylinder_product_name_quantity">(Product Name/Cylinder/Quantity)</string>
     <string name="ready_for_delivery">Ready for Delivery</string>
     <string name="action_addSalseOrde">Sales Order</string>
+    <string name="action_addReturnOrde">Return Order</string>
     <string name="_1_sales_information">1. Sales Information</string>
     <string name="_2_sales_order_details">2. Sales Order Details</string>
     <string name="so_number">SO Number:</string>
@@ -223,4 +224,8 @@
     <string name="client_pending_sales_details">Client Pending Sales Details:</string>
     <string name="warehouse1">Warehouse:</string>
     <string name="per_month_requirement">Per Month Requirement</string>
+    <string name="_2_return_order_details">2. Return Order Details</string>
+    <string name="ro_number">RO Number:</string>
+    <string name="ro_date">RO Date:</string>
+    <string name="user_name">User Name:</string>
 </resources>

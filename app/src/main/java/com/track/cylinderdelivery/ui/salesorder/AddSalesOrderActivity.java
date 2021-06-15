@@ -286,7 +286,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             }
         });
 
-;        NSDeloryNote.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+        NSDeloryNote.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
                 NSDeloryNote.setError(null);

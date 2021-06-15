@@ -155,6 +155,7 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
         lvTab2.setVisibility(View.GONE);
         txtLineinfoUnderline.setBackgroundColor(getResources().getColor(R.color.green));
         txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
+        dNDetailList=new ArrayList<>();
 
         if(isNetworkConnected()){
             callGetActiveEmployeeData();
@@ -410,17 +411,8 @@ public class AddDeliveryNoteActivity extends AppCompatActivity {
                                 }
                                 dNDetailListAdapter=new DNDetailListAdapter(dNDetailList,context);
                                 recyclerView.setAdapter(dNDetailListAdapter);
-
-/*                                if(podetailList.size()>=totalRecord){
-                                    isLastPage=true;
-                                }
-                                if(flgfirstload){
-                                    flgfirstload=false;
-                                    productAddListAdapter=new ProductAddListAdapter(podetailList,context);
-                                    recyclerView.setAdapter(productAddListAdapter);
-                                }else {
-                                    productAddListAdapter.notifyDataSetChanged();
-                                }*/
+                                qrcodeList.clear();
+                                txtCylinderNos.setText("");
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
