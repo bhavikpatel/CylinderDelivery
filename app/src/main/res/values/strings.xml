@@ -228,4 +228,5 @@
     <string name="ro_number">RO Number:</string>
     <string name="ro_date">RO Date:</string>
     <string name="user_name">User Name:</string>
+    <string name="status1">Status:</string>
 </resources>

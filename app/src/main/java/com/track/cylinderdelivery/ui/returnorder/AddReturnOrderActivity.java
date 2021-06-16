@@ -1,10 +1,16 @@
 package com.track.cylinderdelivery.ui.returnorder;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -15,6 +21,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,9 +37,12 @@ import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
+import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
+import com.track.cylinderdelivery.ui.salesorder.AddSalesOrderActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -72,6 +82,17 @@ public class AddReturnOrderActivity extends AppCompatActivity {
 
     TextView txtClientInfo;
     TextView txtPurchaseOrderDetail;
+    private static final String BASE_URL = "http://test.hdvivah.in";
+    private int ROId;
+    NiceSpinner NSPendingSales;
+    ImageView btnScanCylinders;
+    public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
+    TextView txtCylinderNos;
+    private ArrayList<String> qrcodeList;
+    private int pendingsalespos=0;
+    List<String> imtes;
+    private String CylinderStatus;
+    private Button btnAdd,btnLastSubmit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,14 +132,69 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
         txtClientInfo=findViewById(R.id.txtClientInfo);
         txtPurchaseOrderDetail=findViewById(R.id.txtPurchaseOrderDetail);
-
-
+        NSPendingSales=(NiceSpinner)findViewById(R.id.NSPendingSales);
+        btnScanCylinders=findViewById(R.id.btnScanCylinders);
         btnSaveAndContinue=findViewById(R.id.btnSaveAndContinue);
+        txtCylinderNos=findViewById(R.id.txtCylinderNos);
+        qrcodeList=new ArrayList<String>();
+        imtes=new ArrayList<>();
+        btnAdd=findViewById(R.id.btnAdd);
+
+
         if(isNetworkConnected()) {
             callGetActiveUserData();
         }else {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(validate1()){
+                    if(isNetworkConnected()){
+                        //callAddSOCylinder();
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+        NSPendingSales.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                NSPendingSales.setError(null);
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                pendingsalespos=position;
+                if(position!=0) {
+                   // dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
+                    //productId=pendingsalesList.get(position-1).get("productId");
+                    CylinderStatus=imtes.get(position);
+                }else {
+                    pendingsalespos=0;
+                }
+            }
+        });
+        NSPendingSales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
+        btnScanCylinders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(context,
+                        Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(AddReturnOrderActivity.this,
+                            new String[]{Manifest.permission.CAMERA},
+                            MY_PERMISSIONS_REQUEST_CAMERA);
+                }else {
+                    openQrScan();
+                }
+            }
+        });
 
         txtClientInfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,7 +215,11 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                     userFilterEditor.putBoolean("sofilter",true);
                     userFilterEditor.commit();
                     if(validate()){
-                        //callAddEditSO();
+                        try {
+                            callAddEditSO();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }else {
                     Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
@@ -177,6 +257,141 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(v);
             }
         });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==201){
+            try {
+                qrcodeList = (ArrayList<String>) data.getSerializableExtra("scanlist");
+                txtCylinderNos.setText(qrcodeList.toString()+"");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                Log.i("Camera", "G : " + grantResults[0]);
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted,
+                    openQrScan();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    if (ActivityCompat.shouldShowRequestPermissionRationale
+                            (this, Manifest.permission.CAMERA)) {
+                        //showAlert();
+                    } else {
+
+                    }
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+    private boolean validate1() {
+        boolean valid = true;
+        if (qrcodeList.size()==0) {
+            txtCylinderNos.setError("Field is Required.");
+            valid = false;
+        } else {
+            txtCylinderNos.setError(null);
+        }
+        if (pendingsalespos<=0) {
+            NSPendingSales.setError("Field is Required.");
+            valid = false;
+        } else {
+            NSPendingSales.setError(null);
+        }
+        return valid;
+    }
+
+    private void openQrScan() {
+        txtCylinderNos.setError(null);
+        Intent intent=new Intent(context, CylinderQRActivity.class);
+        intent.putExtra("scanlist",qrcodeList);
+        startActivityForResult(intent,201);
+    }
+    private void callAddEditSO() throws JSONException {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = BASE_URL+"/Api/MobReturnOrder/AddEditRO";
+        final JSONObject jsonBody=new JSONObject();
+        jsonBody.put("ROId",JSONObject.NULL);
+        jsonBody.put("RONumber",RONumber);
+        jsonBody.put("UserId",Integer.parseInt(userId));
+        jsonBody.put("RODate",roDate+"");
+        jsonBody.put("ROGeneratedBy",edtSOGeneratedBy.getText().toString()+"");
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+
+        Log.d("jsonRequest==>",jsonBody.toString()+"");
+
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        Log.d("response==>",response.toString()+"");
+                        try{
+                            JSONObject jsonObject=response;
+                            if(jsonObject.getBoolean("status")){
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
+                                ROId=jsonObject.getInt("data");
+                                lvTab1.setVisibility(View.GONE);
+                                lvTab2.setVisibility(View.VISIBLE);
+                                txtPurchaseOrderDetail.setTextColor(getResources().getColor(R.color.green));
+                                txtClientInfo.setTextColor(getResources().getColor(R.color.lightGrey));
+                                txtLineinfoUnderline.setBackgroundColor(getResources().getColor(R.color.lightGrey));
+                                txtPurchasodUnderline.setBackgroundColor(getResources().getColor(R.color.green));
+                                if(isNetworkConnected()){
+                                  //  callGetSalesOrderDetail();
+
+                                    imtes.add("Select");
+                                    imtes.add("Empty");
+                                    imtes.add("Damage");
+                                    NSPendingSales.attachDataSource(imtes);
+                                }else {
+                                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                                }
+                            }else {
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Log.d("response==>",error.toString()+"");
+                    }
+                }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
     }
 
     private void callGetActiveUserData() {
