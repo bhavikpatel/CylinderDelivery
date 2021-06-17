@@ -1,4 +1,4 @@
-package com.track.cylinderdelivery.ui.salesorder;
+package com.track.cylinderdelivery.ui.returnorder;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -15,16 +15,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.track.cylinderdelivery.R;
-import com.track.cylinderdelivery.ui.purchaseorder.AddPurchaseOrderActivity;
+import com.track.cylinderdelivery.ui.salesorder.AddSalesOrderActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SODetailListAdapter extends RecyclerView.Adapter<SODetailListAdapter.ViewHolder>{
+public class RODetailListAdapter extends RecyclerView.Adapter<RODetailListAdapter.ViewHolder>{
 
     ArrayList<HashMap<String, String>> podetailList;
-    AddSalesOrderActivity context;
-    public SODetailListAdapter(ArrayList<HashMap<String, String>> dataList, AddSalesOrderActivity activity) {
+    AddReturnOrderActivity context;
+    public RODetailListAdapter(ArrayList<HashMap<String, String>> dataList, AddReturnOrderActivity activity) {
         podetailList=dataList;
         context=activity;
     }
@@ -48,7 +48,7 @@ public class SODetailListAdapter extends RecyclerView.Adapter<SODetailListAdapte
                 public void onClick(View v) {
                     int pos= (int) imgArrow.getTag ();
                     /*Intent intent=new Intent(context, CylinderDetailActivity.class);
-                    intent.putExtra("editData",cylinderList.get(pos));recyclerView
+                    intent.putExtra("editData",cylinderList.get(pos));
                     context.startActivity(intent);
                     context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);*/
                     AlertDialog.Builder adb = new AlertDialog.Builder(context,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
@@ -58,7 +58,7 @@ public class SODetailListAdapter extends RecyclerView.Adapter<SODetailListAdapte
                     adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             if(isNetworkConnected()){
-                                context.callChangeCompanyStatus(podetailList.get(pos).get("soDetailId"));
+                               // context.callChangeCompanyStatus(podetailList.get(pos).get("soDetailId"));
                             }else {
                                 Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                             }
@@ -79,7 +79,7 @@ public class SODetailListAdapter extends RecyclerView.Adapter<SODetailListAdapte
 
     @NonNull
     @Override
-    public SODetailListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RODetailListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // Create a new view, which defines the UI of the list item
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_podetail, parent, false);
@@ -87,7 +87,7 @@ public class SODetailListAdapter extends RecyclerView.Adapter<SODetailListAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SODetailListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RODetailListAdapter.ViewHolder holder, int position) {
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element

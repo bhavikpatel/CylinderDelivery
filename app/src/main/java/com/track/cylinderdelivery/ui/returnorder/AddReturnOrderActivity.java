@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Context;
@@ -43,6 +44,7 @@ import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
 import com.track.cylinderdelivery.ui.salesorder.AddSalesOrderActivity;
+import com.track.cylinderdelivery.ui.salesorder.SODetailListAdapter;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -93,6 +95,12 @@ public class AddReturnOrderActivity extends AppCompatActivity {
     List<String> imtes;
     private String CylinderStatus;
     private Button btnAdd,btnLastSubmit;
+    private EditText edtRemark;
+    private String Remark;
+    private int totalRecord;
+    private ArrayList<HashMap<String,String>> sODetailList;
+    private RODetailListAdapter sODetailListAdapter;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +147,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         qrcodeList=new ArrayList<String>();
         imtes=new ArrayList<>();
         btnAdd=findViewById(R.id.btnAdd);
+        edtRemark=findViewById(R.id.edtRemark);
 
 
         if(isNetworkConnected()) {
@@ -150,9 +159,14 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Remark=edtRemark.getText().toString().trim();
                 if(validate1()){
                     if(isNetworkConnected()){
-                        //callAddSOCylinder();
+                        try {
+                            callAddSOCylinder();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                     }
@@ -258,6 +272,118 @@ public class AddReturnOrderActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void callAddSOCylinder() throws JSONException {
+        //isLoading=true;
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        /*if(podetailList==null){
+            isLoading=false;
+            isLastPage=false;
+            pageno=0;*/
+        progressDialog.show();
+        /*}else {
+            progressBar.setVisibility(View.VISIBLE);
+        }*/
+        String url = BASE_URL+"/Api/MobReturnOrder/AddEditRODetail";
+        final JSONObject jsonBody=new JSONObject();
+        jsonBody.put("ROId",ROId);
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        jsonBody.put("CylinderList",jsonArrayCylList);
+        jsonBody.put("CylinderStatus",CylinderStatus);
+        jsonBody.put("Remark",Remark);
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        Log.d("jsonRequest==>",jsonBody.toString()+"");
+
+        JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        //progressBar.setVisibility(View.GONE);
+                        // isLoading=false;
+                        Log.d("response==>",response.toString()+"");
+                        try{
+                            JSONObject jsonObject=response;
+                            if(jsonObject.getBoolean("status")){
+                                //Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_LONG).show();
+                                JSONObject dataobj=jsonObject.getJSONObject("data");
+                                totalRecord= dataobj.getInt("totalRecord");
+                                JSONArray jsonArray=dataobj.getJSONArray("list");
+                                Boolean flgfirstload=false;
+                                if(sODetailList==null){
+                                    sODetailList=new ArrayList<>();
+                                    //  flgfirstload=true;
+                                }
+                                for(int i=0;i<jsonArray.length();i++){
+                                    HashMap<String,String> map=new HashMap<>();
+                                    map.put("soDetailId", jsonArray.getJSONObject(i).getString("soDetailId"));
+                                    map.put("soId", jsonArray.getJSONObject(i).getString("soId"));
+                                    map.put("productId", jsonArray.getJSONObject(i).getString("productId"));
+                                    map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
+                                    map.put("cylinderProductMappingId", jsonArray.getJSONObject(i).getString("cylinderProductMappingId"));
+                                    map.put("dnDetailId",jsonArray.getJSONObject(i).getString("dnDetailId"));
+                                    map.put("cylinderID",jsonArray.getJSONObject(i).getString("cylinderID"));
+                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+                                    map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
+                                    map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
+                                    map.put("dNid",jsonArray.getJSONObject(i).getString("dNid"));
+                                    map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
+                                    map.put("createdDateStr",jsonArray.getJSONObject(i).getString("createdDateStr"));
+                                    sODetailList.add(map);
+                                }
+
+                                sODetailListAdapter=new RODetailListAdapter(sODetailList,context);
+                                recyclerView.setAdapter(sODetailListAdapter);
+
+/*                                if(podetailList.size()>=totalRecord){
+                                    isLastPage=true;
+                                }
+                                if(flgfirstload){
+                                    flgfirstload=false;
+                                    productAddListAdapter=new ProductAddListAdapter(podetailList,context);
+                                    recyclerView.setAdapter(productAddListAdapter);
+                                }else {
+                                    productAddListAdapter.notifyDataSetChanged();
+                                }*/
+
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        /*progressBar.setVisibility(View.GONE);
+                        isLoading=false;*/
+                        Log.d("response==>",error.toString()+"");
+                    }
+                }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(jsonObjectRequest);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -308,6 +434,12 @@ public class AddReturnOrderActivity extends AppCompatActivity {
             valid = false;
         } else {
             NSPendingSales.setError(null);
+        }
+        if(Remark.length()==0){
+            edtRemark.setError("Field is Required.");
+            valid=false;
+        }else {
+            edtRemark.setError(null);
         }
         return valid;
     }
