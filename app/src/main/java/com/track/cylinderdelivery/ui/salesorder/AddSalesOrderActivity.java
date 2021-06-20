@@ -96,7 +96,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
     private ArrayList<String> qrcodeList;
     TextView txtCylinderNos;
-    private Button btnAdd,btnLastSubmit;
+    private Button btnAdd,btnLastSubmit,btnSaveAsDraft;
     private int pendingsalespos=0;
     private String dnDetailId;
     private String productId;
@@ -146,6 +146,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         btnLastSubmit=findViewById(R.id.btnLastSubmit);
+        btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
 
         Date c = Calendar.getInstance().getTime();
         Log.d("soDate==>",c+"");
@@ -162,10 +163,18 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+        btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         btnLastSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isNetworkConnected()){
+                if(sODetailList.size()==0){
+                    Toast.makeText(context, "Kindly scan cylinder first.", Toast.LENGTH_LONG).show();
+                }else if(isNetworkConnected()){
                     callSubmitSO();
                 }else {
                     Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();

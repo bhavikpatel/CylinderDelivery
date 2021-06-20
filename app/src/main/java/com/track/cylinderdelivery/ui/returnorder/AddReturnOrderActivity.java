@@ -94,7 +94,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
     private int pendingsalespos=0;
     List<String> imtes;
     private String CylinderStatus;
-    private Button btnAdd,btnLastSubmit;
+    private Button btnAdd,btnLastSubmit,btnSaveAsDraft;
     private EditText edtRemark;
     private String Remark;
     private int totalRecord;
@@ -148,6 +148,9 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         imtes=new ArrayList<>();
         btnAdd=findViewById(R.id.btnAdd);
         edtRemark=findViewById(R.id.edtRemark);
+        btnLastSubmit=findViewById(R.id.btnLastSubmit);
+        btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
+        sODetailList=new ArrayList<>();
 
 
         if(isNetworkConnected()) {
@@ -156,6 +159,27 @@ public class AddReturnOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+
+        btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        btnLastSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkConnected()){
+                    if(sODetailList.size()!=0){
+                        callSubmitSO();
+                    }else {
+                        Toast.makeText(context, "Kindly scan cylinder first.", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -273,6 +297,72 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         });
     }
 
+    private void callSubmitSO() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobReturnOrder/SubmitRO?ROId="+ROId+
+                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                        finish();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     private void callAddSOCylinder() throws JSONException {
         //isLoading=true;
         Log.d("Api Calling==>","Api Calling");
@@ -286,6 +376,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
         }*/
         String url = BASE_URL+"/Api/MobReturnOrder/AddEditRODetail";
+        Log.d("url==>",url);
         final JSONObject jsonBody=new JSONObject();
         jsonBody.put("ROId",ROId);
         JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
@@ -317,19 +408,13 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                                 }
                                 for(int i=0;i<jsonArray.length();i++){
                                     HashMap<String,String> map=new HashMap<>();
-                                    map.put("soDetailId", jsonArray.getJSONObject(i).getString("soDetailId"));
-                                    map.put("soId", jsonArray.getJSONObject(i).getString("soId"));
-                                    map.put("productId", jsonArray.getJSONObject(i).getString("productId"));
-                                    map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
-                                    map.put("cylinderProductMappingId", jsonArray.getJSONObject(i).getString("cylinderProductMappingId"));
-                                    map.put("dnDetailId",jsonArray.getJSONObject(i).getString("dnDetailId"));
-                                    map.put("cylinderID",jsonArray.getJSONObject(i).getString("cylinderID"));
-                                    map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+                                    map.put("roDetailId", jsonArray.getJSONObject(i).getString("roDetailId"));
+                                    map.put("roId", jsonArray.getJSONObject(i).getString("roId"));
+                                    map.put("cylinderIds", jsonArray.getJSONObject(i).getString("cylinderIds"));
+                                    map.put("cylinderStatus",jsonArray.getJSONObject(i).getString("cylinderStatus"));
+                                    map.put("remark", jsonArray.getJSONObject(i).getString("remark"));
+                                    map.put("cylinderNo",jsonArray.getJSONObject(i).getString("cylinderNo"));
                                     map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
-                                    map.put("createdDate",jsonArray.getJSONObject(i).getString("createdDate"));
-                                    map.put("dNid",jsonArray.getJSONObject(i).getString("dNid"));
-                                    map.put("createdByName",jsonArray.getJSONObject(i).getString("createdByName"));
-                                    map.put("createdDateStr",jsonArray.getJSONObject(i).getString("createdDateStr"));
                                     sODetailList.add(map);
                                 }
 
@@ -346,7 +431,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                                 }else {
                                     productAddListAdapter.notifyDataSetChanged();
                                 }*/
-
+                                txtCylinderNos.setText("");
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
                             }else {
                                 Toast.makeText(context,jsonObject.getString("message").toString()+"",Toast.LENGTH_SHORT).show();
@@ -435,12 +520,12 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         } else {
             NSPendingSales.setError(null);
         }
-        if(Remark.length()==0){
+/*        if(Remark.length()==0){
             edtRemark.setError("Field is Required.");
             valid=false;
         }else {
             edtRemark.setError(null);
-        }
+        }*/
         return valid;
     }
 
@@ -647,4 +732,73 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         return valid;
     }
 
+    public void callChangeCompanyStatus(String roDetailId) {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobReturnOrder/DeleteRODetail?RODetailId="+Integer.parseInt(roDetailId);
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        for(int i=0;i<sODetailList.size();i++){
+                            if(sODetailList.get(i).get("roDetailId").equals(roDetailId)){
+                                sODetailList.remove(i);
+                                break;
+                            }
+                        }
+                        sODetailListAdapter.notifyDataSetChanged();
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
 }

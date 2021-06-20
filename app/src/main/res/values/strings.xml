@@ -152,6 +152,7 @@
     <string name="companyType">Company Type*</string>
     <string name="companySortBy">Company Sort By</string>
     <string name="companySortBy11">Order Sort By</string>
+    <string name="companySortBy111">Sales Order Sort By</string>
     <string name="companySortBy1">Sort By</string>
     <string name="remark">Remark</string>
     <string name="status">Status</string>

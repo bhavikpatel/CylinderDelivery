@@ -20,12 +20,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.returnorder.AddReturnOrderActivity"
+        <activity android:name=".ui.returnorder.ROSortingActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
-        <activity android:name=".ui.salesorder.EditSalesOrderActivity"
+            android:theme="@style/Theme.Transparent" />
+        <activity
+            android:name=".ui.salesorder.SalesOrderSortingActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
+            android:theme="@style/Theme.Transparent" />
+        <activity
+            android:name=".ui.returnorder.AddReturnOrderActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".ui.salesorder.EditSalesOrderActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
             android:name=".ui.salesorder.AddSalesOrderActivity"
             android:screenOrientation="portrait"

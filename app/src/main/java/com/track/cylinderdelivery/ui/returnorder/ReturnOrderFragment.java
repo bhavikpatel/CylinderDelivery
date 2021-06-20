@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.product.AddProductActivity;
 import com.track.cylinderdelivery.ui.salesorder.AddSalesOrderActivity;
 import com.track.cylinderdelivery.ui.salesorder.SalesOrderListAdapter;
+import com.track.cylinderdelivery.ui.salesorder.SalesOrderSortingActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.json.JSONArray;
@@ -64,13 +66,14 @@ public class ReturnOrderFragment extends Fragment {
     private int totalinpage=10;
     private ArrayList<HashMap<String,String>> ROrderList;
     private String search="";
-    private int SortBy;
+    private String SortBy="";
     private String Sort="desc";
     private SharedPreferences settings;
     private int totalRecord;
     private ROrderListAdapter ROrderListAdapter;
     SharedPreferences spSorting;
     SearchView svUser;
+    LinearLayout lvSortingParent;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -85,11 +88,20 @@ public class ReturnOrderFragment extends Fragment {
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         spSorting=context.getSharedPreferences("ROFilter",MODE_PRIVATE);
         svUser=root.findViewById(R.id.svUser);
+        lvSortingParent=root.findViewById(R.id.lvSortingParent);
         if(isNetworkConnected()){
             callGetReturnOrderList();
         }else {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
+
+        lvSortingParent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, ROSortingActivity.class);
+                startActivity(intent);
+            }
+        });
 
         svUser.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
@@ -161,11 +173,11 @@ public class ReturnOrderFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(spSorting.getBoolean("sofilter",false)){
+        if(spSorting.getBoolean("refilter",false)){
             SharedPreferences.Editor userFilterEditor = spSorting.edit();
-            userFilterEditor.putBoolean("sofilter",false);
+            userFilterEditor.putBoolean("refilter",false);
             userFilterEditor.commit();
-            SortBy=spSorting.getInt("index1",1);
+            SortBy=spSorting.getString("text1","");
             if(spSorting.getString("text2","Decinding").equals("Decinding")){
                 Sort="desc";
             }else{

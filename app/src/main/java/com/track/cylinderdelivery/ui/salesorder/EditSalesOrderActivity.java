@@ -13,6 +13,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -62,6 +63,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
     private int wareHousepos=0;
     private ArrayList<HashMap<String,String>> warehouseList;
     private String warehouseId;
+    private Button btnCancel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         NSWarehouse=findViewById(R.id.NSWarehouse);
         edtSoGenerateby=findViewById(R.id.edtPOGeneratedBy);
         edtSoGenerateby.setText(mapdata.get("soGeneratedBy"));
+        btnCancel=findViewById(R.id.btnCancel);
 
         if(isNetworkConnected()) {
             callGetReadyforDeliveryDeliveryList();
@@ -92,6 +95,12 @@ public class EditSalesOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         NSWarehouse.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {

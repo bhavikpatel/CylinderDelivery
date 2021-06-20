@@ -58,7 +58,7 @@ public class RODetailListAdapter extends RecyclerView.Adapter<RODetailListAdapte
                     adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             if(isNetworkConnected()){
-                               // context.callChangeCompanyStatus(podetailList.get(pos).get("soDetailId"));
+                                context.callChangeCompanyStatus(podetailList.get(pos).get("roDetailId"));
                             }else {
                                 Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                             }
@@ -92,9 +92,8 @@ public class RODetailListAdapter extends RecyclerView.Adapter<RODetailListAdapte
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
         holder.imgArrow.setTag(position);
-        holder.txtProductName.setText(podetailList.get(position).get("productName")+
-                "/"+podetailList.get(position).get("cylinderID"));
-        holder.txtQuantity.setText("Created by: "+ podetailList.get(position).get("createdByName"));
+        holder.txtProductName.setText(podetailList.get(position).get("cylinderNo"));
+        holder.txtQuantity.setText(podetailList.get(position).get("cylinderStatus"));
     }
 
     @Override
