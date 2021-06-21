@@ -157,6 +157,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         soDate=df1.format(c);
         edtSoNumber.setText(SNNumber);
         edtSOGeneratedBy.setText(settings.getString("fullName",""));
+
         if(isNetworkConnected()) {
             callGetReadyforDeliveryDeliveryList();
         }else {
