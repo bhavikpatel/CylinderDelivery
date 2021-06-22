@@ -20,7 +20,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.returnorder.ROSortingActivity"
+        <activity android:name=".ui.returnorder.EditReturnOrderActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+        <activity
+            android:name=".ui.returnorder.ROSortingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent" />
         <activity

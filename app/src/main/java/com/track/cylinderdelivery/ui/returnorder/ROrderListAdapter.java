@@ -48,12 +48,12 @@ public class ROrderListAdapter extends RecyclerView.Adapter<ROrderListAdapter.Vi
                 @Override
                 public void onClick(View v) {
                     int pos= (int) imgArrow.getTag ();
-                   /* if(podetailList.get(pos).get("status").equals("Draft")){
-                        Intent intent=new Intent(context, EditSalesOrderActivity.class);
+                    if(podetailList.get(pos).get("status").equals("Draft")){
+                        Intent intent=new Intent(context, EditReturnOrderActivity.class);
                         intent.putExtra("editData",podetailList.get(pos));
                         context.startActivity(intent);
                         context.overridePendingTransition(R.anim.enter_from_bottom, R.anim.hold_top);
-                    }*/
+                    }
                 }
             });
         }

@@ -104,7 +104,11 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     private ArrayList<HashMap<String,String>> sODetailList;
     private SODetailListAdapter sODetailListAdapter;
     RecyclerView recyclerView;
-
+    TextView txtUserName11;
+    NiceSpinner NSWarehouse;
+    private int wareHousepos=0;
+    private ArrayList<HashMap<String,String>> warehouseList;
+    private String warehouseId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +151,10 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         btnLastSubmit=findViewById(R.id.btnLastSubmit);
         btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
+        txtUserName11=findViewById(R.id.txtUserName11);
+        NSWarehouse=findViewById(R.id.NSWarehouse);
+        NSWarehouse.setVisibility(View.GONE);
+        txtUserName11.setVisibility(View.GONE);
 
         Date c = Calendar.getInstance().getTime();
         Log.d("soDate==>",c+"");
@@ -164,6 +172,27 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
+                NSWarehouse.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                NSWarehouse.setError(null);
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                wareHousepos=position;
+                if(position!=0) {
+                    warehouseId=warehouseList.get(position-1).get("warehouseId");
+                }else {
+                    //clintvalue="";
+                    //clinttext="";
+                }
+            }
+        });
+        NSWarehouse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
         btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -282,7 +311,11 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                 if(position!=0) {
                     clintvalue=customerList.get(position-1).get("value");
                     clinttext=customerList.get(position-1).get("text");
-
+                    if(isNetworkConnected()){
+                        // callGetUserWarehouse(clintvalue);
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
                 }else {
                     clintvalue="";
                     clinttext="";
@@ -328,7 +361,87 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             }
         });
     }
+    private void callGetUserWarehouse(String clintvalue) {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobWarehouse/GetUserWarehouse?UserId="+Integer.parseInt(clintvalue);
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        warehouseList=new ArrayList<>();
+                        JSONArray datalist=j.getJSONArray("data");
+                        List<String> imtes=new ArrayList<>();
+                        imtes.add("Select");
+                        for(int i=0;i<datalist.length();i++){
+                            HashMap<String,String> map=new HashMap<>();
+                            JSONObject dataobj=datalist.getJSONObject(i);
+                            map.put("warehouseId",dataobj.getInt("warehouseId")+"");
+                            map.put("name",dataobj.getString("name"));
+                            /*if(mapdata.get("warehouseId").equals(dataobj.getString("warehouseId"))){
+                                wareHousepos=i;
+                            }*/
+                            imtes.add(dataobj.getString("name") + "");
+                            warehouseList.add(map);
+                        }
+                        NSWarehouse.setVisibility(View.VISIBLE);
+                        txtUserName11.setVisibility(View.VISIBLE);
+                        NSWarehouse.attachDataSource(imtes);
+                        //NSWarehouse.setSelectedIndex(wareHousepos+1);
+                    }else {
+                        Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
 
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
     private void callSubmitSO() {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);

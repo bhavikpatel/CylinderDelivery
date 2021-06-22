@@ -104,6 +104,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
     private ArrayList<HashMap<String,String>> sODetailList;
     RecyclerView recyclerView;
     EditSODetailListAdapter sODetailListAdapter;
+    TextView txtUserName11;
 
 
     @Override
@@ -126,6 +127,9 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         NsDeliveyNote=findViewById(R.id.NSUserName);
         NSClient=findViewById(R.id.NSClient);
         NSWarehouse=findViewById(R.id.NSWarehouse);
+        txtUserName11=findViewById(R.id.txtUserName11);
+        NSWarehouse.setVisibility(View.GONE);
+        txtUserName11.setVisibility(View.GONE);
         edtSoGenerateby=findViewById(R.id.edtPOGeneratedBy);
         edtSoGenerateby.setText(mapdata.get("soGeneratedBy"));
         btnCancel=findViewById(R.id.btnCancel);
@@ -380,7 +384,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         progressDialog.show();
         String url = BASE_URL+"/Api/MobSalesOrder/AddEditSO";
         final JSONObject jsonBody=new JSONObject();
-        jsonBody.put("SOId",Integer.parseInt(soId));
+        jsonBody.put("SOId",Integer.parseInt(mapdata.get("soId")));
         jsonBody.put("DNId",Integer.parseInt(dnId));
         jsonBody.put("SONumber",Integer.parseInt(soNumber));
         jsonBody.put("UserId",Integer.parseInt(clintvalue));
@@ -447,7 +451,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobSalesOrder/SubmitSO?SOId="+Integer.parseInt(soId)+
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/SubmitSO?SOId="+Integer.parseInt(mapdata.get("soId"))+
                 "&UserId="+Integer.parseInt(settings.getString("userId","1"));
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
@@ -522,7 +526,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         }*/
         String url = BASE_URL+"/Api/MobSalesOrder/AddSOCylinder";
         final JSONObject jsonBody=new JSONObject();
-        jsonBody.put("SOId",Integer.parseInt(soId));
+        jsonBody.put("SOId",Integer.parseInt(mapdata.get("soId")));
         jsonBody.put("ProductId",Integer.parseInt(productId));
         jsonBody.put("DNDetailId",Integer.parseInt(dnDetailId));
         jsonBody.put("DNid",Integer.parseInt(dnId));
@@ -623,7 +627,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
         String url = "http://test.hdvivah.in/Api/MobSalesOrder/GetSalesOrderDetail?search=&pageno=0&totalinpage="+Integer.MAX_VALUE+
-                "&SortBy=&Sort=desc&SOId="+Integer.parseInt(soId)+"&DNId="+Integer.parseInt(dnId)+"&UserId="+Integer.parseInt(clintvalue);
+                "&SortBy=&Sort=desc&SOId="+Integer.parseInt(mapdata.get("soId"))+"&DNId="+Integer.parseInt(dnId)+"&UserId="+Integer.parseInt(clintvalue);
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
@@ -732,12 +736,12 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         }else {
             NsDeliveyNote.setError(null);
         }
-        if(wareHousepos<=0){
+/*        if(wareHousepos<=0){
             NSWarehouse.setError("Field is Required.");
             valid=false;
         }else {
             NSWarehouse.setError(null);
-        }
+        }*/
 
         if(SOGeneratedBy.isEmpty()){
             edtSoGenerateby.setError("Field is Required.");
@@ -779,6 +783,8 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                             imtes.add(dataobj.getString("name") + "");
                             warehouseList.add(map);
                         }
+                        NSWarehouse.setVisibility(View.VISIBLE);
+                        txtUserName11.setVisibility(View.VISIBLE);
                         NSWarehouse.attachDataSource(imtes);
                         NSWarehouse.setSelectedIndex(wareHousepos+1);
                     }else {
@@ -865,7 +871,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                             clintvalue=customerList.get(clientpos-1).get("value");
                             clinttext=customerList.get(clientpos-1).get("text");
                             if(isNetworkConnected()){
-                                callGetUserWarehouse(clintvalue);
+                                //callGetUserWarehouse(clintvalue);
                             }else {
                                 Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                             }

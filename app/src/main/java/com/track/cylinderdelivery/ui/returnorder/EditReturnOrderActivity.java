@@ -43,8 +43,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
-import com.track.cylinderdelivery.ui.salesorder.AddSalesOrderActivity;
-import com.track.cylinderdelivery.ui.salesorder.SODetailListAdapter;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -62,10 +60,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class AddReturnOrderActivity extends AppCompatActivity {
-
+public class EditReturnOrderActivity extends AppCompatActivity {
     private String RONumber;
-    private AddReturnOrderActivity context;
+    private EditReturnOrderActivity context;
     private EditText edtRoNumber,edtSoDate,edtSOGeneratedBy;
     private String roDate;
     private NiceSpinner ROUsers;
@@ -99,14 +96,14 @@ public class AddReturnOrderActivity extends AppCompatActivity {
     private String Remark;
     private int totalRecord;
     private ArrayList<HashMap<String,String>> sODetailList;
-    private RODetailListAdapter sODetailListAdapter;
+    private EditRODetailListAdapter sODetailListAdapter;
     RecyclerView recyclerView;
-
+    HashMap<String, String> mapdata;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_return_order);
-        RONumber= getIntent().getStringExtra("RONumber");
+        setContentView(R.layout.activity_edit_return_order);
+        mapdata= (HashMap<String, String>) getIntent().getSerializableExtra("editData");
         context=this;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final Drawable upArrow =  ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -115,6 +112,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Add Return Order");
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Return Order</font>"));
         edtRoNumber=findViewById(R.id.edtRoNumber);
+        RONumber=mapdata.get("roNumber");
         edtRoNumber.setText(RONumber);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         edtSoDate=findViewById(R.id.edtSoDate);
@@ -205,7 +203,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(view);
                 pendingsalespos=position;
                 if(position!=0) {
-                   // dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
+                    // dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
                     //productId=pendingsalesList.get(position-1).get("productId");
                     CylinderStatus=imtes.get(position);
                 }else {
@@ -225,7 +223,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                 if (ContextCompat.checkSelfPermission(context,
                         Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(AddReturnOrderActivity.this,
+                    ActivityCompat.requestPermissions(EditReturnOrderActivity.this,
                             new String[]{Manifest.permission.CAMERA},
                             MY_PERMISSIONS_REQUEST_CAMERA);
                 }else {
@@ -418,7 +416,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
                                     sODetailList.add(map);
                                 }
 
-                                sODetailListAdapter=new RODetailListAdapter(sODetailList,context);
+                                sODetailListAdapter=new EditRODetailListAdapter(sODetailList,context);
                                 recyclerView.setAdapter(sODetailListAdapter);
 
 /*                                if(podetailList.size()>=totalRecord){
@@ -541,7 +539,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         progressDialog.show();
         String url = BASE_URL+"/Api/MobReturnOrder/AddEditRO";
         final JSONObject jsonBody=new JSONObject();
-        jsonBody.put("ROId",JSONObject.NULL);
+        jsonBody.put("ROId",Integer.parseInt(mapdata.get("roId")));
         jsonBody.put("RONumber",RONumber);
         jsonBody.put("UserId",Integer.parseInt(userId));
         jsonBody.put("RODate",roDate+"");
