@@ -39,7 +39,8 @@
     <string name="enter_username_password">Please enter valid username and password.</string>
     <string name="logout">Sign out</string>
     <string name="dashboard">Dashboard</string>
-    <string name="company">Company</string>
+    <string name="vendor_creation">Vendor Creatioin</string>
+    <string name="company">Distributor</string>
     <string name="user">User</string>
     <string name="user_lst">User List</string>
     <string name="cylinder">Cylinder</string>

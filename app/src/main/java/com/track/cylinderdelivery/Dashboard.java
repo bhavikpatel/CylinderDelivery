@@ -123,8 +123,16 @@ public class Dashboard extends BaseActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
 
+
        JSONObject menuJsonobj=new JSONObject();
        Menu menu = navigationView.getMenu();
+
+/*        SubMenu subMenu = menu.addSubMenu(getString(R.string.company));
+        subMenu.add(0, Menu.FIRST, Menu.FIRST, getString(R.string.company_list))
+                .setIcon(R.drawable.ic_menu_gallery);
+        subMenu.add(1, Menu.FIRST + 1, Menu.FIRST, getString(R.string.company_list))
+                .setIcon(R.drawable.ic_menu_camera);*/
+
        addMenuDynamic(menu,menuJsonobj);
 
 
@@ -148,6 +156,7 @@ public class Dashboard extends BaseActivity {
     }
 
     private void addMenuDynamic(Menu menu, JSONObject menuJsonobj) {
+        //menu.findItem(R.id.nav_company).getSubMenu().addSubMenu(getResources().getString(R.string.company));
         menu.findItem(R.id.nav_product).setVisible(false);
         menu.findItem(R.id.nav_warehouse).setVisible(false);
         menu.findItem(R.id.nav_permssion).setVisible(false);
