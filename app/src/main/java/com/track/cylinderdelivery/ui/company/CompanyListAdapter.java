@@ -76,13 +76,31 @@ public class CompanyListAdapter extends RecyclerView.Adapter<CompanyListAdapter.
        // holder.getTextView().setText(localDataSet[position]);
         holder.imgArrow.setTag(position);
         holder.txtName.setText(companyList.get(position).get("companyName"));
-        holder.txtAdminName.setText("Admin Name: "+companyList.get(position).get("adminName"));
+        holder.txtAdminName.setText("User Name: "+companyList.get(position).get("adminName"));
+        /*+"\n"+"Company Type: "+companyList.get(position).get("companyType"));*/
         holder.txtStatus.setText(companyList.get(position).get("status"));
-        holder.txtAddress.setText(companyList.get(position).get("address1")+
-                ","+companyList.get(position).get("address2")+
-                ","+companyList.get(position).get("city")+
-                ","+companyList.get(position).get("county")+
-                ","+companyList.get(position).get("zipCode"));
+        String address="";
+        if(companyList.get(position).get("address1").trim().length()!=0
+            && !companyList.get(position).get("address1").trim().equals("null")){
+            address+=companyList.get(position).get("address1");
+        }
+        if(companyList.get(position).get("address2").trim().length()!=0
+                && !companyList.get(position).get("address2").trim().equals("null")){
+            address+=" ,"+companyList.get(position).get("address2");
+        }
+        if(companyList.get(position).get("city").trim().length()!=0
+                && !companyList.get(position).get("city").trim().equals("null")){
+            address+=" ,"+companyList.get(position).get("city");
+        }
+        if(companyList.get(position).get("county").trim().length()!=0
+                && !companyList.get(position).get("county").trim().equals("null")){
+            address+=" ,"+companyList.get(position).get("county");
+        }
+        if(companyList.get(position).get("zipCode").trim().length()!=0
+                && !companyList.get(position).get("zipCode").trim().equals("null")){
+            address+=" ,"+companyList.get(position).get("zipCode");
+        }
+        holder.txtAddress.setText(address);
     }
 
     @Override

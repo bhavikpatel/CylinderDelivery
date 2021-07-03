@@ -248,6 +248,7 @@ public class CompanyFragment extends Fragment {
                         map.put("companyName", jsonArray.getJSONObject(i).getString("companyName") + "");
                         map.put("adminName", jsonArray.getJSONObject(i).getString("adminName") + "");
                         map.put("companyType", jsonArray.getJSONObject(i).getString("companyType") + "");
+                        map.put("companyCategory", jsonArray.getJSONObject(i).getString("companyCategory") + "");
                         map.put("address1", jsonArray.getJSONObject(i).getString("address1") + "");
                         map.put("address2", jsonArray.getJSONObject(i).getString("address2") + "");
                         map.put("city", jsonArray.getJSONObject(i).getString("city") + "");

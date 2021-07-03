@@ -65,8 +65,9 @@ public class AddCompany extends AppCompatActivity {
     private SharedPreferences CompanyUpdate;
     private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     ArrayList<HashMap<String,String>> companyTypeList;
-    NiceSpinner spCompanyType;
-    int companytypepos=-1;
+    NiceSpinner spCompanyType,spCompanyCatergory;
+    int companytypepos=-1,companycatpos=-1;
+    private ArrayList<HashMap<String,String>> companyCatList;
 
 
     @Override
@@ -78,12 +79,13 @@ public class AddCompany extends AppCompatActivity {
         final Drawable upArrow =  ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
         upArrow.setColorFilter(ContextCompat.getColor(context, R.color.black), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        getSupportActionBar().setTitle("Add Company");
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Company</font>"));
+        getSupportActionBar().setTitle("Add Distributor");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Distributor</font>"));
 
         btnSubmit=(Button)findViewById(R.id.btnSubmit);
         btnCancel=(Button)findViewById(R.id.btnCancel);
         spCompanyType=findViewById(R.id.spCompanyType);
+        spCompanyCatergory=findViewById(R.id.spCompanyCatergory);
         edtName=findViewById(R.id.edtName);
         edtPersonName=findViewById(R.id.edtPersonName);
         edtAddress1=findViewById(R.id.edtAddress1);
@@ -136,6 +138,21 @@ public class AddCompany extends AppCompatActivity {
             }
         });
 
+        spCompanyCatergory.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                companycatpos=position;
+            }
+        });
+        spCompanyCatergory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
+
         spCompanyType.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
@@ -160,8 +177,8 @@ public class AddCompany extends AppCompatActivity {
         final JSONObject jsonBody=new JSONObject();
         SharedPreferences setting= getSharedPreferences("setting",MODE_PRIVATE);
         jsonBody.put("CompanyId",JSONObject.NULL);
-        jsonBody.put("CompanyName",edtName.getText().toString().trim()+"");
         jsonBody.put("AdminName",edtPersonName.getText().toString().trim()+"");
+        jsonBody.put("CompanyName",edtName.getText().toString().trim()+"");
         jsonBody.put("Address1",edtAddress1.getText().toString().trim()+"");
         jsonBody.put("Address2",edtAddress2.getText().toString().trim()+"");
         jsonBody.put("City",editCity.getText().toString().trim()+"");
@@ -176,6 +193,7 @@ public class AddCompany extends AppCompatActivity {
         jsonBody.put("ModifiedBy",Integer.parseInt(settings.getString("userId","1")));
         jsonBody.put("CompanyType",companyTypeList.get(companytypepos-1).get("value")+"");
         jsonBody.put("TaxNumber",edtTexNumber.getText().toString().trim()+"");
+        jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value")+"");
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -241,13 +259,13 @@ public class AddCompany extends AppCompatActivity {
         }*/
 
         if (fullName.isEmpty()) {
-            edtName.setError("Field is Required.");
+            edtName.setError("Name is required");
             valid = false;
         } else {
             edtName.setError(null);
         }
         if (CopmanyName.isEmpty()) {
-            edtPersonName.setError("Field is Required.");
+            edtPersonName.setError("Contact person name is required");
             valid = false;
         } else {
             edtPersonName.setError(null);
@@ -257,6 +275,12 @@ public class AddCompany extends AppCompatActivity {
             valid = false;
         } else {
             spCompanyType.setError(null);
+        }
+        if (companycatpos<=0) {
+            spCompanyCatergory.setError("Field is Required.");
+            valid = false;
+        } else {
+            spCompanyCatergory.setError(null);
         }
         if (Address1.isEmpty()) {
             edtAddress1.setError("Field is Required.");
@@ -367,6 +391,11 @@ public class AddCompany extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                if(isNetworkConnected()){
+                    getCompanyCategoryList();
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -407,6 +436,86 @@ public class AddCompany extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
+
+    private void getCompanyCategoryList() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobCompany/CompanyCategoryList";
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        JSONArray jsonArray=j.getJSONArray("data");
+                        companyCatList = new ArrayList<>();
+                        List<String> imtes=new ArrayList<>();
+                        imtes.add("Select");
+                        for(int i=0;i<jsonArray.length();i++) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("disabled", jsonArray.getJSONObject(i).getString("disabled")+"");
+                            map.put("group", jsonArray.getJSONObject(i).getString("group") + "");
+                            map.put("selected",jsonArray.getJSONObject(i).getBoolean("selected")+"");
+                            map.put("text",jsonArray.getJSONObject(i).getString("text")+"");
+                            map.put("value",jsonArray.getJSONObject(i).getString("value")+"");
+
+                            imtes.add(jsonArray.getJSONObject(i).getString("value") + "");
+                            companyCatList.add(map);
+                        }
+                        spCompanyCatergory.attachDataSource(imtes);
+                    }else {
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();

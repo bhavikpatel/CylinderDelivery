@@ -11,7 +11,7 @@
         <item
             android:id="@+id/nav_company"
             android:icon="@drawable/ic_apartment_24px"
-            android:title="@string/vendor_creation" >
+            android:title="@string/company" >
 
         </item>
         <item
