@@ -11,7 +11,7 @@
     <string name="login_failed">"Login failed"</string>
     <string name="todo">TODO</string>
     <string name="userid">UserID</string>
-    <string name="password">Password*</string>
+    <string name="password">Password:</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="create_account">Create Account</string>
     <string name="conform_password">Conform Password</string>
@@ -42,7 +42,7 @@
     <string name="vendor_creation">Vendor Creatioin</string>
     <string name="company">Distributor</string>
     <string name="user">Customer</string>
-    <string name="user_lst">User List</string>
+    <string name="user_lst">Customer List</string>
     <string name="cylinder">Cylinder</string>
     <string name="product">Product</string>
     <string name="warehouse">Warehouse</string>
@@ -229,7 +229,8 @@
     <string name="_2_return_order_details">2. Return Order Details</string>
     <string name="ro_number">RO Number:</string>
     <string name="ro_date">RO Date:</string>
-    <string name="user_name">User Name:</string>
     <string name="status1">Status:</string>
+    <string name="user_name">User Name:</string>
+    <string name="name_of_company">Name Of Company:</string>
     <string name="company_category">Company Category:</string>
 </resources>

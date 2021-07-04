@@ -26,7 +26,7 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         android:layout_marginTop="10dp"
-        android:text="@string/name" />
+        android:text="@string/user_name" />
 
     <EditText
         android:id="@+id/edtName"
@@ -34,28 +34,44 @@
         android:layout_height="40dp"
         android:paddingRight="@dimen/EditTextPadding"
         android:paddingLeft="@dimen/EditTextPadding"
-
         android:inputType="textPersonName"
         android:text="" />
+        <TextView
+            android:id="@+id/txtLblName1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/lblForm"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginTop="10dp"
+            android:text="@string/name_of_company" />
 
+        <EditText
+            android:id="@+id/edtCompanyName"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingRight="@dimen/EditTextPadding"
+            android:paddingLeft="@dimen/EditTextPadding"
+            android:inputType="textPersonName"
+            android:text="" />
         <TextView
             android:id="@+id/txtType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/type"
+            android:text="@string/company_category"
             android:textColor="@color/black"
             android:textSize="@dimen/lblForm"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <org.angmarch.views.NiceSpinner
-            android:id="@+id/NSUserType"
+            android:id="@+id/NsCompanyCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/veryLightGray"
             android:textSize="20sp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:popupTextAlignment="start"
             app:textTint="@color/black" />
     <TextView
@@ -200,6 +216,22 @@
             android:inputType="number"
             android:text="" />
         <TextView
+            android:id="@+id/txtSecondaryMobile11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/pin_number" />
+        <EditText
+            android:id="@+id/edtPinNumber"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingRight="@dimen/EditTextPadding"
+            android:paddingLeft="@dimen/EditTextPadding"
+            android:text="" />
+        <TextView
             android:id="@+id/txtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -232,7 +264,6 @@
             android:layout_height="40dp"
             android:paddingRight="@dimen/EditTextPadding"
             android:paddingLeft="@dimen/EditTextPadding"
-
             android:inputType="textPassword"
             android:text="" />
         <TextView

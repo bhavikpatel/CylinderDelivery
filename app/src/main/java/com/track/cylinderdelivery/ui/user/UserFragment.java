@@ -320,6 +320,7 @@ public class UserFragment extends Fragment {
                             HashMap<String, String> map = new HashMap<>();
                             map.put("userId", jsonArray.getJSONObject(i).getString("userId") + "");
                             map.put("fullName", jsonArray.getJSONObject(i).getString("fullName") + "");
+                            map.put("nameOfCompany",jsonArray.getJSONObject(i).getString("nameOfCompany"));
                             map.put("companyId", jsonArray.getJSONObject(i).getString("companyId") + "");
                             map.put("address1", jsonArray.getJSONObject(i).getString("address1") + "");
                             map.put("address2", jsonArray.getJSONObject(i).getString("address2") + "");
@@ -340,11 +341,12 @@ public class UserFragment extends Fragment {
                             map.put("createdDate", jsonArray.getJSONObject(i).getString("createdDate") + "");
                             map.put("createdDateStr", jsonArray.getJSONObject(i).getString("createdDateStr") + "");
                             map.put("modifiedBy", jsonArray.getJSONObject(i).getString("modifiedBy") + "");
-                            map.put("modifiedDate", jsonArray.getJSONObject(i).getString("modifiedDate") + "");
-                            map.put("forgotPassword", jsonArray.getJSONObject(i).getString("forgotPassword") + "");
-                            map.put("forgotPasswordDate", jsonArray.getJSONObject(i).getString("forgotPasswordDate") + "");
+                            //map.put("modifiedDate", jsonArray.getJSONObject(i).getString("modifiedDate") + "");
+                            //map.put("forgotPassword", jsonArray.getJSONObject(i).getString("forgotPassword") + "");
+                            //map.put("forgotPasswordDate", jsonArray.getJSONObject(i).getString("forgotPasswordDate") + "");
                             map.put("companyName", jsonArray.getJSONObject(i).getString("companyName") + "");
-                            map.put("companyType", jsonArray.getJSONObject(i).getString("companyType") + "");
+                            map.put("companyCategory",jsonArray.getJSONObject(i).getString("companyCategory")+"");
+                            map.put("status", jsonArray.getJSONObject(i).getString("status") + "");
                             dataList.add(map);
                         }
                         if(dataList.size()>=totalRecord){

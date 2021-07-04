@@ -13,36 +13,54 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.BaseActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
+import org.angmarch.views.NiceSpinner;
+import org.angmarch.views.OnSpinnerItemSelectedListener;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EditUserActivity extends BaseActivity {
 
     Context context;
+    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     EditText edtName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode;
     EditText edtMobile,edtSecondaryMobile,edtEmail,edtPassword,edtSecondaryEmail;
-    EditText edtHoldingCapacity;
+    EditText edtHoldingCapacity,edtCompanyName,edtPinNumber;
     Button btnSubmit,btnCancel;
     HashMap<String, String> mapdata;
     private SharedPreferences spUserFilter;
     int holdingCapacity=10;
+    NiceSpinner NsCompanyCategory;
+    private ArrayList<HashMap<String,String>> companyCatList;
+    private int companycatpos=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +73,8 @@ public class EditUserActivity extends BaseActivity {
         final Drawable upArrow =  ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
         upArrow.setColorFilter(ContextCompat.getColor(context, R.color.black), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        getSupportActionBar().setTitle("Edit User");
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Edit User </font>"));
+        getSupportActionBar().setTitle("Edit Customer");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Edit Customer</font>"));
         //RefreshUserList=true;
         //spinner_name=(AppCompatSpinner)findViewById(R.id.spinner_name);
         edtName= findViewById(R.id.edtName);
@@ -73,6 +91,9 @@ public class EditUserActivity extends BaseActivity {
         btnSubmit= findViewById(R.id.btnSubmit);
         btnCancel= findViewById(R.id.btnCancel);
         edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
+        NsCompanyCategory=findViewById(R.id.NsCompanyCategory);
+        edtCompanyName=findViewById(R.id.edtCompanyName);
+        edtPinNumber=findViewById(R.id.edtPinNumber);
 
         edtName.setText(mapdata.get("fullName"));
         edtAddress1.setText(mapdata.get("address1"));
@@ -86,6 +107,14 @@ public class EditUserActivity extends BaseActivity {
         edtSecondaryEmail.setText(mapdata.get("secondaryEmail"));
         edtPassword.setText(mapdata.get("emailPassword"));
         edtHoldingCapacity.setText(mapdata.get("holdingCapacity"));
+        edtCompanyName.setText(mapdata.get("nameOfCompany")+"");
+        edtPinNumber.setText(mapdata.get("taxNumber")+"");
+
+        if(isNetworkConnected()){
+            getCompanyCategoryList();
+        }else {
+            Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+        }
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +124,8 @@ public class EditUserActivity extends BaseActivity {
                         edtZipCode.getText().toString().trim(),edtMobile.getText().toString().trim(),
                         edtEmail.getText().toString().trim(),edtPassword.getText().toString().trim(),
                         edtAddress2.getText().toString().trim(),edtSecondaryMobile.getText().toString().trim(),
-                        edtSecondaryEmail.getText().toString().trim())){
+                        edtSecondaryEmail.getText().toString().trim(),edtCompanyName.getText().toString().trim(),
+                        edtPinNumber.getText().toString().trim())){
                     try {
                         if(isNetworkConnected()){
                             if(edtHoldingCapacity.getText().toString().trim().length()!=0){
@@ -118,6 +148,102 @@ public class EditUserActivity extends BaseActivity {
                 finish();
             }
         });
+        NsCompanyCategory.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                companycatpos=position;
+            }
+        });
+        NsCompanyCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
+    }
+
+    private void getCompanyCategoryList() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobCompany/CompanyCategoryList";
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        JSONArray jsonArray=j.getJSONArray("data");
+                        companyCatList = new ArrayList<>();
+                        List<String> imtes=new ArrayList<>();
+                        imtes.add("Select");
+                        for(int i=0;i<jsonArray.length();i++) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("disabled", jsonArray.getJSONObject(i).getString("disabled")+"");
+                            map.put("group", jsonArray.getJSONObject(i).getString("group") + "");
+                            map.put("selected",jsonArray.getJSONObject(i).getBoolean("selected")+"");
+                            map.put("text",jsonArray.getJSONObject(i).getString("text")+"");
+                            map.put("value",jsonArray.getJSONObject(i).getString("value")+"");
+                            if(mapdata.get("companyCategory").equals(jsonArray.getJSONObject(i).getString("value"))){
+                                companycatpos=i+1;
+                            }
+                            imtes.add(jsonArray.getJSONObject(i).getString("value") + "");
+                            companyCatList.add(map);
+                        }
+                        NsCompanyCategory.attachDataSource(imtes);
+                        NsCompanyCategory.setSelectedIndex(companycatpos);
+                    }else {
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
     }
 
     private void callEditUserApi() throws JSONException {
@@ -138,13 +264,17 @@ public class EditUserActivity extends BaseActivity {
         jsonBody.put("Phone",edtMobile.getText().toString().trim()+"");
         jsonBody.put("SecondaryPhone",edtSecondaryMobile.getText().toString().trim()+"");
         jsonBody.put("HoldingCapacity",holdingCapacity);
+        jsonBody.put("TaxNumber",edtPinNumber.getText().toString().trim()+"");
         jsonBody.put("Email",edtEmail.getText().toString().trim()+"");
         jsonBody.put("SecondaryEmail",edtSecondaryEmail.getText().toString().trim()+"");
         jsonBody.put("EmailPassword",edtPassword.getText().toString().trim()+"");
-        jsonBody.put("accNo",Integer.parseInt(mapdata.get("accNo")));
-        jsonBody.put("UserType",mapdata.get("userType"));
+        //jsonBody.put("accNo",Integer.parseInt(mapdata.get("accNo")));
+        jsonBody.put("UserType","Client");
         jsonBody.put("CreatedBy",Integer.parseInt(setting.getString("userId","")));
         jsonBody.put("ModifiedBy",Integer.parseInt(setting.getString("userId","")));
+        jsonBody.put("NameOfCompany",edtCompanyName.getText().toString().trim()+"");
+        jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value"));
+
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -199,9 +329,23 @@ public class EditUserActivity extends BaseActivity {
     }
     public boolean validate(String fullName,String Address1,String City,String County,
                             String ZipCode, String Phone, String Email,String EmailPassword,
-                            String address2,String SecondaryMobile,String SecondaryEmail) {
+                            String address2,String SecondaryMobile,String SecondaryEmail,
+                            String nameOfCompany,String pinNumber) {
         boolean valid = true;
 
+        if (nameOfCompany.isEmpty()) {
+            edtCompanyName.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtCompanyName.setError(null);
+        }
+
+        if (pinNumber.isEmpty()) {
+            edtPinNumber.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtPinNumber.setError(null);
+        }
 /*        if (SecondaryEmail.isEmpty()) {
             edtSecondaryEmail.setError("Field is Required.");
             valid = false;
@@ -220,6 +364,12 @@ public class EditUserActivity extends BaseActivity {
         } else {
             edtAddress2.setError(null);
         }*/
+        if (companycatpos<=0) {
+            NsCompanyCategory.setError("Field is Required.");
+            valid = false;
+        } else {
+            NsCompanyCategory.setError(null);
+        }
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
             valid = false;
@@ -273,5 +423,9 @@ public class EditUserActivity extends BaseActivity {
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+    public void hideSoftKeyboard(View view){
+        InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

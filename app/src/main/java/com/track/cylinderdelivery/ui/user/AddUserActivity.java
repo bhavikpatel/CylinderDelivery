@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,12 +22,18 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.Dashboard;
 import com.track.cylinderdelivery.LoginActivity;
@@ -35,25 +42,29 @@ import com.track.cylinderdelivery.ui.BaseActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
+import org.angmarch.views.OnSpinnerItemSelectedListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AddUserActivity extends BaseActivity {
 
 
     Context context;
-    EditText edtName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode;
-    EditText edtMobile,edtSecondaryMobile,edtEmail,edtPassword,edtSecondaryEmail;
+    EditText edtName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode,edtCompanyName;
+    EditText edtMobile,edtSecondaryMobile,edtEmail,edtPassword,edtSecondaryEmail,edtPinNumber;
     Button btnSubmit,btnCancel;
     private SharedPreferences spUserFilter;
-    NiceSpinner NSUserType;
+    NiceSpinner NsCompanyCategory;
     private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     private EditText edtHoldingCapacity;
+    private ArrayList<HashMap<String,String>> companyCatList;
+    private int companycatpos=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +76,9 @@ public class AddUserActivity extends BaseActivity {
         spUserFilter=getSharedPreferences("userFilter",MODE_PRIVATE);
         upArrow.setColorFilter(ContextCompat.getColor(context, R.color.black), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        getSupportActionBar().setTitle("Add User");
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add User </font>"));
+        getSupportActionBar().setTitle("Add Customer");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Customer</font>"));
         //RefreshUserList=true;
-
-
         edtName=(EditText)findViewById(R.id.edtName);
         edtAddress1=(EditText)findViewById(R.id.edtAddress1);
         edtAddress2=(EditText)findViewById(R.id.edtAddress2);
@@ -83,9 +92,15 @@ public class AddUserActivity extends BaseActivity {
         edtSecondaryEmail=(EditText)findViewById(R.id.edtSecondaryEmail);
         btnSubmit=(Button)findViewById(R.id.btnSubmit);
         btnCancel=(Button)findViewById(R.id.btnCancel);
-        NSUserType=findViewById(R.id.NSUserType);
+        NsCompanyCategory=findViewById(R.id.NsCompanyCategory);
         edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
-
+        edtPinNumber=findViewById(R.id.edtPinNumber);
+        edtCompanyName=findViewById(R.id.edtCompanyName);
+        if(isNetworkConnected()){
+            getCompanyCategoryList();
+        }else {
+            Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+        }
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +117,8 @@ public class AddUserActivity extends BaseActivity {
                 String SecondaryEmail=edtSecondaryEmail.getText().toString().trim();
                 String EmailPassword=edtPassword.getText().toString().trim();
                 String UserType="Client";
+                String PinNumber=edtPinNumber.getText().toString().trim();
+                String NameOfCompany=edtCompanyName.getText().toString().trim();
                 int CreatedBy=1;
                 int ModifiedBy=1;
                 int HoldingCapacity=10;
@@ -110,12 +127,12 @@ public class AddUserActivity extends BaseActivity {
                 }
 
                 if(validate(FullName,Address1,City,County,ZipCode,Phone,Email,EmailPassword,
-                        Address2,SecondaryPhone,SecondaryEmail)){
+                        Address2,SecondaryPhone,SecondaryEmail,PinNumber,NameOfCompany)){
                     try {
                         if(isNetworkConnected()){
                             callAddUserApi(FullName,CompanyId,Address1,Address2,City,County,ZipCode,Phone,
                                     SecondaryPhone,HoldingCapacity,Email,SecondaryEmail,EmailPassword,
-                                    UserType,CreatedBy,ModifiedBy);
+                                    UserType,CreatedBy,ModifiedBy,PinNumber,NameOfCompany);
                         }else {
                             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                         }
@@ -132,14 +149,106 @@ public class AddUserActivity extends BaseActivity {
                 finish();
             }
         });
-    }
 
-    private void callAddUserApi(String FullName, int CompanyId,String Address1,
-                                String Address2, String City,String County,
-                                String ZipCode,String Phone,String SecondaryPhone,
-                                int HoldingCapacity,String Email,String SecondaryEmail,
-                                String EmailPassword,String UserType,int CreatedBy
-                                ,int ModifiedBy) throws JSONException {
+        NsCompanyCategory.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+            @Override
+            public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
+                Log.d("checkedId==>",position+"");
+                hideSoftKeyboard(view);
+                companycatpos=position;
+            }
+        });
+        NsCompanyCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideSoftKeyboard(v);
+            }
+        });
+    }
+    private void getCompanyCategoryList() {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobCompany/CompanyCategoryList";
+        Log.d("request==>",url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    if(j.getBoolean("status")){
+                        JSONArray jsonArray=j.getJSONArray("data");
+                        companyCatList = new ArrayList<>();
+                        List<String> imtes=new ArrayList<>();
+                        imtes.add("Select");
+                        for(int i=0;i<jsonArray.length();i++) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("disabled", jsonArray.getJSONObject(i).getString("disabled")+"");
+                            map.put("group", jsonArray.getJSONObject(i).getString("group") + "");
+                            map.put("selected",jsonArray.getJSONObject(i).getBoolean("selected")+"");
+                            map.put("text",jsonArray.getJSONObject(i).getString("text")+"");
+                            map.put("value",jsonArray.getJSONObject(i).getString("value")+"");
+
+                            imtes.add(jsonArray.getJSONObject(i).getString("value") + "");
+                            companyCatList.add(map);
+                        }
+                        NsCompanyCategory.attachDataSource(imtes);
+                    }else {
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+    private void callAddUserApi(String FullName, int CompanyId, String Address1,
+                                String Address2, String City, String County,
+                                String ZipCode, String Phone, String SecondaryPhone,
+                                int HoldingCapacity, String Email, String SecondaryEmail,
+                                String EmailPassword, String UserType, int CreatedBy
+            , int ModifiedBy, String pinNumber,String NameOfCompany) throws JSONException {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(AddUserActivity.this, R.drawable.loader);
         progressDialog.show();
@@ -157,6 +266,7 @@ public class AddUserActivity extends BaseActivity {
         jsonBody.put("Phone",Phone+"");
         jsonBody.put("SecondaryPhone",SecondaryPhone+"");
         jsonBody.put("HoldingCapacity",HoldingCapacity);
+        jsonBody.put("TaxNumber",pinNumber);
         jsonBody.put("Email",Email+"");
         jsonBody.put("SecondaryEmail",SecondaryEmail+"");
         jsonBody.put("EmailPassword",EmailPassword+"");
@@ -164,6 +274,9 @@ public class AddUserActivity extends BaseActivity {
         jsonBody.put("UserType","Client");
         jsonBody.put("CreatedBy",CreatedBy);
         jsonBody.put("ModifiedBy",ModifiedBy);
+
+        jsonBody.put("NameOfCompany",NameOfCompany);
+        jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value"));
 
         final String v = jsonBody.toString();
         Log.d("request==>",v);
@@ -221,9 +334,9 @@ public class AddUserActivity extends BaseActivity {
         return true;
     }
 
-    public boolean validate(String fullName,String Address1,String City,String County,
-                            String ZipCode, String Phone, String Email,String EmailPassword,
-                            String Address2,String SecondaryPhone,String SecondaryEmail) {
+    public boolean validate(String fullName, String Address1, String City, String County,
+                            String ZipCode, String Phone, String Email, String EmailPassword,
+                            String Address2, String SecondaryPhone, String SecondaryEmail, String pinNumber, String nameOfCompany) {
         boolean valid = true;
 
 /*
@@ -239,6 +352,20 @@ public class AddUserActivity extends BaseActivity {
         } else {
             edtAddress2.setError(null);
         }*/
+        if (nameOfCompany.isEmpty()) {
+            edtCompanyName.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtCompanyName.setError(null);
+        }
+
+        if (pinNumber.isEmpty()) {
+            edtPinNumber.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtPinNumber.setError(null);
+        }
+
         if (fullName.isEmpty()) {
             edtName.setError("Field is Required.");
             valid = false;
@@ -288,6 +415,12 @@ public class AddUserActivity extends BaseActivity {
             edtEmail.setError("valid email address.");
             valid=false;
         }
+        if (companycatpos<=0) {
+            NsCompanyCategory.setError("Field is Required.");
+            valid = false;
+        } else {
+            NsCompanyCategory.setError(null);
+        }
 /*        if (SecondaryEmail.isEmpty()) {
             edtSecondaryEmail.setError("Field is Required.");
             valid = false;
@@ -312,5 +445,9 @@ public class AddUserActivity extends BaseActivity {
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+    public void hideSoftKeyboard(View view){
+        InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
