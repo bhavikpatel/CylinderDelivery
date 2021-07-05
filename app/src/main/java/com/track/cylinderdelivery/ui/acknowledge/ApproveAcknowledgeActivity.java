@@ -8,10 +8,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -85,8 +87,8 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         final Drawable upArrow =  ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
         upArrow.setColorFilter(ContextCompat.getColor(context, R.color.black), PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        getSupportActionBar().setTitle("Add User");
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Acknowledge </font>"));
+        getSupportActionBar().setTitle("Approve Acknowledge");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Approve Acknowledge</font>"));
         edtDate=findViewById(R.id.edtDate);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         shpreRefresh=getSharedPreferences("ackRefresh",MODE_PRIVATE);
@@ -94,6 +96,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         btnAckno=findViewById(R.id.btnSubmit);
         btnCancel=findViewById(R.id.btnCancel);
         statusType=new LinkedList<>();
+        statusType.add("Select");
         statusType.add("Pending");
         statusType.add("Approved");
         statusType.add("Rejected");
@@ -137,7 +140,8 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         btnAckno.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validate(edtHoldingCapacity.getText().toString(),edtDate.getText().toString(),edtRemark.getText().toString())){
+                if(validate(edtHoldingCapacity.getText().toString(),edtDate.getText().toString(),
+                        edtRemark.getText().toString(),spinarStatus.getSelectedItem().toString())){
                     int UserId= Integer.parseInt(mapdata.get("userId"));
                     AcknowledgeId=Integer.parseInt(mapdata.get("acknowledgeId"));
                     int HoldingCapacity=Integer.parseInt(edtHoldingCapacity.getText().toString()+"");
@@ -146,11 +150,15 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                     String AchnowledgeRemark=edtRemark.getText().toString();
                     int CreatedBy= Integer.parseInt(settings.getString("userId","1"));
                     int AcknowledgeBy= Integer.parseInt(settings.getString("userId","1"));
-                    try {
-                        callAppriveAcknowledge(UserId,HoldingCapacity,AcknowledgeDate,
-                                Status,AchnowledgeRemark,CreatedBy,AcknowledgeBy);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if(isNetworkConnected()){
+                        try {
+                            callAppriveAcknowledge(UserId,HoldingCapacity,AcknowledgeDate,
+                                    Status,AchnowledgeRemark,CreatedBy,AcknowledgeBy);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -168,6 +176,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 updateLabel();
+
             }
         };
 
@@ -175,6 +184,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
+                hideSoftKeyboard(v);
                 // TODO Auto-generated method stub
                 new DatePickerDialog(context, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
@@ -440,9 +450,15 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         edtDate.setText(sdf.format(myCalendar.getTime()));
     }
-    public boolean validate(String fullName,String date,String remark) {
+    public boolean validate(String fullName, String date, String remark, String s) {
         boolean valid = true;
 
+        if (s.equals("Select")) {
+            spinarStatus.setError("Field is Required.");
+            valid = false;
+        } else {
+            spinarStatus.setError(null);
+        }
         if (fullName.isEmpty()) {
             edtHoldingCapacity.setError("Field is Required.");
             valid = false;
@@ -462,5 +478,13 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
             edtRemark.setError(null);
         }
         return valid;
+    }
+    public void hideSoftKeyboard(View view){
+        InputMethodManager imm =(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
 }

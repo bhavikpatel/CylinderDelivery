@@ -262,7 +262,8 @@ public class AddCylinderActivity extends AppCompatActivity {
         final JSONObject jsonBody=new JSONObject();
         SharedPreferences setting= getSharedPreferences("setting",MODE_PRIVATE);
         jsonBody.put("CylinderId",JSONObject.NULL);
-        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList);
+        Log.d("jsonArraycyl==>",jsonArrayCylList.toString()+"");
         jsonBody.put("CylinderNoList",jsonArrayCylList);
         jsonBody.put("WarehouseId",Integer.parseInt(wharehouselist.get(wharehouspos-1).get("warehouseId")));
         jsonBody.put("ManufacturingDate",ManufacturingDate);

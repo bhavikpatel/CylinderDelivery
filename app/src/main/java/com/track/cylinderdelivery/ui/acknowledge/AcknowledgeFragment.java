@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,6 +70,8 @@ public class AcknowledgeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_acknowledge, container, false);
         context=getActivity();
+         setHasOptionsMenu(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Acknowledge List");
         rvAcknowledge=root.findViewById(R.id.rvAcknowledge);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         rvAcknowledge.setLayoutManager(layoutManager);

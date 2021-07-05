@@ -182,7 +182,7 @@ public class UserDetailActivity extends AppCompatActivity {
             final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
             progressDialog.show();
             //Api/MobUser/UserStatus?Id=2&Status=Active&UserId=1
-            String url = "http://test.hdvivah.in/Api/MobUser/UserStatus?Id="+mapdata.get("userId")+"&Status="+Status+
+            String url = "http://test.hdvivah.in/Api/MobUser/ChangeUserStatus?Id="+mapdata.get("userId")+"&Status="+Status+
                     "&UserId="+settings.getString("userId","1");
             Log.d("request==>",url);
             StringRequest stringRequest = new StringRequest(Request.Method.GET,
@@ -206,7 +206,7 @@ public class UserDetailActivity extends AppCompatActivity {
                         }
                         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                         SharedPreferences.Editor editor = CompanyUpdate.edit();
-                        editor.putBoolean("refresh",true);
+                        editor.putBoolean("dofilter",true);
                         editor.commit();
                         finish();
                     } catch (JSONException e) {
