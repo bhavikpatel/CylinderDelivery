@@ -31,6 +31,10 @@
             android:icon="@drawable/ic_fire_extinguisher_24px"
             android:title="@string/cylinder" />
         <item
+            android:id="@+id/nav_product"
+            android:icon="@drawable/ic_inventory_2_24px"
+            android:title="@string/product" />
+        <item
             android:id="@+id/nav_cylinderproductmapping"
             android:icon="@drawable/ic_baseline_attach_file_24"
             android:title="@string/cylinderproductmapping" />
@@ -54,12 +58,6 @@
             android:id="@+id/nav_return_order"
             android:icon="@drawable/ic_baseline_reply_24"
             android:title="@string/return_order" />
-
-        <item
-            android:id="@+id/nav_product"
-            android:icon="@drawable/ic_inventory_2_24px"
-            android:title="@string/product" />
-
         <item
             android:id="@+id/nav_report"
             android:icon="@drawable/ic_baseline_addchart_24"

@@ -117,18 +117,53 @@
             android:inputType="number"
             android:text="" />
         <TextView
+            android:id="@+id/txtCompanyName1"
+            android:layout_marginTop="5dp"
+            android:textSize="@dimen/lblForm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/unit1" />
+        <EditText
+            android:id="@+id/edtUnit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="KG"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
+        <TextView
             android:id="@+id/txtAddress1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
             android:text="@string/Purity" />
+        <RelativeLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <EditText
             android:id="@+id/edtPurity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:layout_toLeftOf="@+id/txtPer"
             android:text="" />
+            <TextView
+                android:id="@+id/txtPer"
+                android:text="%"
+                android:layout_centerVertical="true"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_alignParentRight="true"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
         <TextView
             android:id="@+id/txtAddress2"
             android:layout_width="match_parent"

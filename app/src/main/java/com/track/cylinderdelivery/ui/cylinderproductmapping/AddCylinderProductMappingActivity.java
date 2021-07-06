@@ -77,7 +77,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
     Calendar myCalendar;
     Button btnCancel,btnSubmit;
     private String CylinderNos;
-    private String FillingDate;
+    private String FillingDate="";
     EditText edtQuantity,edtPurity,edtGaugePressure,edtImpurities;
     private String Quantity;
     private String Purity;
@@ -227,7 +227,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
         final JSONObject jsonBody=new JSONObject();
         SharedPreferences setting= getSharedPreferences("setting",MODE_PRIVATE);
         jsonBody.put("CompanyId",Integer.parseInt(setting.getString("CompanyId","1")));
-        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList);
         jsonBody.put("CylinderList",jsonArrayCylList);
         jsonBody.put("FromWarehouseId",Integer.parseInt(wharehouselist.get(fromwharehouspos-1).get("warehouseId")));
         jsonBody.put("WarehouseId",Integer.parseInt(prowhereHouseList.get(towarehousepos-1).get("warehouseId")));
@@ -238,6 +238,7 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
         jsonBody.put("GaugePressure",GaugePressure);
         jsonBody.put("FillingDate",FillingDate);
         jsonBody.put("CreatedBy",Integer.parseInt(setting.getString("userId","1")));
+        jsonBody.put("Unit","KG");
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -330,11 +331,18 @@ public class AddCylinderProductMappingActivity extends AppCompatActivity {
         }else{
             edtPurity.setError(null);
         }
+
         if(GaugePressure.isEmpty()){
             edtGaugePressure.setError("Field is Required.");
             valid=false;
         }else{
             edtGaugePressure.setError(null);
+        }
+        if(Impurities.isEmpty()){
+            edtImpurities.setError("Field is Required.");
+            valid=false;
+        }else{
+            edtImpurities.setError(null);
         }
         return valid;
     }

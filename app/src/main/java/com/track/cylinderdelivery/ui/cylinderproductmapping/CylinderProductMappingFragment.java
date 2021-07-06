@@ -41,6 +41,7 @@ import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.cylinder.AddCylinderActivity;
 import com.track.cylinderdelivery.ui.diliverynote.DeliveryNoteListAdapter;
 import com.track.cylinderdelivery.ui.product.AddProductActivity;
+import com.track.cylinderdelivery.ui.purchaseorder.purchaseOrderSorting;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.json.JSONArray;
@@ -82,7 +83,7 @@ public class CylinderProductMappingFragment extends Fragment {
         context=getActivity();
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         setHasOptionsMenu(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.cylinderproductmapping));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Cylinder Product Mapping List");
         recyclerView=root.findViewById(R.id.rv_cylinder_list);
         progressBar=root.findViewById(R.id.progressBar);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -100,7 +101,8 @@ public class CylinderProductMappingFragment extends Fragment {
         lvSortingParent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Under development", Toast.LENGTH_LONG).show();
+                Intent intent=new Intent(context, SortingCylinderProductMappingActivity.class);
+                startActivity(intent);
             }
         });
         svSearch.setOnCloseListener(new SearchView.OnCloseListener() {
@@ -175,10 +177,16 @@ public class CylinderProductMappingFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(cylindeMappingActivity.getBoolean("refresh",false)){
+        if(cylindeMappingActivity.getBoolean("dofilter",false)){
             SharedPreferences.Editor editor = cylindeMappingActivity.edit();
-            editor.putBoolean("refresh",false);
+            editor.putBoolean("dofilter",false);
             editor.commit();
+            SortBy=cylindeMappingActivity.getString("text1","");
+            if(cylindeMappingActivity.getString("text2","Decinding").equals("Decinding")){
+                Sort="desc";
+            }else{
+                Sort="asc";
+            }
             if(isNetworkConnected()){
                 cylinderProductMappingList=null;
                 callGetCylinderProductMappingList();
