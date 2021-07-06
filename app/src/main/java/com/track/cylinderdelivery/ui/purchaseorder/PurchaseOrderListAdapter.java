@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
         TextView txtUserName;
         ImageView imgArrow;
         TextView txtStatus;
+        RelativeLayout rvBackground;
 
         public ViewHolder(View view) {
             super(view);
@@ -47,6 +49,7 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
             txtUserName=(TextView)view.findViewById(R.id.txtUserName);
             imgArrow=(ImageView)view.findViewById(R.id.imgArrow);
             txtStatus=view.findViewById(R.id.txtStatus);
+            rvBackground=(RelativeLayout)view.findViewById(R.id.rvBackground);
             imgArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -87,12 +90,15 @@ public class PurchaseOrderListAdapter extends RecyclerView.Adapter<PurchaseOrder
                 //holder.imgArrow.setImageResource(R.drawable.ic_baseline_pending_24);
             holder.imgArrow.setVisibility(View.INVISIBLE);
             holder.txtStatus.setVisibility(View.VISIBLE);
+            holder.rvBackground.setBackgroundColor(context.getResources().getColor(R.color.yellow));
         }else if(podetailList.get(position).get("status").equals("Draft")){
             holder.imgArrow.setVisibility(View.VISIBLE);
             holder.txtStatus.setVisibility(View.VISIBLE);
+            holder.rvBackground.setBackgroundColor(context.getResources().getColor(R.color.white));
         }else {
             holder.imgArrow.setVisibility(View.GONE);
             holder.txtStatus.setVisibility(View.GONE);
+            holder.rvBackground.setBackgroundColor(context.getResources().getColor(R.color.white));
         }
     }
 

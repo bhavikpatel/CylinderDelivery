@@ -108,6 +108,8 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
     Boolean isLastPage=false;
     private int totalRecord;
     private int pageno=0;
+    private EditText edtgasqty;
+    private int qtygaskg;
 
 
     @Override
@@ -136,6 +138,7 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         txtPurchasodUnderline=findViewById(R.id.txtPurchasodUnderline);
         txtLineinfoUnderline=findViewById(R.id.txtLineinfoUnderline);
         NSProduct=findViewById(R.id.NSProduct);
+        edtgasqty=findViewById(R.id.edtgasqty);
 
         recyclerView=findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
@@ -519,6 +522,7 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         } else {
             edtPoNumber.setError(null);
         }
+
         if(PoDate.isEmpty()){
             edtPoDate.setError("Field is Required.");
             valid=false;
@@ -850,6 +854,12 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         }else {
             NSProduct.setError(null);
         }
+        if(edtgasqty.getText().toString().isEmpty()){
+            edtgasqty.setError("Field is Required.");
+            valid=false;
+        }else {
+            edtgasqty.setError(null);
+        }
         if(edtQuantity.getText().toString().isEmpty()){
             edtQuantity.setError("Field is Required.");
             valid=false;
@@ -877,6 +887,8 @@ public class EditPurchaseOrderActivity extends AppCompatActivity {
         jsonBody.put("ProductId",productid);
         jsonBody.put("Quantity",quantity);
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("QuantityOfGas",qtygaskg);
+        jsonBody.put("Unit","KG");
 
         Log.d("jsonRequest==>",url+jsonBody.toString()+"");
 

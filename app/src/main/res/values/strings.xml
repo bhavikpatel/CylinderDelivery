@@ -203,7 +203,7 @@
     <string name="save_and_continue"><![CDATA[Save & Continue]]></string>
     <string name="add">Add</string>
     <string name="save_as_draft">Save as Draft</string>
-    <string name="cylinderQunatity">Cylinder Quantity</string>
+    <string name="cylinderQunatity">Qty of Cylinder:</string>
     <string name="Delivery_Note_List">Delivery Note List</string>
     <string name="delivery_note_detials">2. Delivery Note Detials</string>
     <string name="DN_Number">DN Number:</string>
@@ -235,4 +235,5 @@
     <string name="user_name">User Name:</string>
     <string name="name_of_company">Name Of Company:</string>
     <string name="company_category">Company Category:</string>
+    <string name="qty_of_gas">Qty of Gas:</string>
 </resources>

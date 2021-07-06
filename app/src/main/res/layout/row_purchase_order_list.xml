@@ -5,13 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-
     card_view:cardCornerRadius="4dp">
     <RelativeLayout
+        android:id="@+id/rvBackground"
         android:padding="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <TextView
             android:id="@+id/txtPonumber"
             android:layout_width="match_parent"
