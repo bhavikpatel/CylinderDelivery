@@ -80,7 +80,7 @@ public class ReturnOrderFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_return_order, container, false);
         context=getActivity();
         setHasOptionsMenu(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.return_order));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Return Order List");
         recyclerView=root.findViewById(R.id.rv_product_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);

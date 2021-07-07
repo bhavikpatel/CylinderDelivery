@@ -83,6 +83,7 @@ public class DNCylinderActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     private TransparentProgressDialog progressDialog;
     private Button btnLastSubmit;
+    private EditText edtVehicleno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +111,7 @@ public class DNCylinderActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         btnLastSubmit=findViewById(R.id.btnLastSubmit);
+        edtVehicleno=findViewById(R.id.edtVehicleno);
 
         DNNumber= mapdata.get("dnNumber");
         edtDNnumber.setText(DNNumber);
@@ -219,7 +221,8 @@ public class DNCylinderActivity extends AppCompatActivity {
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
         String url = "http://test.hdvivah.in/Api/MobDeliveryNote/ReadyforDelivery?DNId="+Integer.parseInt(mapdata.get("dnId"))+
-                "&UserId="+Integer.parseInt(settings.getString("userId","1"));
+                "&UserId="+Integer.parseInt(settings.getString("userId","1"))+
+                "&DriverVehicleNo="+edtVehicleno.getText().toString().trim();
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
@@ -235,7 +238,6 @@ public class DNCylinderActivity extends AppCompatActivity {
                         finish();
                     }else {
                         Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
-                        finish();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -289,9 +291,9 @@ public class DNCylinderActivity extends AppCompatActivity {
         Log.d("url==>",url);
         final JSONObject jsonBody=new JSONObject();
         jsonBody.put("DNId",Integer.parseInt(mapdata.get("dnId")));
-        jsonBody.put("WarehouseId",warehouseId);
+       // jsonBody.put("WarehouseId",warehouseId);
         jsonBody.put("ProductId",productID);
-        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList);
         jsonBody.put("CylinderList",jsonArrayCylList);
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
 
@@ -362,8 +364,8 @@ public class DNCylinderActivity extends AppCompatActivity {
     }
     void callGetDeliveryNoteCylinder(){
         Log.d("Api Calling==>","Api Calling");
-/*        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
-        progressDialog.show();*/
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
         String url = BASE_URL+"/Api/MobDeliveryNote/GetDeliveryNoteCylinder?search=&pageno=0&totalinpage="+
                 Integer.MAX_VALUE+"&SortBy=&Sort=desc&DNid="+Integer.parseInt(mapdata.get("dnId"));
         Log.d("request==>",url);
@@ -383,7 +385,7 @@ public class DNCylinderActivity extends AppCompatActivity {
                             map.put("dnId", jsonArray.getJSONObject(i).getString("dnId"));
                             map.put("dnNo", jsonArray.getJSONObject(i).getString("dnNo"));
                             map.put("cylinderProductMappingId",jsonArray.getJSONObject(i).getString("cylinderProductMappingId"));
-                            map.put("warehouseId", jsonArray.getJSONObject(i).getString("warehouseId"));
+                           // map.put("warehouseId", jsonArray.getJSONObject(i).getString("warehouseId"));
                             map.put("cylinderID",jsonArray.getJSONObject(i).getString("cylinderID"));
                             map.put("productID",jsonArray.getJSONObject(i).getString("productID"));
                             map.put("createdBy",jsonArray.getJSONObject(i).getString("createdBy"));
@@ -393,6 +395,7 @@ public class DNCylinderActivity extends AppCompatActivity {
                             map.put("productName",jsonArray.getJSONObject(i).getString("productName"));
                             map.put("warehouseName",jsonArray.getJSONObject(i).getString("warehouseName"));
                             map.put("cylinderList",jsonArray.getJSONObject(i).getString("cylinderList"));
+                            map.put("driverVehicleNo",jsonArray.getJSONObject(i).getString("driverVehicleNo")+"");
 
                             AddEditDNList.add(map);
                         }
@@ -442,7 +445,7 @@ public class DNCylinderActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
     private void callGetWarehouseList() {
-        Log.d("Api Calling==>","Api Calling");
+/*        Log.d("Api Calling==>","Api Calling");
         progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
         String url = "http://test.hdvivah.in/Api/MobWarehouse/GetWarehouseList?CompanyId="+
@@ -470,7 +473,7 @@ public class DNCylinderActivity extends AppCompatActivity {
                             whereHouseList.add(map);
                         }
                         NSwarehouse.attachDataSource(imtes);
-                        callGetDeliveryNotePendingCylinder();
+
                     }else {
 
                     }
@@ -515,13 +518,16 @@ public class DNCylinderActivity extends AppCompatActivity {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         RequestQueue queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
+        queue.add(stringRequest);*/
+
+
+        callGetDeliveryNotePendingCylinder();
     }
 
     private void callGetDeliveryNotePendingCylinder() {
         Log.d("Api Calling==>","Api Calling");
-/*        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
-        progressDialog.show();*/
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
         String url = "http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNotePendingCylinder?search=&pageno=0&totalinpage="+Integer.MAX_VALUE+
                 "&SortBy=&Sort=desc&DNid="+Integer.parseInt(mapdata.get("dnId"));
         Log.d("request==>",url);
@@ -529,7 +535,7 @@ public class DNCylinderActivity extends AppCompatActivity {
                 url,new Response.Listener<String>() {
             @Override
             public void onResponse(String Response) {
-                //progressDialog.dismiss();
+                progressDialog.dismiss();
                 Log.d("resonse ==>",Response+"");
                 JSONObject j;
                 try {
@@ -664,12 +670,18 @@ public class DNCylinderActivity extends AppCompatActivity {
         } else {
             txtCylinderNos.setError(null);
         }
-        if (warehousepos<=0) {
+        if(edtVehicleno.getText().toString().trim().length()==0){
+            edtVehicleno.setError("Field is Required.");
+            valid = false;
+        }else {
+            edtVehicleno.setError(null);
+        }
+/*        if (warehousepos<=0) {
             NSwarehouse.setError("Field is Required.");
             valid = false;
         } else {
             NSwarehouse.setError(null);
-        }
+        }*/
         if(pendingcylpos<=0){
             NSPendingcyl.setError("Field is Required.");
             valid = false;
@@ -712,7 +724,7 @@ public class DNCylinderActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //progressDialog.dismiss();
+                progressDialog.dismiss();
                 String message = null;
                 if (error instanceof NetworkError) {
                     message = "Cannot connect to Internet...Please check your connection!";

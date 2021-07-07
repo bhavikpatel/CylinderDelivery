@@ -62,9 +62,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/lv_underline"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="-10dp"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/txtPoNumber"
@@ -132,6 +132,19 @@
             android:cursorVisible="false"
             android:focusable="false" />
 
+        <TextView
+            android:id="@+id/txtPOGeneratedBy11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/driver_vehicle_no_"
+            android:textSize="@dimen/lblForm" />
+
+        <EditText
+            android:id="@+id/edtVehicleno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -165,7 +178,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/lv_underline"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/txtClientList"
@@ -184,6 +197,7 @@
             android:textSize="20sp"
             app:popupTextAlignment="start"
             app:textTint="@color/black" />
+
         <TextView
             android:id="@+id/txtPOGeneratedBy1"
             android:layout_width="wrap_content"
@@ -197,8 +211,7 @@
             android:id="@+id/edtRemark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txtPOGeneratedBy1"
-             />
+            android:layout_below="@+id/txtPOGeneratedBy1" />
 
         <ImageView
             android:id="@+id/btnScanCylinders"

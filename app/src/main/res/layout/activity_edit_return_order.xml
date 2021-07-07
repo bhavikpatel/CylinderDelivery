@@ -131,7 +131,18 @@
             android:clickable="false"
             android:cursorVisible="false"
             android:focusable="false" />
+        <TextView
+            android:id="@+id/txtPOGeneratedBy11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/driver_vehicle_no_"
+            android:textSize="@dimen/lblForm" />
 
+        <EditText
+            android:id="@+id/edtVehicleno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

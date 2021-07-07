@@ -63,7 +63,7 @@ import java.util.Map;
 public class EditReturnOrderActivity extends AppCompatActivity {
     private String RONumber;
     private EditReturnOrderActivity context;
-    private EditText edtRoNumber,edtSoDate,edtSOGeneratedBy;
+    private EditText edtRoNumber,edtSoDate,edtSOGeneratedBy,edtVehicleno;
     private String roDate;
     private NiceSpinner ROUsers;
     private static final int MY_SOCKET_TIMEOUT_MS = 10000;
@@ -114,6 +114,7 @@ public class EditReturnOrderActivity extends AppCompatActivity {
         edtRoNumber=findViewById(R.id.edtRoNumber);
         RONumber=mapdata.get("roNumber");
         edtRoNumber.setText(RONumber);
+        edtVehicleno=findViewById(R.id.edtVehicleno);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         edtSoDate=findViewById(R.id.edtSoDate);
         Date c = Calendar.getInstance().getTime();
@@ -518,6 +519,7 @@ public class EditReturnOrderActivity extends AppCompatActivity {
         } else {
             NSPendingSales.setError(null);
         }
+
 /*        if(Remark.length()==0){
             edtRemark.setError("Field is Required.");
             valid=false;
@@ -545,6 +547,7 @@ public class EditReturnOrderActivity extends AppCompatActivity {
         jsonBody.put("RODate",roDate+"");
         jsonBody.put("ROGeneratedBy",edtSOGeneratedBy.getText().toString()+"");
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("DriverVehicleNo",edtVehicleno.getText().toString()+"");
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -721,7 +724,12 @@ public class EditReturnOrderActivity extends AppCompatActivity {
         }else {
             ROUsers.setError(null);
         }
-
+        if(edtVehicleno.getText().toString().trim().length()==0){
+            edtVehicleno.setError("Field is Required.");
+            valid = false;
+        }else {
+            edtVehicleno.setError(null);
+        }
         if(edtSOGeneratedBy.getText().toString()==null){
             edtSOGeneratedBy.setError("Field is Required.");
             valid=false;

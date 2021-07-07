@@ -210,8 +210,6 @@ public class DeliveryNoteFragment extends Fragment {
         }else {
             progressBar.setVisibility(View.VISIBLE);
         }
-        //http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteList?search=&pageno=0&totalinpage=10&SortBy=&Sort=desc&UserId=1&CompanyId=1&UserType=Admin
-//        /Api/MobDeliveryNote/GetDeliveryNoteList?search=&pageno=0&totalinpage=10&SortBy=&Sort=desc&UserId=1&CompanyId=1&UserType=Admin
 
         String url = "http://test.hdvivah.in/Api/MobDeliveryNote/GetDeliveryNoteList?search="+search+
                 "&pageno="+pageno+"&totalinpage="+totalinpage+

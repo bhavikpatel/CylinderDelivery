@@ -178,7 +178,7 @@
     <string name="repot">Report</string>
     <string name="cylinder_warehouse_mapping">Cylinder Warehouse Mapping</string>
     <string name="permission">Permission</string>
-    <string name="delivery_note">Delivery Note</string>
+    <string name="delivery_note">Driver Delivery Note</string>
     <string name="delivery_note_">Delivery Note:</string>
     <string name="sales_order">Sales Order</string>
     <string name="return_order">Return Order</string>
@@ -204,7 +204,7 @@
     <string name="add">Add</string>
     <string name="save_as_draft">Save as Draft</string>
     <string name="cylinderQunatity">Qty of Cylinder:</string>
-    <string name="Delivery_Note_List">Delivery Note List</string>
+    <string name="Delivery_Note_List">Driver Delivery Note List</string>
     <string name="delivery_note_detials">2. Delivery Note Detials</string>
     <string name="DN_Number">DN Number:</string>
     <string name="DN_Date">DN Date:</string>
@@ -215,7 +215,7 @@
     <string name="podetial">(PO Number/Product Name/Quantity)</string>
     <string name="delivery_note_no">Delivery Note No:</string>
     <string name="from_warehouse">From Warehouse:</string>
-    <string name="cylinder_list1">Cylinder List:</string>
+    <string name="cylinder_list1">Client DN Cylinders:</string>
     <string name="cylinder_product_name_quantity">(Product Name/Cylinder/Quantity)</string>
     <string name="ready_for_delivery">Ready for Delivery</string>
     <string name="action_addSalseOrde">Sales Order</string>
@@ -236,4 +236,6 @@
     <string name="name_of_company">Name Of Company:</string>
     <string name="company_category">Company Category:</string>
     <string name="qty_of_gas">Qty of Gas:</string>
+    <string name="driver_vehicleno">Driver VehicleNo:</string>
+    <string name="driver_vehicle_no_">Driver Vehicle No:</string>
 </resources>

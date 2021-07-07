@@ -101,6 +101,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
     private ArrayList<HashMap<String,String>> sODetailList;
     private RODetailListAdapter sODetailListAdapter;
     RecyclerView recyclerView;
+    EditText edtVehicleno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +117,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Add Return Order</font>"));
         edtRoNumber=findViewById(R.id.edtRoNumber);
         edtRoNumber.setText(RONumber);
+        edtVehicleno=findViewById(R.id.edtVehicleno);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         edtSoDate=findViewById(R.id.edtSoDate);
         Date c = Calendar.getInstance().getTime();
@@ -379,7 +381,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         Log.d("url==>",url);
         final JSONObject jsonBody=new JSONObject();
         jsonBody.put("ROId",ROId);
-        JSONArray jsonArrayCylList=new JSONArray(qrcodeList.toString());
+        JSONArray jsonArrayCylList=new JSONArray(qrcodeList);
         jsonBody.put("CylinderList",jsonArrayCylList);
         jsonBody.put("CylinderStatus",CylinderStatus);
         jsonBody.put("Remark",Remark);
@@ -520,6 +522,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         } else {
             NSPendingSales.setError(null);
         }
+
 /*        if(Remark.length()==0){
             edtRemark.setError("Field is Required.");
             valid=false;
@@ -547,6 +550,7 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         jsonBody.put("RODate",roDate+"");
         jsonBody.put("ROGeneratedBy",edtSOGeneratedBy.getText().toString()+"");
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("DriverVehicleNo",edtVehicleno.getText().toString().trim());
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -723,7 +727,12 @@ public class AddReturnOrderActivity extends AppCompatActivity {
         }else {
             ROUsers.setError(null);
         }
-
+        if(edtVehicleno.getText().toString().trim().length()==0){
+            edtVehicleno.setError("Field is Required.");
+            valid = false;
+        }else {
+            edtVehicleno.setError(null);
+        }
         if(edtSOGeneratedBy.getText().toString()==null){
             edtSOGeneratedBy.setError("Field is Required.");
             valid=false;
