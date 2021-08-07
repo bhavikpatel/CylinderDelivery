@@ -386,7 +386,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         final JSONObject jsonBody=new JSONObject();
         jsonBody.put("SOId",Integer.parseInt(mapdata.get("soId")));
         jsonBody.put("DNId",Integer.parseInt(dnId));
-        jsonBody.put("SONumber",Integer.parseInt(soNumber));
+        jsonBody.put("SONumber",soNumber);
         jsonBody.put("UserId",Integer.parseInt(clintvalue));
         jsonBody.put("SODate",soDate);
         jsonBody.put("SOGeneratedBy",SOGeneratedBy+"");
