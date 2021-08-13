@@ -238,4 +238,8 @@
     <string name="qty_of_gas">Qty of Gas:</string>
     <string name="driver_vehicleno">Driver VehicleNo:</string>
     <string name="driver_vehicle_no_">Driver Vehicle No:</string>
+    <string name="agreement">aggreement</string>
+    <string name="save_signature">Save</string>
+    <string name="compress_signature">Scale 50%</string>
+    <string name="clear_pad">Erase</string>
 </resources>

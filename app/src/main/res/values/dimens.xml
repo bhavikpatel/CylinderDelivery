@@ -5,7 +5,7 @@
     <dimen name="nav_header_vertical_spacing">10dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="lblForm">15dp</dimen>
+    <dimen name="lblForm">15sp</dimen>
     <dimen name="EditTextPadding">5dp</dimen>
     <dimen name="address_in_list">15sp</dimen>
     <dimen name="name_in_list">20sp</dimen>

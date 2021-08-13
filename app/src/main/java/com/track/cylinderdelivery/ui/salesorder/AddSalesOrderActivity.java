@@ -45,6 +45,7 @@ import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
 import com.track.cylinderdelivery.ui.diliverynote.DNDetailListAdapter;
+import com.track.cylinderdelivery.utils.SignatureActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -68,7 +69,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     private String SNNumber;
     EditText edtSoNumber,edtSoDate,edtSOGeneratedBy;
     private static final String BASE_URL = "http://test.hdvivah.in";
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     private SharedPreferences settings;
     NiceSpinner NSDeloryNote,NSClient;
     private ArrayList<HashMap<String,String>> deliveryList;
@@ -94,6 +95,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     private ArrayList<HashMap<String,String>> pendingsalesList;
     ImageView btnScanCylinders;
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
+    public static final int MY_PERMISSIONS_REQUEST_READ_WRITE_FILE = 101;
     private ArrayList<String> qrcodeList;
     TextView txtCylinderNos;
     private Button btnAdd,btnLastSubmit,btnSaveAsDraft;
@@ -109,6 +111,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     private int wareHousepos=0;
     private ArrayList<HashMap<String,String>> warehouseList;
     private String warehouseId;
+    Button btnSignature;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +158,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         NSWarehouse=findViewById(R.id.NSWarehouse);
         NSWarehouse.setVisibility(View.GONE);
         txtUserName11.setVisibility(View.GONE);
+        btnSignature=findViewById(R.id.btnSignature);
 
         Date c = Calendar.getInstance().getTime();
         Log.d("soDate==>",c+"");
@@ -185,6 +189,13 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                     //clintvalue="";
                     //clinttext="";
                 }
+            }
+        });
+        btnSignature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, SignatureActivity.class);
+                startActivity(intent);
             }
         });
         NSWarehouse.setOnClickListener(new View.OnClickListener() {
@@ -675,6 +686,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                 }
                 return;
             }
+
             // other 'case' lines to check for other
             // permissions this app might request
         }

@@ -44,6 +44,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.R;
 import com.track.cylinderdelivery.ui.cylinder.CylinderQRActivity;
+import com.track.cylinderdelivery.utils.SignatureActivity;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.angmarch.views.NiceSpinner;
@@ -105,6 +106,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     EditSODetailListAdapter sODetailListAdapter;
     TextView txtUserName11;
+    Button btnSignature;
 
 
     @Override
@@ -153,6 +155,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         btnLastSubmit=findViewById(R.id.btnLastSubmit);
         btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
+        btnSignature=findViewById(R.id.btnSignature);
 
 
         if(isNetworkConnected()) {
@@ -161,7 +164,13 @@ public class EditSalesOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
-
+        btnSignature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, SignatureActivity.class);
+                startActivity(intent);
+            }
+        });
         btnSaveAsDraft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
