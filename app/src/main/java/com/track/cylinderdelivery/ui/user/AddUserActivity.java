@@ -61,7 +61,7 @@ public class AddUserActivity extends BaseActivity {
     Button btnSubmit,btnCancel;
     private SharedPreferences spUserFilter;
     NiceSpinner NsCompanyCategory;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     private EditText edtHoldingCapacity;
     private ArrayList<HashMap<String,String>> companyCatList;
     private int companycatpos=0;
