@@ -85,8 +85,7 @@ public class AddCylinderActivity extends AppCompatActivity {
     private String Address2;
     private SharedPreferences settings;
     private SharedPreferences CompanyUpdate;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
-
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

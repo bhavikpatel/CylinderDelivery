@@ -32,6 +32,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.track.cylinderdelivery.ui.BaseActivity;
+import com.track.cylinderdelivery.ui.cylinder.CylinderListAdapter;
 import com.track.cylinderdelivery.utils.TransparentProgressDialog;
 
 import org.json.JSONArray;
@@ -39,17 +40,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends BaseActivity {
 
-    private TextView txtSignup;
+    private TextView txtSignup,txtForgotPass;
     private Context context;
     private Button btn_login;
     private EditText edt_user,edt_password;
     private SharedPreferences settings;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
    // private boolean loggedIN;
 
     @Override
@@ -61,11 +63,24 @@ public class LoginActivity extends BaseActivity {
         btn_login=(Button)findViewById(R.id.btn_login);
         edt_user=(EditText)findViewById(R.id.edt_user_id);
         edt_password=(EditText)findViewById(R.id.edt_password);
+        txtForgotPass=findViewById(R.id.txtForgotPass);
         edt_user.setText("admin@admin.com");
         edt_password.setText("admin@123");
         settings=getSharedPreferences("setting",MODE_PRIVATE);
        // loggedIN=settings.getBoolean("loggedIN",false);
 
+        txtForgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(validateemail()) {
+                    if (isNetworkConnected()) {
+                         callForgotPassApi(edt_user.getText().toString().trim());
+                    }else {
+                        Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +106,69 @@ public class LoginActivity extends BaseActivity {
             }
         });
     }
+
+    private void callForgotPassApi(String email) {
+        Log.d("Api Calling==>","Api Calling");
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(LoginActivity.this, R.drawable.loader);
+        progressDialog.show();
+        String url = "http://test.hdvivah.in/Api/MobLogin/ForgotPassword?email="+email;
+        Log.d("request==>",url);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String Response) {
+                progressDialog.dismiss();
+                Log.d("resonse ==>",Response+"");
+                JSONObject j;
+                try {
+                    j = new JSONObject(Response);
+                    String message=j.getString("message");
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                String message = null;
+                if (error instanceof NetworkError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    message = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    message = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ParseError) {
+                    message = "Parsing error! Please try again after some time!!";
+                } else if (error instanceof TimeoutError) {
+                    message = "Connection TimeOut! Please check your internet connection.";
+                }
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                Log.d("error==>",message+"");
+            }
+        }){
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() {
+                HashMap map=new HashMap();
+                map.put("content-type","application/json");
+                return map;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                MY_SOCKET_TIMEOUT_MS,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(context);
+        queue.add(stringRequest);
+    }
+
     private void callLoginApi(String username, String password) throws JSONException {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(LoginActivity.this, R.drawable.loader);
@@ -176,6 +254,18 @@ public class LoginActivity extends BaseActivity {
             valid = false;
         } else {
             edt_password.setError(null);
+        }
+        return valid;
+    }
+    public boolean validateemail() {
+        boolean valid = true;
+        String email1 = edt_user.getText().toString().trim();
+
+        if (email1.isEmpty()) {
+            edt_user.setError("Field is Required.");
+            valid = false;
+        } else {
+            edt_user.setError(null);
         }
         return valid;
     }
