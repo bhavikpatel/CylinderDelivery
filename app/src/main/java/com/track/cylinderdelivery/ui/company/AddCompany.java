@@ -57,13 +57,13 @@ public class AddCompany extends AppCompatActivity {
     private EditText edtCountry;
     private EditText edtZipCode;
     private EditText edtTexNumber;
-    private EditText edtEmail;
-    private EditText edtSecondaryEmail;
-    private EditText edtMobile;
+    private EditText edtEmail,edtCylHolCreDay;
+    private EditText edtSecondaryEmail,edtHoldingCapacity;
+    private EditText edtMobile,edtPerMonReq;
     private EditText edtSecondaryMobile,edtEmailPassword;
     private SharedPreferences settings;
     private SharedPreferences CompanyUpdate;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     ArrayList<HashMap<String,String>> companyTypeList;
     NiceSpinner spCompanyType,spCompanyCatergory;
     int companytypepos=-1,companycatpos=-1;
@@ -99,6 +99,9 @@ public class AddCompany extends AppCompatActivity {
         edtMobile=findViewById(R.id.edtMobile);
         edtSecondaryMobile=findViewById(R.id.edtSecondaryMobile);
         edtEmailPassword=findViewById(R.id.edtEmailPassword);
+        edtPerMonReq=findViewById(R.id.edtPerMonReq);
+        edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
+        edtCylHolCreDay=findViewById(R.id.edtCylHolCreDay);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         CompanyUpdate=context.getSharedPreferences("companyUpdate",MODE_PRIVATE);
         if(isNetworkConnected()){
@@ -124,7 +127,10 @@ public class AddCompany extends AppCompatActivity {
                         edtZipCode.getText().toString().trim(),
                         edtTexNumber.getText().toString().trim(),
                         edtMobile.getText().toString().trim(),
-                        edtEmail.getText().toString().trim())){
+                        edtEmail.getText().toString().trim(),
+                        edtPerMonReq.getText().toString().trim(),
+                        edtHoldingCapacity.getText().toString().trim(),
+                        edtCylHolCreDay.getText().toString().trim())){
                     try {
                         if(isNetworkConnected()){
                             callEditCompanyApi();
@@ -194,6 +200,9 @@ public class AddCompany extends AppCompatActivity {
         jsonBody.put("CompanyType",companyTypeList.get(companytypepos-1).get("value")+"");
         jsonBody.put("TaxNumber",edtTexNumber.getText().toString().trim()+"");
         jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value")+"");
+        jsonBody.put("PerMonthRequirement",Integer.parseInt(edtPerMonReq.getText().toString().trim()));
+        jsonBody.put("HoldingCapacity",Integer.parseInt(edtHoldingCapacity.getText().toString().trim()));
+        jsonBody.put("CylinderHoldingCreditDays",Integer.parseInt(edtCylHolCreDay.getText().toString().trim()));
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -241,8 +250,9 @@ public class AddCompany extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public boolean validate(String fullName,String CopmanyName,String Address1,String City,String County,
-                            String ZipCode,String TaxNumber, String Phone, String Email) {
+    public boolean validate(String fullName, String CopmanyName, String Address1, String City, String County,
+                            String ZipCode, String TaxNumber, String Phone, String Email, String perMonthReq,
+                            String holdingCap, String cylholdcarditday) {
         boolean valid = true;
 
 /*        if (Address2.isEmpty()) {
@@ -257,7 +267,24 @@ public class AddCompany extends AppCompatActivity {
         } else {
             edtSecondaryMobile.setError(null);
         }*/
-
+        if (cylholdcarditday.isEmpty()) {
+            edtCylHolCreDay.setError("Name is required");
+            valid = false;
+        } else {
+            edtCylHolCreDay.setError(null);
+        }
+        if (holdingCap.isEmpty()) {
+            edtHoldingCapacity.setError("Name is required");
+            valid = false;
+        } else {
+            edtHoldingCapacity.setError(null);
+        }
+        if (perMonthReq.isEmpty()) {
+            edtPerMonReq.setError("Name is required");
+            valid = false;
+        } else {
+            edtPerMonReq.setError(null);
+        }
         if (fullName.isEmpty()) {
             edtName.setError("Name is required");
             valid = false;
