@@ -15,7 +15,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -26,8 +25,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignatureActivity extends AppCompatActivity {
 
@@ -74,36 +86,10 @@ public class SignatureActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Bitmap signatureBitmap = mSilkySignaturePad.getSignatureBitmap();
-              //  Log.d("bitmap==>",savedInstanceState+"");
                 imageView2.setImageBitmap(signatureBitmap);
                 if(signatureBitmap!=null) {
                     uploadimage(signatureBitmap);
                 }
-                /* String root = Environment.getExternalStorageDirectory().toString();
-                File myDir = new File(root + "/req_images");
-                myDir.mkdirs();
-                Random generator = new Random();
-                int n = 10000;
-                n = generator.nextInt(n);
-                String fname = SONumber+"-" + n + ".jpg";
-                File file = new File(myDir, fname);
-                Log.i("TAG", "" + file);
-                if (file.exists())
-                    file.delete();
-                try {
-                    FileOutputStream out = new FileOutputStream(file);
-                    signatureBitmap.compress(Bitmap.CompressFormat.JPEG, 0, out);
-                    out.flush();
-                    out.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if (file != null) {
-                   // imageUpload(file.getPath());
-                } else {
-                    Toast.makeText(getApplicationContext(), "Image not selected!", Toast.LENGTH_LONG).show();
-                }*/
             }
         });
         mClearButton.setOnClickListener(new View.OnClickListener() {
@@ -115,59 +101,40 @@ public class SignatureActivity extends AppCompatActivity {
     }
 
     private void uploadimage(Bitmap signatureBitmap) {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, baseUrl,
-                new Response.Listener<String>() {
+        MarketPlaceApiInterface apiService = Apiclient.getClient().create(MarketPlaceApiInterface.class);
+        File file = new File(getCacheDir().getPath() + "SignImage.jpg");
+        try {
+            OutputStream fOut = new FileOutputStream(file);
+            signatureBitmap.compress(Bitmap.CompressFormat.JPEG,85,fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+//        RequestBody requestFile = RequestBody.create(MediaType.parse("text/plain"), file);
+        MultipartBody.Part BusinessImage = MultipartBody.Part.
+                createFormData("files", file.getName(), requestFile);
+        apiService.UpdateMarketPlaceProducts(Collections.singletonList(BusinessImage))
+                .enqueue(new Callback<ResponseBody>() {
                     @Override
-                    public void onResponse(String response) {
-                        Log.d("response==>",response+"");
-                            /*JSONObject jsonObject  = new JSONObject(response);
-                            String Response = jsonObject.getString("response");
-                            Toast.makeText(SignatureActivity.this, Response,Toast.LENGTH_LONG).show();*/
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        try {
+                            Log.d("onResponse", "onResponse: " + response.body().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        } )
-        {
-            @Override
-            public String getBodyContentType() {
-                return "multipart/form-data";
-            }
 
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                final JSONObject jsonBody=new JSONObject();
-                try {
-                    jsonBody.put("files",imageToString(signatureBitmap));
-                    Log.d("bitmap==>",imageToString(signatureBitmap)+"");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return jsonBody.toString().getBytes();
-            }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.d("onFailure", "onResponse: " + t.getMessage());
 
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> map = new HashMap<>();
-                map.put("content-type","multipart/form-data");
-                return map;
-            }
-        };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        RequestQueue queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
+                    }
+                });
     }
-    private byte[] imageToString(Bitmap bitmap)
-    {
-        ByteArrayOutputStream byteArrayOutputStream =  new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-        byte[] imgbytes = byteArrayOutputStream.toByteArray();
-       // return Base64.encodeToString(imgbytes, Base64.DEFAULT);
-        return imgbytes;
-    }
+
 }
