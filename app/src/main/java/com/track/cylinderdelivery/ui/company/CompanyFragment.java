@@ -54,7 +54,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class CompanyFragment extends Fragment {
 
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     Context context;
     String search="";
     int pageno=0;
@@ -264,6 +264,10 @@ public class CompanyFragment extends Fragment {
                         map.put("status", jsonArray.getJSONObject(i).getString("status") + "");
                         map.put("createdByName", jsonArray.getJSONObject(i).getString("createdByName") + "");
                         map.put("createdDateStr", jsonArray.getJSONObject(i).getString("createdDateStr") + "");
+                        map.put("PerMonthRequirement", jsonArray.getJSONObject(i).getString("PerMonthRequirement") + "");
+                        map.put("HoldingCapacity", jsonArray.getJSONObject(i).getString("HoldingCapacity") + "");
+                        map.put("CylinderHoldingCreditDays", jsonArray.getJSONObject(i).getString("CylinderHoldingCreditDays") + "");
+
                         dataList.add(map);
                     }
                     if(dataList.size()>=totalRecord){

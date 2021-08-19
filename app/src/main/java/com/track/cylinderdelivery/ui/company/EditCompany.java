@@ -53,10 +53,11 @@ public class EditCompany extends AppCompatActivity {
     private HashMap<String, String> mapdata;
     Button btnCancel,btnSubmit;
     EditText edtName,edtContactPerName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode;
-    EditText edtTexNumber,edtEmail,edtSecondaryEmail,edtMobile,edtSecondaryMobile;
+    EditText edtTexNumber,edtEmail,edtSecondaryEmail,edtMobile,edtSecondaryMobile,edtPerMonReq;
+    EditText edtHoldingCapacity,edtCylHolCreDay;
     NiceSpinner spCompanyType,spCompanyCatergory;
     private SharedPreferences settings,CompanyUpdate;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     ArrayList<HashMap<String,String>> companyTypeList;
     private int companytypepos=0,companycatpos=0;
     private ArrayList<HashMap<String,String>> companyCatList;
@@ -91,6 +92,8 @@ public class EditCompany extends AppCompatActivity {
         edtSecondaryMobile=findViewById(R.id.edtSecondaryMobile);
         spCompanyType=findViewById(R.id.spCompanyType);
         spCompanyCatergory=findViewById(R.id.spCompanyCatergory);
+        edtPerMonReq=findViewById(R.id.edtPerMonReq);
+        edtCylHolCreDay=findViewById(R.id.edtCylHolCreDay);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         CompanyUpdate=context.getSharedPreferences("companyUpdate",MODE_PRIVATE);
 
@@ -103,6 +106,9 @@ public class EditCompany extends AppCompatActivity {
         edtZipCode.setText(mapdata.get("zipCode"));
         edtTexNumber.setText(mapdata.get("taxNumber"));
         edtEmail.setText(mapdata.get("email"));
+        edtPerMonReq.setText(mapdata.get("PerMonthRequirement"));
+        edtHoldingCapacity.setText(mapdata.get("HoldingCapacity"));
+        edtCylHolCreDay.setText(mapdata.get("CylinderHoldingCreditDays"));
         String secondaryEmail=mapdata.get("secondaryEmail");
         if(secondaryEmail.isEmpty() || secondaryEmail.equals("null")){
             secondaryEmail="";
@@ -138,7 +144,10 @@ public class EditCompany extends AppCompatActivity {
                         edtEmail.getText().toString().trim(),
                         edtTexNumber.getText().toString().trim(),edtSecondaryEmail.getText().toString().trim(),
                         edtSecondaryMobile.getText().toString().trim(),
-                        edtAddress2.getText().toString().trim())){
+                        edtAddress2.getText().toString().trim(),
+                        edtPerMonReq.getText().toString().trim(),
+                        edtHoldingCapacity.getText().toString().trim(),
+                        edtCylHolCreDay.getText().toString().trim())){
                     try {
                         callEditCompanyApi();
                     } catch (JSONException e) {
@@ -203,6 +212,9 @@ public class EditCompany extends AppCompatActivity {
         jsonBody.put("CompanyType",companyTypeList.get(companytypepos-1).get("value"));
         jsonBody.put("TaxNumber",edtTexNumber.getText().toString().trim()+"");
         jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value")+"");
+        jsonBody.put("PerMonthRequirement",Integer.parseInt(edtPerMonReq.getText().toString().trim()));
+        jsonBody.put("HoldingCapacity",Integer.parseInt(edtHoldingCapacity.getText().toString().trim()));
+        jsonBody.put("CylinderHoldingCreditDays",Integer.parseInt(edtCylHolCreDay.getText().toString().trim()));
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -256,11 +268,30 @@ public class EditCompany extends AppCompatActivity {
         return true;
     }
 
-    public boolean validate(String fullName,String ContactPerName,String Address1,String City,String County,
-                            String ZipCode, String Phone, String Email,String EmailPassword,
-                            String secondaryEmail,String secondaryPhone,String address2) {
+    public boolean validate(String fullName, String ContactPerName, String Address1, String City, String County,
+                            String ZipCode, String Phone, String Email, String EmailPassword,
+                            String secondaryEmail, String secondaryPhone, String address2, String perMonReq,
+                            String holdingCap, String cylholcredday) {
         boolean valid = true;
 
+        if (cylholcredday.isEmpty()) {
+            edtCylHolCreDay.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtCylHolCreDay.setError(null);
+        }
+        if (holdingCap.isEmpty()) {
+            edtHoldingCapacity.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtHoldingCapacity.setError(null);
+        }
+        if (perMonReq.isEmpty()) {
+            edtPerMonReq.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtPerMonReq.setError(null);
+        }
         if (address2.isEmpty()) {
             edtAddress2.setError("Field is Required.");
             valid = false;

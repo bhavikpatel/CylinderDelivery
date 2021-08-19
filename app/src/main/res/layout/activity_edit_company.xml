@@ -147,6 +147,48 @@
             android:inputType="number"
             android:text="" />
         <TextView
+            android:id="@+id/txtZipCode1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/per_month_requirement" />
+        <EditText
+            android:id="@+id/edtPerMonReq"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:text="" />
+        <TextView
+            android:id="@+id/txtZipCode11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/holding_capacity" />
+        <EditText
+            android:id="@+id/edtHoldingCapacity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:text="" />
+        <TextView
+            android:id="@+id/txtZipCode111"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/cylinder_holding_credit_days" />
+        <EditText
+            android:id="@+id/edtCylHolCreDay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:text="" />
+        <TextView
             android:id="@+id/txtPinNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
