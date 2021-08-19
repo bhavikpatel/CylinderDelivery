@@ -242,4 +242,6 @@
     <string name="save_signature">Save</string>
     <string name="compress_signature">Scale 50%</string>
     <string name="clear_pad">Erase</string>
+    <string name="cylinder_holding_credit_days">Cylinder Holding Credit Days:</string>
+    <string name="per_month_requirement1">Per Month Requirement:</string>
 </resources>

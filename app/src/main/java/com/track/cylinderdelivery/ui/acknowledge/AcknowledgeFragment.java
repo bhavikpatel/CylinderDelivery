@@ -47,7 +47,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class AcknowledgeFragment extends Fragment {
 
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     Button btnApproved,btnRejected,btnPanding;
     RecyclerView rvAcknowledge;
     Context context;
@@ -64,7 +64,6 @@ public class AcknowledgeFragment extends Fragment {
     int flgAck=1;
     ArrayList<HashMap<String,String>> dataList;
     private AcknowledgeListAdapter acknowledgeListAdapter;
-
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

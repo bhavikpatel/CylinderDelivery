@@ -424,7 +424,24 @@
                 android:text=""
                 android:textColor="@color/dark_gray"
                 android:textSize="13sp" />
+            <TextView
+                android:id="@+id/txtHoldingCapacity1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/per_month_requirement1"
+                android:textColor="@color/black"
+                android:textSize="@dimen/lblForm"
+                android:textStyle="bold" />
 
+            <EditText
+                android:id="@+id/edtReqPerMonth"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:inputType="number"
+                android:paddingLeft="@dimen/EditTextPadding"
+                android:paddingRight="@dimen/EditTextPadding"
+                android:text="" />
             <TextView
                 android:id="@+id/txtHoldingCapacity"
                 android:layout_width="match_parent"
@@ -437,6 +454,24 @@
 
             <EditText
                 android:id="@+id/edtHoldingCapacity"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:inputType="number"
+                android:paddingLeft="@dimen/EditTextPadding"
+                android:paddingRight="@dimen/EditTextPadding"
+                android:text="" />
+            <TextView
+                android:id="@+id/txtHoldingCapacity11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/cylinder_holding_credit_days"
+                android:textColor="@color/black"
+                android:textSize="@dimen/lblForm"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtHoldingCreditDay"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:inputType="number"

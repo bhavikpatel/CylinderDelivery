@@ -57,7 +57,7 @@ import java.util.Map;
 
 public class ApproveAcknowledgeActivity extends BaseActivity {
     Context context;
-    EditText edtDate;
+    EditText edtDate,edtReqPerMonth,edtHoldingCreditDay;
     Calendar myCalendar;
     NiceSpinner spinarStatus;
     List<String> statusType;
@@ -69,7 +69,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
     LinearLayout lvTextnumber,lvUserRemark,lvparent;
     TextView txtPhoneNo,txtSecondaryMobile,txtEmail,txtSecondaryEmail,txtPermonthReq;
     TextView txtTexNumber,txtUserRemark;
-    private static final int MY_SOCKET_TIMEOUT_MS = 5000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     private HashMap<String, String> map;
     EditText edtHoldingCapacity,edtRemark;
     private SharedPreferences settings;
@@ -133,9 +133,10 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         rvParent=findViewById(R.id.rvParent);
         lvparent=findViewById(R.id.lvparent);
         lvparent.setVisibility(View.VISIBLE);
+        edtReqPerMonth=findViewById(R.id.edtReqPerMonth);
+        edtHoldingCreditDay=findViewById(R.id.edtHoldingCreditDay);
 
         callGetUserDetail(Integer.parseInt(mapdata.get("userId")));
-
 
         btnAckno.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,10 +151,12 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                     String AchnowledgeRemark=edtRemark.getText().toString();
                     int CreatedBy= Integer.parseInt(settings.getString("userId","1"));
                     int AcknowledgeBy= Integer.parseInt(settings.getString("userId","1"));
+                    int reqPerMonth=Integer.parseInt(edtReqPerMonth.getText().toString());
+                    int cylCreditdays=Integer.parseInt(edtHoldingCreditDay.getText().toString());
                     if(isNetworkConnected()){
                         try {
                             callAppriveAcknowledge(UserId,HoldingCapacity,AcknowledgeDate,
-                                    Status,AchnowledgeRemark,CreatedBy,AcknowledgeBy);
+                                    Status,AchnowledgeRemark,CreatedBy,AcknowledgeBy,reqPerMonth,cylCreditdays);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -201,7 +204,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
 
     private void callAppriveAcknowledge(int userId, int holdingCapacity, String acknowledgeDate,
                                         String status, String achnowledgeRemark, int createdBy,
-                                        int acknowledgeBy) throws JSONException {
+                                        int acknowledgeBy, int reqPerMonth, int cylCreditdays) throws JSONException {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
@@ -215,6 +218,9 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
         jsonBody.put("CreatedBy",createdBy);
         jsonBody.put("AcknowledgeBy",acknowledgeBy);
         jsonBody.put("AcknowledgeId",AcknowledgeId);
+        jsonBody.put("PerMonthRequirement",reqPerMonth);
+        jsonBody.put("CylinderHoldingCreditDays",cylCreditdays);
+
         final String v = jsonBody.toString();
         Log.d("parambers==>",v);
 
