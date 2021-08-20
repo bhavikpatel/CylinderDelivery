@@ -62,7 +62,7 @@ public class AddUserActivity extends BaseActivity {
     private SharedPreferences spUserFilter;
     NiceSpinner NsCompanyCategory;
     private static final int MY_SOCKET_TIMEOUT_MS = 100000;
-    private EditText edtHoldingCapacity;
+    private EditText edtHoldingCapacity,edtPerMonReq,edtCylHolCreDay;
     private ArrayList<HashMap<String,String>> companyCatList;
     private int companycatpos=0;
 
@@ -96,6 +96,8 @@ public class AddUserActivity extends BaseActivity {
         edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
         edtPinNumber=findViewById(R.id.edtPinNumber);
         edtCompanyName=findViewById(R.id.edtCompanyName);
+        edtPerMonReq=findViewById(R.id.edtPerMonReq);
+        edtCylHolCreDay=findViewById(R.id.edtCylHolCreDay);
         if(isNetworkConnected()){
             getCompanyCategoryList();
         }else {
@@ -122,17 +124,20 @@ public class AddUserActivity extends BaseActivity {
                 int CreatedBy=1;
                 int ModifiedBy=1;
                 int HoldingCapacity=10;
+
                 if(edtHoldingCapacity.getText().toString().trim().length()!=0){
                     HoldingCapacity=Integer.parseInt(edtHoldingCapacity.getText().toString());
                 }
 
                 if(validate(FullName,Address1,City,County,ZipCode,Phone,Email,EmailPassword,
-                        Address2,SecondaryPhone,SecondaryEmail,PinNumber,NameOfCompany)){
+                        Address2,SecondaryPhone,SecondaryEmail,PinNumber,NameOfCompany,
+                        edtPerMonReq.getText().toString().trim(),edtCylHolCreDay.getText().toString().trim())){
                     try {
                         if(isNetworkConnected()){
                             callAddUserApi(FullName,CompanyId,Address1,Address2,City,County,ZipCode,Phone,
                                     SecondaryPhone,HoldingCapacity,Email,SecondaryEmail,EmailPassword,
-                                    UserType,CreatedBy,ModifiedBy,PinNumber,NameOfCompany);
+                                    UserType,CreatedBy,ModifiedBy,PinNumber,NameOfCompany,
+                                    edtPerMonReq.getText().toString().trim(),edtCylHolCreDay.getText().toString().trim());
                         }else {
                             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                         }
@@ -248,7 +253,7 @@ public class AddUserActivity extends BaseActivity {
                                 String ZipCode, String Phone, String SecondaryPhone,
                                 int HoldingCapacity, String Email, String SecondaryEmail,
                                 String EmailPassword, String UserType, int CreatedBy
-            , int ModifiedBy, String pinNumber,String NameOfCompany) throws JSONException {
+            , int ModifiedBy, String pinNumber, String NameOfCompany, String reqPerMon, String cylHoldCap) throws JSONException {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(AddUserActivity.this, R.drawable.loader);
         progressDialog.show();
@@ -274,6 +279,8 @@ public class AddUserActivity extends BaseActivity {
         jsonBody.put("UserType","Client");
         jsonBody.put("CreatedBy",CreatedBy);
         jsonBody.put("ModifiedBy",ModifiedBy);
+        jsonBody.put("PerMonthRequirement",Integer.parseInt(reqPerMon));
+        jsonBody.put("CylinderHoldingCreditDays",Integer.parseInt(cylHoldCap));
 
         jsonBody.put("NameOfCompany",NameOfCompany);
         jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value"));
@@ -336,7 +343,8 @@ public class AddUserActivity extends BaseActivity {
 
     public boolean validate(String fullName, String Address1, String City, String County,
                             String ZipCode, String Phone, String Email, String EmailPassword,
-                            String Address2, String SecondaryPhone, String SecondaryEmail, String pinNumber, String nameOfCompany) {
+                            String Address2, String SecondaryPhone, String SecondaryEmail,
+                            String pinNumber, String nameOfCompany, String reqPerMon, String cylHoldDay) {
         boolean valid = true;
 
 /*
@@ -352,6 +360,19 @@ public class AddUserActivity extends BaseActivity {
         } else {
             edtAddress2.setError(null);
         }*/
+
+        if (cylHoldDay.isEmpty()) {
+            edtHoldingCapacity.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtHoldingCapacity.setError(null);
+        }
+        if (reqPerMon.isEmpty()) {
+            edtPerMonReq.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtPerMonReq.setError(null);
+        }
         if (nameOfCompany.isEmpty()) {
             edtCompanyName.setError("Field is Required.");
             valid = false;

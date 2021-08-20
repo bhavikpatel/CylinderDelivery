@@ -206,9 +206,43 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/lblForm"
-            android:text="@string/per_month_requirement" />
+            android:text="@string/holding_capacity" />
         <EditText
             android:id="@+id/edtHoldingCapacity"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingRight="@dimen/EditTextPadding"
+            android:paddingLeft="@dimen/EditTextPadding"
+            android:inputType="number"
+            android:text="" />
+        <TextView
+            android:id="@+id/txtSecondaryMobile111"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/per_month_requirement" />
+        <EditText
+            android:id="@+id/edtPerMonReq"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:paddingRight="@dimen/EditTextPadding"
+            android:paddingLeft="@dimen/EditTextPadding"
+            android:inputType="number"
+            android:text="" />
+        <TextView
+            android:id="@+id/txtSecondaryMobile1111"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="@dimen/lblForm"
+            android:text="@string/cylinder_holding_credit_days" />
+        <EditText
+            android:id="@+id/edtCylHolCreDay"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:paddingRight="@dimen/EditTextPadding"

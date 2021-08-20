@@ -52,7 +52,7 @@ public class EditUserActivity extends BaseActivity {
     private static final int MY_SOCKET_TIMEOUT_MS = 10000;
     EditText edtName,edtAddress1,edtAddress2,editCity,edtCountry,edtZipCode;
     EditText edtMobile,edtSecondaryMobile,edtEmail,edtPassword,edtSecondaryEmail;
-    EditText edtHoldingCapacity,edtCompanyName,edtPinNumber;
+    EditText edtHoldingCapacity,edtCompanyName,edtPinNumber,edtPerMonReq,edtCylHolCreDay;
     Button btnSubmit,btnCancel;
     HashMap<String, String> mapdata;
     private SharedPreferences spUserFilter;
@@ -91,6 +91,8 @@ public class EditUserActivity extends BaseActivity {
         btnSubmit= findViewById(R.id.btnSubmit);
         btnCancel= findViewById(R.id.btnCancel);
         edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
+        edtPerMonReq=findViewById(R.id.edtPerMonReq);
+        edtCylHolCreDay=findViewById(R.id.edtCylHolCreDay);
         NsCompanyCategory=findViewById(R.id.NsCompanyCategory);
         edtCompanyName=findViewById(R.id.edtCompanyName);
         edtPinNumber=findViewById(R.id.edtPinNumber);
@@ -107,6 +109,8 @@ public class EditUserActivity extends BaseActivity {
         edtSecondaryEmail.setText(mapdata.get("secondaryEmail"));
         edtPassword.setText(mapdata.get("emailPassword"));
         edtHoldingCapacity.setText(mapdata.get("holdingCapacity"));
+        edtPerMonReq.setText(mapdata.get("PerMonthRequirement"));
+        edtCylHolCreDay.setText(mapdata.get("CylinderHoldingCreditDays"));
         edtCompanyName.setText(mapdata.get("nameOfCompany")+"");
         edtPinNumber.setText(mapdata.get("taxNumber")+"");
 
@@ -125,7 +129,8 @@ public class EditUserActivity extends BaseActivity {
                         edtEmail.getText().toString().trim(),edtPassword.getText().toString().trim(),
                         edtAddress2.getText().toString().trim(),edtSecondaryMobile.getText().toString().trim(),
                         edtSecondaryEmail.getText().toString().trim(),edtCompanyName.getText().toString().trim(),
-                        edtPinNumber.getText().toString().trim())){
+                        edtPinNumber.getText().toString().trim(),edtPerMonReq.getText().toString().trim(),
+                        edtCylHolCreDay.getText().toString().trim())){
                     try {
                         if(isNetworkConnected()){
                             if(edtHoldingCapacity.getText().toString().trim().length()!=0){
@@ -274,6 +279,8 @@ public class EditUserActivity extends BaseActivity {
         jsonBody.put("ModifiedBy",Integer.parseInt(setting.getString("userId","")));
         jsonBody.put("NameOfCompany",edtCompanyName.getText().toString().trim()+"");
         jsonBody.put("CompanyCategory",companyCatList.get(companycatpos-1).get("value"));
+        jsonBody.put("PerMonthRequirement",Integer.parseInt(edtPerMonReq.getText().toString().trim()));
+        jsonBody.put("CylinderHoldingCreditDays",Integer.parseInt(edtCylHolCreDay.getText().toString().trim()));
 
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
@@ -327,11 +334,24 @@ public class EditUserActivity extends BaseActivity {
         onBackPressed();
         return true;
     }
-    public boolean validate(String fullName,String Address1,String City,String County,
-                            String ZipCode, String Phone, String Email,String EmailPassword,
-                            String address2,String SecondaryMobile,String SecondaryEmail,
-                            String nameOfCompany,String pinNumber) {
+    public boolean validate(String fullName, String Address1, String City, String County,
+                            String ZipCode, String Phone, String Email, String EmailPassword,
+                            String address2, String SecondaryMobile, String SecondaryEmail,
+                            String nameOfCompany, String pinNumber, String PerMonReq, String cylHoldDay) {
         boolean valid = true;
+
+        if (cylHoldDay.isEmpty()) {
+            edtCylHolCreDay.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtCylHolCreDay.setError(null);
+        }
+        if (PerMonReq.isEmpty()) {
+            edtPerMonReq.setError("Field is Required.");
+            valid = false;
+        } else {
+            edtPerMonReq.setError(null);
+        }
 
         if (nameOfCompany.isEmpty()) {
             edtCompanyName.setError("Field is Required.");
