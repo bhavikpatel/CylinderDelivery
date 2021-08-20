@@ -159,6 +159,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         NSWarehouse.setVisibility(View.GONE);
         txtUserName11.setVisibility(View.GONE);
         btnSignature=findViewById(R.id.btnSignature);
+        sODetailList=new ArrayList<>();
 
         Date c = Calendar.getInstance().getTime();
         Log.d("soDate==>",c+"");
@@ -897,7 +898,8 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+Integer.parseInt(dnId);
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+Integer.parseInt(dnId)+
+                "&CompanyId="+Integer.parseInt(settings.getString("companyId","0"));
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
