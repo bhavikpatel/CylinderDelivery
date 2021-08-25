@@ -75,7 +75,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     private ArrayList<HashMap<String,String>> deliveryList;
     private int delnotepos=0;
     private String dnNumber;
-    private String dnId;
+    private String dnId="0";
     private ArrayList<HashMap<String,String>> customerList;
     Button btnCancel,btnSaveAndContinue;
     SharedPreferences spSorting;
@@ -100,8 +100,8 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     TextView txtCylinderNos;
     private Button btnAdd,btnLastSubmit,btnSaveAsDraft;
     private int pendingsalespos=0;
-    private String dnDetailId;
-    private String productId;
+    private String dnDetailId="0";
+    private String productId="0";
     private int totalRecord;
     private ArrayList<HashMap<String,String>> sODetailList;
     private SODetailListAdapter sODetailListAdapter;
@@ -110,8 +110,11 @@ public class AddSalesOrderActivity extends AppCompatActivity {
     NiceSpinner NSWarehouse;
     private int wareHousepos=0;
     private ArrayList<HashMap<String,String>> warehouseList;
-    private String warehouseId;
+    private String warehouseId="";
     Button btnSignature;
+    private int CylinderHoldingCreditDays=0;
+    private EditText edtCylinderHoldingCreditDays;
+    private String PODetailId="0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +162,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         NSWarehouse.setVisibility(View.GONE);
         txtUserName11.setVisibility(View.GONE);
         btnSignature=findViewById(R.id.btnSignature);
+        edtCylinderHoldingCreditDays=findViewById(R.id.edtCylinderHoldingCreditDays);
         sODetailList=new ArrayList<>();
 
         Date c = Calendar.getInstance().getTime();
@@ -177,7 +181,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
         }
 
-                NSWarehouse.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
+        NSWarehouse.setOnSpinnerItemSelectedListener(new OnSpinnerItemSelectedListener() {
             @Override
             public void onItemSelected(NiceSpinner parent, View view, int position, long id) {
                 NSWarehouse.setError(null);
@@ -273,6 +277,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                     userFilterEditor.commit();
                     if(validate()){
                         try {
+                            CylinderHoldingCreditDays=Integer.parseInt(edtCylinderHoldingCreditDays.getText().toString().trim());
                             callAddEditSO();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -299,8 +304,28 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(view);
                 pendingsalespos=position;
                 if(position!=0) {
-                    dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
-                    productId=pendingsalesList.get(position-1).get("productId");
+                    if(pendingsalesList.get(position-1).get("dnDetailId").equals("null") ||
+                            pendingsalesList.get(position-1).get("dnDetailId").equals(null) ||
+                            pendingsalesList.get(position-1).get("dnDetailId").toString().length()==0){
+                            dnDetailId="0";
+                    }else
+                    {
+                        dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
+                    }
+                    if(pendingsalesList.get(position-1).get("productId").equals("null") ||
+                            pendingsalesList.get(position-1).get("productId").equals(null) ||
+                            pendingsalesList.get(position-1).get("productId").toString().length()==0){
+                            productId="0";
+                    }else {
+                        productId = pendingsalesList.get(position - 1).get("productId");
+                    }
+                    if(pendingsalesList.get(position-1).get("poDetailId").equals("null") ||
+                            pendingsalesList.get(position-1).get("poDetailId").equals(null) ||
+                            pendingsalesList.get(position-1).get("poDetailId").toString().length()==0){
+                        PODetailId="0";
+                    }else {
+                        PODetailId = pendingsalesList.get(position - 1).get("poDetailId");
+                    }
                 }else {
 
                 }
@@ -323,8 +348,16 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                 if(position!=0) {
                     clintvalue=customerList.get(position-1).get("value");
                     clinttext=customerList.get(position-1).get("text");
+                    if(customerList.get(position-1).get("cylinderHoldingCreditDays").equals("null") ||
+                            customerList.get(position-1).get("cylinderHoldingCreditDays").equals("")){
+                        edtCylinderHoldingCreditDays.setText("0");
+                    }else{
+                        edtCylinderHoldingCreditDays.setText(customerList.get(position-1).get("cylinderHoldingCreditDays"));
+                    }
                     if(isNetworkConnected()){
-                        // callGetUserWarehouse(clintvalue);
+                         if(customerList.get(position-1).get("isAdmin").equals("true")){
+                             callGetUserWarehouse(clintvalue);
+                         }
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                     }
@@ -349,15 +382,28 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(view);
                 delnotepos=position;
                 if(position!=0) {
-                    dnNumber=deliveryList.get(position-1).get("dnNumber");
-                    dnId=deliveryList.get(position-1).get("dnId");
-                    if(isNetworkConnected()){
+                     if(deliveryList.get(position-1).get("dnNumber").equals(null) ||
+                            deliveryList.get(position-1).get("dnNumber").equals("null") ||
+                            deliveryList.get(position-1).get("dnNumber").length()==0){
+                            dnNumber="0";
+                    }else {
+                         dnNumber=deliveryList.get(position-1).get("dnNumber");
+                     }
+                    if(deliveryList.get(position-1).get("dnId").equals(null) ||
+                            deliveryList.get(position-1).get("dnId").equals("null") ||
+                            deliveryList.get(position-1).get("dnId").length()==0){
+                        dnId="0";
+                    }else {
+                        dnId=deliveryList.get(position-1).get("dnId");
+                    }
+
+                   /* if(isNetworkConnected()){
                         if(dnId!=null){
-                            callgetDeliveryNoteCustomerList(dnId);
+                            callgetDeliveryNoteCustomerList("dnId");
                         }
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                    }
+                    }*/
                 }else {
                     List<String> imtes=new ArrayList<>();
                     imtes.add("Select");
@@ -404,9 +450,11 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                             imtes.add(dataobj.getString("name") + "");
                             warehouseList.add(map);
                         }
-                        NSWarehouse.setVisibility(View.VISIBLE);
-                        txtUserName11.setVisibility(View.VISIBLE);
-                        NSWarehouse.attachDataSource(imtes);
+                        if(warehouseList.size()!=0){
+                            NSWarehouse.setVisibility(View.VISIBLE);
+                            txtUserName11.setVisibility(View.VISIBLE);
+                            NSWarehouse.attachDataSource(imtes);
+                        }
                         //NSWarehouse.setSelectedIndex(wareHousepos+1);
                     }else {
                         Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
@@ -542,6 +590,8 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         jsonBody.put("CylinderList",jsonArrayCylList);
         Log.d("jsonRequest==>",jsonBody.toString()+"");
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("CylinderHoldingCreditDays",CylinderHoldingCreditDays);
+        jsonBody.put("PODetailId",Integer.parseInt(PODetailId));
 
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
                 new Response.Listener<JSONObject>() {
@@ -712,6 +762,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         jsonBody.put("SOGeneratedBy",edtSOGeneratedBy.getText().toString()+"");
         jsonBody.put("WarehouseId",WarehouseId);
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("CylinderHoldingCreditDays",CylinderHoldingCreditDays);
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -790,7 +841,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                         for(int i=0;i<datalist.length();i++){
                             HashMap<String,String> map=new HashMap<>();
                             JSONObject dataobj=datalist.getJSONObject(i);
-                            map.put("dnDetailId",dataobj.getInt("dnDetailId")+"");
+                            map.put("dnDetailId",dataobj.getString("dnDetailId")+"");
                             map.put("dnId",dataobj.getString("dnId"));
                             map.put("companyId",dataobj.getString("companyId"));
                             map.put("userId",dataobj.getString("userId"));
@@ -808,10 +859,15 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                             map.put("cylinderList",dataobj.getString("cylinderList"));
                             map.put("cylinders",dataobj.getString("cylinders"));
 
+
+                            String cylinderList=dataobj.getString("cylinderList");
+                            if(cylinderList.equals("null")||cylinderList.equals(null)||cylinderList.length()==0){
+                                cylinderList="";
+                            }
                             imtes.add(dataobj.getString("productName") +
                                     "/"+dataobj.getString("quantity")+
                                     "/"+dataobj.getString("userName")+
-                                    "/"+dataobj.getString("cylinderList"));
+                                    "/"+cylinderList);
                             pendingsalesList.add(map);
                         }
                         NSPendingSales.attachDataSource(imtes);
@@ -874,17 +930,26 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         }else {
             edtSoDate.setError(null);
         }
-        if(delnotepos<=0){
+        /*if(delnotepos<=0){
             NSDeloryNote.setError("Field is Required.");
             valid=false;
         }else {
             NSDeloryNote.setError(null);
-        }
+        }*/
         if(clientpos<=0){
             NSClient.setError("Field is Required.");
             valid=false;
         }else {
             NSClient.setError(null);
+        }
+        if(edtCylinderHoldingCreditDays.getText().toString().trim().length()==0 ||
+                edtCylinderHoldingCreditDays.getText().toString().equals("null") ||
+                edtCylinderHoldingCreditDays.getText().toString().equals("0")){
+
+            edtCylinderHoldingCreditDays.setError("Minimum 1 day required.");
+            valid=false;
+        }else {
+            edtCylinderHoldingCreditDays.setError(null);
         }
         if(edtSOGeneratedBy.getText().toString()==null){
             edtSOGeneratedBy.setError("Field is Required.");
@@ -898,7 +963,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+Integer.parseInt(dnId)+
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+dnId+
                 "&CompanyId="+Integer.parseInt(settings.getString("companyId","0"));
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
@@ -920,6 +985,8 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                             JSONObject dataobj=datalist.getJSONObject(i);
                             map.put("value",dataobj.getInt("value")+"");
                             map.put("text",dataobj.getString("text"));
+                            map.put("isAdmin",dataobj.getBoolean("isAdmin")+"");
+                            map.put("cylinderHoldingCreditDays",dataobj.getString("cylinderHoldingCreditDays")+"");
                             imtes.add(dataobj.getString("text") + "");
                             customerList.add(map);
                         }
@@ -1005,6 +1072,14 @@ public class AddSalesOrderActivity extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+
+                if(isNetworkConnected()){
+                       //if(dnId!=null){
+                           callgetDeliveryNoteCustomerList("");
+                       //}
+                }else {
+                      Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                 }
             }
         }, new Response.ErrorListener() {

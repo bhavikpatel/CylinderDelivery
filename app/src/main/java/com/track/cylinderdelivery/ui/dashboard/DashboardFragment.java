@@ -35,7 +35,6 @@ public class DashboardFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
       //  recyclerView.setLayoutManager(layoutManager);
         context=getActivity();
-
         return root;
     }
 

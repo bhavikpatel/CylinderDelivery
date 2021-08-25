@@ -57,7 +57,7 @@ public class SalesOrderFragment extends Fragment {
 
     private RecyclerView recyclerView;
     Context context;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     private boolean isLoading=false;
     private boolean isLastPage=false;
     private int pageno;
@@ -79,7 +79,7 @@ public class SalesOrderFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_sales_order, container, false);
         context=getActivity();
         setHasOptionsMenu(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.sales_order));
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.sales_order_list));
         recyclerView=root.findViewById(R.id.rv_product_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);

@@ -132,6 +132,7 @@
             android:textSize="20sp"
             app:popupTextAlignment="start"
             app:textTint="@color/black" />
+
         <TextView
             android:id="@+id/txtUserName11"
             android:layout_width="wrap_content"
@@ -148,6 +149,22 @@
             android:textSize="20sp"
             app:popupTextAlignment="start"
             app:textTint="@color/black" />
+
+        <TextView
+            android:id="@+id/txtPOGeneratedBy1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/cylinder_holding_credit_days"
+            android:textSize="@dimen/lblForm" />
+
+
+        <EditText
+            android:id="@+id/edtCylinderHoldingCreditDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+
         <TextView
             android:id="@+id/txtPOGeneratedBy"
             android:layout_width="wrap_content"
@@ -190,11 +207,12 @@
                 android:background="@drawable/button_background"
                 android:text="@string/cancel"
                 android:textColor="@color/white" />
+
             <Button
                 android:id="@+id/btnSignature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Signature"/>
+                android:text="Signature" />
         </LinearLayout>
     </LinearLayout>
 

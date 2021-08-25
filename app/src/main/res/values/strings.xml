@@ -180,7 +180,7 @@
     <string name="permission">Permission</string>
     <string name="delivery_note">Driver Delivery Note</string>
     <string name="delivery_note_">Delivery Note:</string>
-    <string name="sales_order">Sales Order</string>
+    <string name="sales_order">Client Delivery Note</string>
     <string name="return_order">Return Order</string>
     <string name="action_addCylinderProductMapping">Add Cylinder Product Mapping</string>
     <string name="action_addCylinderWarehouseMapping">Add Cylinder Prouduct Mapping</string>
@@ -225,7 +225,7 @@
     <string name="so_number">SO Number:</string>
     <string name="so_date">SO Date:</string>
     <string name="client">Client:</string>
-    <string name="client_pending_sales_details">Client Pending Sales Details:</string>
+    <string name="client_pending_sales_details">Client Pending Sales Details(Product/Quantity/Client/Cylinders):</string>
     <string name="warehouse1">Warehouse:</string>
     <string name="per_month_requirement">Per Month Requirement</string>
     <string name="_2_return_order_details">2. Return Order Details</string>
@@ -244,4 +244,6 @@
     <string name="clear_pad">Erase</string>
     <string name="cylinder_holding_credit_days">Cylinder Holding Credit Days:</string>
     <string name="per_month_requirement1">Per Month Requirement:</string>
+    <string name="sales_order_list">Client Delivery Note List</string>
+    <string name="welcome_to_simba">Welcome to Simba</string>
 </resources>
