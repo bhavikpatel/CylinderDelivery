@@ -1,10 +1,14 @@
 package com.track.cylinderdelivery.utils;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,10 +49,10 @@ public class SignatureActivity extends AppCompatActivity {
 
     private SignaturePad mSilkySignaturePad;
     private Button mClearButton;
-    private Button mSaveButton;
+    private Button mSaveButton,btnDone;
     Context context;
     String baseUrl="http://test.hdvivah.in/api/MobSalesOrder/UploadSalesImage";
-    String SONumber="SO0001";
+    int SOId;
     ImageView imageView2;
     private static final int MY_SOCKET_TIMEOUT_MS = 100000;
 
@@ -57,9 +61,17 @@ public class SignatureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signature);
         context=this;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        final Drawable upArrow =  ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(ContextCompat.getColor(context, R.color.black), PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        getSupportActionBar().setTitle("Customer Signature");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Customer Signature</font>"));
+        SOId=getIntent().getIntExtra("SOId",0);
         mClearButton = findViewById(R.id.clear_button);
         mSaveButton = findViewById(R.id.save_button);
         imageView2=findViewById(R.id.imageView2);
+        btnDone=findViewById(R.id.btnDone);
 
         mSilkySignaturePad = findViewById(R.id.signature_pad);
 
@@ -81,12 +93,17 @@ public class SignatureActivity extends AppCompatActivity {
                 mClearButton.setEnabled(false);
             }
         });
-
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bitmap signatureBitmap = mSilkySignaturePad.getSignatureBitmap();
-                imageView2.setImageBitmap(signatureBitmap);
+
                 if(signatureBitmap!=null) {
                     uploadimage(signatureBitmap);
                 }
@@ -99,13 +116,19 @@ public class SignatureActivity extends AppCompatActivity {
             }
         });
     }
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
     private void uploadimage(Bitmap signatureBitmap) {
+        final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
+        progressDialog.show();
         MarketPlaceApiInterface apiService = Apiclient.getClient().create(MarketPlaceApiInterface.class);
-        File file = new File(getCacheDir().getPath() + "SignImage.jpg");
+        File file = new File(getCacheDir().getPath() +"SOId_"+SOId+".jpg");
         try {
             OutputStream fOut = new FileOutputStream(file);
-            signatureBitmap.compress(Bitmap.CompressFormat.JPEG,85,fOut);
+            signatureBitmap.compress(Bitmap.CompressFormat.JPEG,50,fOut);
             fOut.flush();
             fOut.close();
         } catch (IOException e) {
@@ -114,6 +137,7 @@ public class SignatureActivity extends AppCompatActivity {
 
         //        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+        Log.d("requestbody==>",requestFile+"");
 //        RequestBody requestFile = RequestBody.create(MediaType.parse("text/plain"), file);
         MultipartBody.Part BusinessImage = MultipartBody.Part.
                 createFormData("files", file.getName(), requestFile);
@@ -122,17 +146,18 @@ public class SignatureActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         try {
-                            Log.d("onResponse", "onResponse: " + response.body().string());
+                            imageView2.setImageBitmap(signatureBitmap);
+                            Log.d("onResponse==>", "" + response.body().string());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
+                        progressDialog.dismiss();
                     }
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
                         Log.d("onFailure", "onResponse: " + t.getMessage());
-
+                        progressDialog.dismiss();
                     }
                 });
     }

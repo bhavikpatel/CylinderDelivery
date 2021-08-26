@@ -64,7 +64,7 @@
         android:layout_below="@+id/lv_underline"
         android:layout_marginTop="2dp"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/txtPoNumber"
@@ -151,6 +151,21 @@
             app:textTint="@color/black" />
 
         <TextView
+            android:id="@+id/txtPOGeneratedBy1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/cylinder_holding_credit_days"
+            android:textSize="@dimen/lblForm" />
+
+
+        <EditText
+            android:id="@+id/edtCylinderHoldingCreditDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+
+        <TextView
             android:id="@+id/txtPOGeneratedBy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -192,11 +207,7 @@
                 android:background="@drawable/button_background"
                 android:text="@string/cancel"
                 android:textColor="@color/white" />
-            <Button
-                android:id="@+id/btnSignature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Signature"/>
+
         </LinearLayout>
     </LinearLayout>
 
@@ -205,7 +216,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/lv_underline"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/txtClientList"
@@ -315,6 +326,18 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="@string/save_as_draft"
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
+
+            <Button
+                android:id="@+id/btnSignature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/button_background"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Signature"
                 android:textAllCaps="false"
                 android:textColor="@color/white" />
         </LinearLayout>

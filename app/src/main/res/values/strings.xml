@@ -246,4 +246,5 @@
     <string name="per_month_requirement1">Per Month Requirement:</string>
     <string name="sales_order_list">Client Delivery Note List</string>
     <string name="welcome_to_simba">Welcome to Simba</string>
+    <string name="close">Close</string>
 </resources>

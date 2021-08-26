@@ -341,6 +341,7 @@ public class SalesOrderFragment extends Fragment {
                         map.put("warehouseId",jsonArray.getJSONObject(i).getString("warehouseId")+"");
                         map.put("isAdmin",jsonArray.getJSONObject(i).getString("isAdmin")+"");
                         map.put("sodm",jsonArray.getJSONObject(i).getString("sodm")+"");
+                        map.put("cylinderHoldingCreditDays",jsonArray.getJSONObject(i).getString("cylinderHoldingCreditDays"));
                         salesOrderList.add(map);
                     }
 

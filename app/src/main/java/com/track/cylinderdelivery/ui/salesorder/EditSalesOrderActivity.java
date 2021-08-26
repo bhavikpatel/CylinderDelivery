@@ -53,16 +53,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class EditSalesOrderActivity extends AppCompatActivity {
 
     private HashMap<String, String> mapdata;
     EditSalesOrderActivity context;
-    EditText edtSoNumber,edtSoDate,edtSoGenerateby;
+    EditText edtSoNumber,edtSoDate,edtSoGenerateby,edtCylinderHoldingCreditDays;
     NiceSpinner NsDeliveyNote,NSClient;
     private SharedPreferences settings;
     private ArrayList<HashMap<String,String>> deliveryList;
@@ -71,9 +76,9 @@ public class EditSalesOrderActivity extends AppCompatActivity {
     private String dnId;
     private ArrayList<HashMap<String,String>> customerList;
     private int clientpos=0;
-    private static final int MY_SOCKET_TIMEOUT_MS = 10000;
+    private static final int MY_SOCKET_TIMEOUT_MS = 100000;
     NiceSpinner NSWarehouse;
-    private String clintvalue;
+    private String clintvalue="0";
     private String clinttext;
     private int wareHousepos=0;
     private ArrayList<HashMap<String,String>> warehouseList;
@@ -94,8 +99,8 @@ public class EditSalesOrderActivity extends AppCompatActivity {
     NiceSpinner nSPendingSales;
     private int pendingSalespos=0;
     private String soId;
-    private String dnDetailId;
-    private String productId;
+    private String dnDetailId="0";
+    private String productId="0";
     private ArrayList<HashMap<String,String>> pendingsalesList;
     ImageView btnScanCylinders;
     public static final int MY_PERMISSIONS_REQUEST_CAMERA = 100;
@@ -107,6 +112,9 @@ public class EditSalesOrderActivity extends AppCompatActivity {
     EditSODetailListAdapter sODetailListAdapter;
     TextView txtUserName11;
     Button btnSignature;
+    private int CylinderHoldingCreditDays=0;
+    private int SOId;
+    private String PODetailId="0";
 
 
     @Override
@@ -124,8 +132,29 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         edtSoNumber=findViewById(R.id.edtSoNumber);
         edtSoNumber.setText(mapdata.get("soNumber"));
+
         edtSoDate=findViewById(R.id.edtSoDate);
-        edtSoDate.setText(mapdata.get("strDNDate"));
+
+
+        String dtStart = mapdata.get("strDNDate");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date c = format.parse(dtStart);
+           // System.out.println(date);
+            //Date c = Calendar.getInstance().getTime();
+            Log.d("soDate==>",c+"");
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String formattedDate = df.format(c);
+            edtSoDate.setText(formattedDate);
+            SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            soDate=df1.format(c);
+            //edtSoDate.setText(soDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+
         NsDeliveyNote=findViewById(R.id.NSUserName);
         NSClient=findViewById(R.id.NSClient);
         NSWarehouse=findViewById(R.id.NSWarehouse);
@@ -156,7 +185,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         btnLastSubmit=findViewById(R.id.btnLastSubmit);
         btnSaveAsDraft=findViewById(R.id.btnSaveAsDraft);
         btnSignature=findViewById(R.id.btnSignature);
-
+        edtCylinderHoldingCreditDays=findViewById(R.id.edtCylinderHoldingCreditDays);
 
         if(isNetworkConnected()) {
             callGetReadyforDeliveryDeliveryList();
@@ -168,6 +197,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context, SignatureActivity.class);
+                intent.putExtra("SOId",SOId);
                 startActivity(intent);
             }
         });
@@ -180,7 +210,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         btnLastSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(sODetailList.size()==0){
+                if(sODetailList==null || sODetailList.size()==0){
                     Toast.makeText(context, "Kindly scan cylinder first.", Toast.LENGTH_LONG).show();
                 }else if(isNetworkConnected()){
                     callSubmitSO();
@@ -241,9 +271,10 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                     soNumber=edtSoNumber.getText().toString();
                     //PoDate=edtPoDate.getText().toString();
                     SOGeneratedBy=edtSoGenerateby.getText().toString();
-                    soDate=edtSoDate.getText().toString();
+                   // soDate=edtSoDate.getText().toString();
                     if(validate()){
                         try {
+                            CylinderHoldingCreditDays=Integer.parseInt(edtCylinderHoldingCreditDays.getText().toString().trim());
                             callAddEditSO();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -269,9 +300,28 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(view);
                 pendingSalespos=position;
                 if(position!=0) {
-                    soId=pendingSalesList.get(position-1).get("dnDetailId");
-                    dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
-                    productId=pendingsalesList.get(position-1).get("productId");
+                    if(pendingsalesList.get(position-1).get("dnDetailId").equals("null") ||
+                            pendingsalesList.get(position-1).get("dnDetailId").equals(null) ||
+                            pendingsalesList.get(position-1).get("dnDetailId").toString().length()==0){
+                        dnDetailId="0";
+                    }else
+                    {
+                        dnDetailId=pendingsalesList.get(position-1).get("dnDetailId");
+                    }
+                    if(pendingsalesList.get(position-1).get("productId").equals("null") ||
+                            pendingsalesList.get(position-1).get("productId").equals(null) ||
+                            pendingsalesList.get(position-1).get("productId").toString().length()==0){
+                        productId="0";
+                    }else {
+                        productId = pendingsalesList.get(position - 1).get("productId");
+                    }
+                    if(pendingsalesList.get(position-1).get("poDetailId").equals("null") ||
+                            pendingsalesList.get(position-1).get("poDetailId").equals(null) ||
+                            pendingsalesList.get(position-1).get("poDetailId").toString().length()==0){
+                        PODetailId="0";
+                    }else {
+                        PODetailId = pendingsalesList.get(position - 1).get("poDetailId");
+                    }
                 }else {
                     //clintvalue="";
                     //clinttext="";
@@ -316,8 +366,16 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                 if(position!=0) {
                     clintvalue=customerList.get(position-1).get("value");
                     clinttext=customerList.get(position-1).get("text");
+                    if(customerList.get(position-1).get("cylinderHoldingCreditDays").equals("null") ||
+                            customerList.get(position-1).get("cylinderHoldingCreditDays").equals("")){
+                        edtCylinderHoldingCreditDays.setText("0");
+                    }else{
+                        edtCylinderHoldingCreditDays.setText(customerList.get(position-1).get("cylinderHoldingCreditDays"));
+                    }
                     if(isNetworkConnected()){
-                        callGetUserWarehouse(clintvalue);
+                        if(customerList.get(position-1).get("isAdmin").equals("true")){
+                            callGetUserWarehouse(clintvalue);
+                        }
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                     }
@@ -341,15 +399,28 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                 hideSoftKeyboard(view);
                 delnotepos=position;
                 if(position!=0) {
-                    dnNumber=deliveryList.get(position-1).get("dnNumber");
-                    dnId=deliveryList.get(position-1).get("dnId");
-                    if(isNetworkConnected()){
+                    if(deliveryList.get(position-1).get("dnNumber").equals(null) ||
+                            deliveryList.get(position-1).get("dnNumber").equals("null") ||
+                            deliveryList.get(position-1).get("dnNumber").length()==0){
+                        dnNumber="0";
+                    }else {
+                        dnNumber=deliveryList.get(position-1).get("dnNumber");
+                    }
+                    if(deliveryList.get(position-1).get("dnId").equals(null) ||
+                            deliveryList.get(position-1).get("dnId").equals("null") ||
+                            deliveryList.get(position-1).get("dnId").length()==0){
+                        dnId="0";
+                    }else {
+                        dnId=deliveryList.get(position-1).get("dnId");
+                    }
+
+                   /* if(isNetworkConnected()){
                         if(dnId!=null){
-                            callgetDeliveryNoteCustomerList(dnId);
+                            callgetDeliveryNoteCustomerList("dnId");
                         }
                     }else {
                         Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                    }
+                    }*/
                 }else {
                     List<String> imtes=new ArrayList<>();
                     imtes.add("Select");
@@ -379,6 +450,27 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         } else {
             nSPendingSales.setError(null);
         }
+        if(clientpos<=0){
+            NSClient.setError("Field is Required.");
+            valid=false;
+        }else {
+            NSClient.setError(null);
+        }
+        if(edtCylinderHoldingCreditDays.getText().toString().trim().length()==0 ||
+                edtCylinderHoldingCreditDays.getText().toString().equals("null") ||
+                edtCylinderHoldingCreditDays.getText().toString().equals("0")){
+
+            edtCylinderHoldingCreditDays.setError("Minimum 1 day required.");
+            valid=false;
+        }else {
+            edtCylinderHoldingCreditDays.setError(null);
+        }
+        /*if(edtSOGeneratedBy.getText().toString()==null){
+            edtSOGeneratedBy.setError("Field is Required.");
+            valid=false;
+        }else {
+            edtSOGeneratedBy.setError(null);
+        }*/
         return valid;
     }
     private void openQrScan() {
@@ -393,14 +485,16 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         progressDialog.show();
         String url = BASE_URL+"/Api/MobSalesOrder/AddEditSO";
         final JSONObject jsonBody=new JSONObject();
+        SOId=Integer.parseInt(mapdata.get("soId"));
         jsonBody.put("SOId",Integer.parseInt(mapdata.get("soId")));
         jsonBody.put("DNId",Integer.parseInt(dnId));
         jsonBody.put("SONumber",soNumber);
         jsonBody.put("UserId",Integer.parseInt(clintvalue));
         jsonBody.put("SODate",soDate);
         jsonBody.put("SOGeneratedBy",SOGeneratedBy+"");
-        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","0")));
         jsonBody.put("WarehouseId",warehouseId);
+        jsonBody.put("CylinderHoldingCreditDays",CylinderHoldingCreditDays);
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
 
@@ -543,6 +637,8 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         jsonBody.put("CylinderList",jsonArrayCylList);
         Log.d("jsonRequest==>",jsonBody.toString()+"");
         jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("CylinderHoldingCreditDays",CylinderHoldingCreditDays);
+        jsonBody.put("PODetailId",Integer.parseInt(PODetailId));
 
         JsonObjectRequest jsonObjectRequest=new JsonObjectRequest(Request.Method.POST,url,jsonBody,
                 new Response.Listener<JSONObject>() {
@@ -751,7 +847,15 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         }else {
             NSWarehouse.setError(null);
         }*/
+        if(edtCylinderHoldingCreditDays.getText().toString().trim().length()==0 ||
+                edtCylinderHoldingCreditDays.getText().toString().equals("null") ||
+                edtCylinderHoldingCreditDays.getText().toString().equals("0")){
 
+            edtCylinderHoldingCreditDays.setError("Minimum 1 day required.");
+            valid=false;
+        }else {
+            edtCylinderHoldingCreditDays.setError(null);
+        }
         if(SOGeneratedBy.isEmpty()){
             edtSoGenerateby.setError("Field is Required.");
             valid=false;
@@ -792,10 +896,15 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                             imtes.add(dataobj.getString("name") + "");
                             warehouseList.add(map);
                         }
-                        NSWarehouse.setVisibility(View.VISIBLE);
+/*                        NSWarehouse.setVisibility(View.VISIBLE);
                         txtUserName11.setVisibility(View.VISIBLE);
                         NSWarehouse.attachDataSource(imtes);
-                        NSWarehouse.setSelectedIndex(wareHousepos+1);
+                        NSWarehouse.setSelectedIndex(wareHousepos+1);*/
+                        if(warehouseList.size()!=0){
+                            NSWarehouse.setVisibility(View.VISIBLE);
+                            txtUserName11.setVisibility(View.VISIBLE);
+                            NSWarehouse.attachDataSource(imtes);
+                        }
                     }else {
                         Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
                     }
@@ -847,7 +956,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+Integer.parseInt(dnId)+
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/getDeliveryNoteCustomerList?DNId="+dnId+
                 "&CompanyId="+Integer.parseInt(settings.getString("companyId","0"));
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
@@ -869,6 +978,8 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                             JSONObject dataobj=datalist.getJSONObject(i);
                             map.put("value",dataobj.getInt("value")+"");
                             map.put("text",dataobj.getString("text"));
+                            map.put("isAdmin",dataobj.getBoolean("isAdmin")+"");
+                            map.put("cylinderHoldingCreditDays",dataobj.getString("cylinderHoldingCreditDays")+"");
                             if(mapdata.get("username").equals(dataobj.getString("text"))){
                                 clientpos=i+1;
                             }
@@ -936,7 +1047,7 @@ public class EditSalesOrderActivity extends AppCompatActivity {
         Log.d("Api Calling==>","Api Calling");
         final TransparentProgressDialog progressDialog = new TransparentProgressDialog(context, R.drawable.loader);
         progressDialog.show();
-        String url = "http://test.hdvivah.in/Api/MobSalesOrder/GetReadyforDeliveryDeliveryList?CompanyId="+Integer.parseInt(settings.getString("companyId","1"));
+        String url = "http://test.hdvivah.in/Api/MobSalesOrder/GetReadyforDeliveryDeliveryList?CompanyId="+Integer.parseInt(settings.getString("companyId","0"));
         Log.d("request==>",url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 url,new Response.Listener<String>() {
@@ -968,19 +1079,25 @@ public class EditSalesOrderActivity extends AppCompatActivity {
                         if(delnotepos!=0){
                             dnNumber=deliveryList.get(delnotepos-1).get("dnNumber");
                             dnId=deliveryList.get(delnotepos-1).get("dnId");
-                            if(isNetworkConnected()){
+                            /*if(isNetworkConnected()){
                                 if(dnId!=null){
                                     callgetDeliveryNoteCustomerList(dnId);
                                 }
                             }else {
                                 Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
-                            }
+                            }*/
                         }
                     }else {
                         Toast.makeText(context, j.getString("message")+"", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+
+                if(isNetworkConnected()){
+                        callgetDeliveryNoteCustomerList("");
+                }else {
+                    Toast.makeText(context, "Kindly check your internet connectivity.", Toast.LENGTH_LONG).show();
                 }
             }
         }, new Response.ErrorListener() {

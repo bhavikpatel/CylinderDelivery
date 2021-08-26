@@ -76,6 +76,15 @@
             android:background="@android:color/holo_red_light"
             android:enabled="false"
             android:text="@string/clear_pad" />
+        <Button
+            android:id="@+id/btnDone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:background="@android:color/holo_green_dark"
+            android:textColor="@android:color/white"
+            android:text="@string/close" />
 
     </LinearLayout>
 

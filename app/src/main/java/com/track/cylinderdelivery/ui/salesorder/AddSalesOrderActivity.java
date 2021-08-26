@@ -200,6 +200,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context, SignatureActivity.class);
+                intent.putExtra("SOId",SOId);
                 startActivity(intent);
             }
         });
@@ -761,7 +762,7 @@ public class AddSalesOrderActivity extends AppCompatActivity {
         jsonBody.put("SODate",soDate+"");
         jsonBody.put("SOGeneratedBy",edtSOGeneratedBy.getText().toString()+"");
         jsonBody.put("WarehouseId",WarehouseId);
-        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","1")));
+        jsonBody.put("CreatedBy",Integer.parseInt(settings.getString("userId","0")));
         jsonBody.put("CylinderHoldingCreditDays",CylinderHoldingCreditDays);
 
         Log.d("jsonRequest==>",jsonBody.toString()+"");
