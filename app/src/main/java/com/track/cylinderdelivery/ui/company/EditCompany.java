@@ -77,6 +77,7 @@ public class EditCompany extends AppCompatActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='#734CEA'>Edit Company</font>"));
         btnCancel=(Button)findViewById(R.id.btnCancel);
         btnSubmit=(Button)findViewById(R.id.btnSubmit);
+        edtHoldingCapacity=findViewById(R.id.edtHoldingCapacity);
 
         edtName=findViewById(R.id.edtName);
         edtContactPerName=findViewById(R.id.edtContactPerName);
@@ -97,19 +98,32 @@ public class EditCompany extends AppCompatActivity {
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         CompanyUpdate=context.getSharedPreferences("companyUpdate",MODE_PRIVATE);
 
-        edtName.setText(mapdata.get("companyName"));
-        edtContactPerName.setText(mapdata.get("adminName"));
-        edtAddress1.setText(mapdata.get("address1"));
-        edtAddress2.setText(mapdata.get("address2"));
-        editCity.setText(mapdata.get("city"));
-        edtCountry.setText(mapdata.get("county"));
-        edtZipCode.setText(mapdata.get("zipCode"));
-        edtTexNumber.setText(mapdata.get("taxNumber"));
-        edtEmail.setText(mapdata.get("email"));
-        edtPerMonReq.setText(mapdata.get("PerMonthRequirement"));
-        edtHoldingCapacity.setText(mapdata.get("HoldingCapacity"));
-        edtCylHolCreDay.setText(mapdata.get("CylinderHoldingCreditDays"));
-        String secondaryEmail=mapdata.get("secondaryEmail");
+        edtName.setText(mapdata.get("companyName")+"");
+        edtContactPerName.setText(mapdata.get("adminName")+"");
+        edtAddress1.setText(mapdata.get("address1")+"");
+        edtAddress2.setText(mapdata.get("address2")+"");
+        editCity.setText(mapdata.get("city")+"");
+        edtCountry.setText(mapdata.get("county")+"");
+        edtZipCode.setText(mapdata.get("zipCode")+"");
+        edtTexNumber.setText(mapdata.get("taxNumber")+"");
+        edtEmail.setText(mapdata.get("email")+"");
+        if(mapdata.get("perMonthRequirement").equals(null) || mapdata.get("perMonthRequirement").equals("null")){
+            edtPerMonReq.setText("");
+        }else {
+            edtPerMonReq.setText(mapdata.get("perMonthRequirement")+"");
+        }
+        if(mapdata.get("holdingCapacity").equals(null) || mapdata.get("holdingCapacity").equals("null")){
+            edtHoldingCapacity.setText("");
+        }else {
+            edtHoldingCapacity.setText(mapdata.get("holdingCapacity")+"");
+        }
+        if(mapdata.get("cylinderHoldingCreditDays").equals(null) || mapdata.get("cylinderHoldingCreditDays").equals("null")){
+            edtCylHolCreDay.setText("");
+        }else {
+            edtCylHolCreDay.setText(mapdata.get("cylinderHoldingCreditDays")+"");
+        }
+
+        String secondaryEmail=mapdata.get("secondaryEmail")+"";
         if(secondaryEmail.isEmpty() || secondaryEmail.equals("null")){
             secondaryEmail="";
         }

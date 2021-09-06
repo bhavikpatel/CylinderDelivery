@@ -264,9 +264,9 @@ public class CompanyFragment extends Fragment {
                         map.put("status", jsonArray.getJSONObject(i).getString("status") + "");
                         map.put("createdByName", jsonArray.getJSONObject(i).getString("createdByName") + "");
                         map.put("createdDateStr", jsonArray.getJSONObject(i).getString("createdDateStr") + "");
-                        map.put("PerMonthRequirement", jsonArray.getJSONObject(i).getString("PerMonthRequirement") + "");
-                        map.put("HoldingCapacity", jsonArray.getJSONObject(i).getString("HoldingCapacity") + "");
-                        map.put("CylinderHoldingCreditDays", jsonArray.getJSONObject(i).getString("CylinderHoldingCreditDays") + "");
+                        map.put("perMonthRequirement", jsonArray.getJSONObject(i).getString("perMonthRequirement") + "");
+                        map.put("holdingCapacity", jsonArray.getJSONObject(i).getString("holdingCapacity") + "");
+                        map.put("cylinderHoldingCreditDays", jsonArray.getJSONObject(i).getString("cylinderHoldingCreditDays") + "");
 
                         dataList.add(map);
                     }
