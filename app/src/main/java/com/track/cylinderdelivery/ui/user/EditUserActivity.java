@@ -109,8 +109,8 @@ public class EditUserActivity extends BaseActivity {
         edtSecondaryEmail.setText(mapdata.get("secondaryEmail"));
         edtPassword.setText(mapdata.get("emailPassword"));
         edtHoldingCapacity.setText(mapdata.get("holdingCapacity"));
-        edtPerMonReq.setText(mapdata.get("PerMonthRequirement"));
-        edtCylHolCreDay.setText(mapdata.get("CylinderHoldingCreditDays"));
+        edtPerMonReq.setText(mapdata.get("perMonthRequirement"));
+        edtCylHolCreDay.setText(mapdata.get("cylinderHoldingCreditDays"));
         edtCompanyName.setText(mapdata.get("nameOfCompany")+"");
         edtPinNumber.setText(mapdata.get("taxNumber")+"");
 

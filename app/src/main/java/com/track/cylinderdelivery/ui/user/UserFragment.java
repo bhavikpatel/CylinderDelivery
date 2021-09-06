@@ -341,8 +341,8 @@ public class UserFragment extends Fragment {
                             map.put("createdDate", jsonArray.getJSONObject(i).getString("createdDate") + "");
                             map.put("createdDateStr", jsonArray.getJSONObject(i).getString("createdDateStr") + "");
                             map.put("modifiedBy", jsonArray.getJSONObject(i).getString("modifiedBy") + "");
-                            //map.put("modifiedDate", jsonArray.getJSONObject(i).getString("modifiedDate") + "");
-                            //map.put("forgotPassword", jsonArray.getJSONObject(i).getString("forgotPassword") + "");
+                            map.put("perMonthRequirement", jsonArray.getJSONObject(i).getString("perMonthRequirement") + "");
+                            map.put("cylinderHoldingCreditDays", jsonArray.getJSONObject(i).getString("cylinderHoldingCreditDays") + "");
                             //map.put("forgotPasswordDate", jsonArray.getJSONObject(i).getString("forgotPasswordDate") + "");
                             map.put("companyName", jsonArray.getJSONObject(i).getString("companyName") + "");
                             map.put("companyCategory",jsonArray.getJSONObject(i).getString("companyCategory")+"");

@@ -289,7 +289,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                             map = new HashMap<>();
                             map.put("userId", data.getString("userId") + "");
                             map.put("fullName", data.getString("fullName") + "");
-
+                            map.put("nameOfCompany",data.getString("nameOfCompany")+"");
                             if(data.getString("fullName").equals("")||data.getString("fullName").equals("null")){
                                 lvUserName.setVisibility(View.GONE);
                                 txtUserName.setVisibility(View.GONE);
@@ -343,6 +343,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                             }else {
                                 txtSecondaryMobile.setText(data.getString("secondaryPhone"));
                             }
+                            map.put("perMonthRequirement",data.getString("perMonthRequirement")+"");
                             map.put("holdingCapacity", data.getString("holdingCapacity") + "");
                             if(data.getString("holdingCapacity").equals("") || data.getString("holdingCapacity").equals("null")){
                                 lvPermonthReq.setVisibility(View.GONE);
@@ -350,6 +351,7 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                             }else {
                                 txtPermonthReq.setText(data.getString("holdingCapacity"));
                             }
+                            map.put("cylinderHoldingCreditDays",data.getString("cylinderHoldingCreditDays")+"");
                             map.put("taxNumber", data.getString("taxNumber") + "");
                             if(data.getString("taxNumber").equals("") || data.getString("taxNumber").equals("null")){
                                 lvTextnumber.setVisibility(View.GONE);
@@ -381,9 +383,9 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                             map.put("createdDate", data.getString("createdDate") + "");
                             map.put("createdDateStr", data.getString("createdDateStr") + "");
                             map.put("modifiedBy", data.getString("modifiedBy") + "");
-                            map.put("modifiedDate", data.getString("modifiedDate") + "");
-                            map.put("forgotPassword", data.getString("forgotPassword") + "");
-                            map.put("forgotPasswordDate", data.getString("forgotPasswordDate") + "");
+                           // map.put("modifiedDate", data.getString("modifiedDate") + "");
+                          //  map.put("forgotPassword", data.getString("forgotPassword") + "");
+                           // map.put("forgotPasswordDate", data.getString("forgotPasswordDate") + "");
                             map.put("companyName", data.getString("companyName") + "");
                             if(data.getString("companyName").equals("") || data.getString("companyName").equals("null")){
                                 lvCompanyName.setVisibility(View.GONE);
@@ -391,7 +393,8 @@ public class ApproveAcknowledgeActivity extends BaseActivity {
                             }else {
                                 txtAdminName.setText(data.getString("companyName"));
                             }
-                            map.put("companyType", data.getString("companyType") + "");
+                            map.put("companyCategory", data.getString("companyCategory") + "");
+                            map.put("status",data.getString("status")+"");
                             if(mapdata.get("remark").equals("") || mapdata.get("remark").equals("null")){
                                 lvUserRemark.setVisibility(View.GONE);
                                 txtUserRemark.setVisibility(View.GONE);
