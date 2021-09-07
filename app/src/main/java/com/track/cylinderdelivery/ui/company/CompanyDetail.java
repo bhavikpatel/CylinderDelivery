@@ -47,7 +47,7 @@ public class CompanyDetail extends AppCompatActivity {
     RelativeLayout rvBlank;
     ImageView btnCancel,btnEdit;
     TextView txtCompanyName,txtAdminName,txtAddress,txtPinNumber,txtPhoneNo,txtEmail,txtCreatedby;
-    TextView txtCreatedDate;
+    TextView txtCreatedDate,txtCompanytype,txtCompanyCategory;
     private HashMap<String, String> mapdata;
     ImageView btnActive;
     String CompanyStatus;
@@ -74,11 +74,15 @@ public class CompanyDetail extends AppCompatActivity {
         txtEmail=findViewById(R.id.txtEmail);
         txtCreatedby=findViewById(R.id.txtCreatedby);
         txtCreatedDate=findViewById(R.id.txtCreatedDate);
+        txtCompanytype=findViewById(R.id.txtCompanytype);
+        txtCompanyCategory=findViewById(R.id.txtCompanyCategory);
         settings=context.getSharedPreferences("setting",MODE_PRIVATE);
         CompanyUpdate=context.getSharedPreferences("companyUpdate",MODE_PRIVATE);
 
         txtCompanyName.setText(mapdata.get("companyName"));
         txtAdminName.setText(mapdata.get("adminName"));
+        txtCompanytype.setText(mapdata.get("companyType"));
+        txtCompanyCategory.setText(mapdata.get("companyCategory"));
         String address2=mapdata.get("address2");
         if(address2.isEmpty() || address2.equals("null")){
             address2="";
@@ -114,7 +118,6 @@ public class CompanyDetail extends AppCompatActivity {
             alretString="You are sure want to Active Company?";
             Status="Active";
         }
-
 
         AlertDialog.Builder adb = new AlertDialog.Builder(this,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
         //adb.setView(alertDialogView);

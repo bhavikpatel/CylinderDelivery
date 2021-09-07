@@ -68,7 +68,8 @@
     <string name="country1">County</string>
     <string name="zipcode">ZipCode:</string>
     <string name="zipcode1">ZipCode</string>
-    <string name="pin_number">Pin Number:</string>
+    <string name="pin_number">Pin Number</string>
+    <string name="pin_number11">Pin Number:</string>
     <string name="pin_number1">Tax Number</string>
     <string name="email">Email:</string>
     <string name="email1">Email</string>
@@ -85,6 +86,7 @@
     <string name="add_user">Add User</string>
     <string name="cylinder_no">Cylinder No:</string>
     <string name="holding_capacity">Holding Capacity</string>
+    <string name="holding_capacity1">Holding Capacity:</string>
     <string name="manufacturing_date">Manufacturing Date:</string>
     <string name="manufacturing_date1">Manufactruing Date</string>
     <string name="company_name">Name of company:</string>
@@ -152,7 +154,7 @@
     <string name="adminName">Admin Name</string>
     <string name="texNumber">Pin Number:</string>
     <string name="texNumber_">Tex Number</string>
-    <string name="companyType">Company Type:</string>
+    <string name="companyType">Company Type</string>
     <string name="companySortBy">Company Sort By</string>
     <string name="companySortBy11">Order Sort By</string>
     <string name="companySortBy111">Sales Order Sort By</string>
@@ -228,13 +230,14 @@
     <string name="client_pending_sales_details">Client Pending Sales Details(Product/Quantity/Client/Cylinders):</string>
     <string name="warehouse1">Warehouse:</string>
     <string name="per_month_requirement">Per Month Requirement</string>
+    <string name="per_month_requirement11">Per Month Requirement:</string>
     <string name="_2_return_order_details">2. Return Order Details</string>
     <string name="ro_number">RO Number:</string>
     <string name="ro_date">RO Date:</string>
     <string name="status1">Status:</string>
     <string name="user_name">User Name:</string>
     <string name="name_of_company">Name Of Company:</string>
-    <string name="company_category">Company Category:</string>
+    <string name="company_category">Company Category</string>
     <string name="qty_of_gas">Qty of Gas:</string>
     <string name="driver_vehicleno">Driver VehicleNo:</string>
     <string name="driver_vehicle_no_">Driver Vehicle No:</string>

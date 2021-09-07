@@ -170,7 +170,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/per_month_requirement" />
+            android:text="@string/per_month_requirement11" />
         <EditText
             android:id="@+id/edtPerMonReq"
             android:layout_width="match_parent"
@@ -184,7 +184,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:textSize="@dimen/lblForm"
-            android:text="@string/holding_capacity" />
+            android:text="@string/holding_capacity1" />
         <EditText
             android:id="@+id/edtHoldingCapacity"
             android:layout_width="match_parent"
@@ -212,7 +212,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textSize="@dimen/lblForm"
-        android:text="@string/pin_number" />
+        android:text="@string/pin_number11" />
     <EditText
         android:id="@+id/edtPinNumber"
         android:layout_width="match_parent"

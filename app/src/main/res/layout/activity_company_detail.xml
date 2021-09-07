@@ -59,7 +59,7 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:layout_marginLeft="10dp"
-                        android:text="@string/adminName"
+                        android:text="@string/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
@@ -71,7 +71,60 @@
                     android:textColor="@color/dark_gray"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@drawable/ic_baseline_circle_24"
+                        android:layout_width="15dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="15dp"/>
+                    <TextView
+                        android:id="@+id/txtAddresslb1l"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="10dp"
+                        android:text="@string/companyType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/txtCompanytype"
+                    android:text="companyType"
+                    android:textSize="13sp"
+                    android:layout_marginLeft="25dp"
+                    android:textColor="@color/dark_gray"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:src="@drawable/ic_baseline_circle_24"
+                        android:layout_width="15dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_height="15dp"/>
+                    <TextView
+                        android:id="@+id/txtAddresslb1l1"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:layout_marginLeft="10dp"
+                        android:text="@string/company_category"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/txtCompanyCategory"
+                    android:text="companyCategory"
+                    android:textSize="13sp"
+                    android:layout_marginLeft="25dp"
+                    android:textColor="@color/dark_gray"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="5dp"
@@ -116,7 +169,7 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:layout_marginLeft="10dp"
-                        android:text="@string/pin_number1"
+                        android:text="@string/pin_number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
